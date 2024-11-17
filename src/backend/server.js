@@ -1,15 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+
 const connectDB = require('./db/db');
+connectDB();
+
 const errorHandler = require('./middlewares/errorMiddleware');
 
-const example1Routes = require('./routes/example1Routes');
-const example2Routes = require('./routes/example2Routes');
+const mangaRoutes = require('./routes/mangaRoutes');
 
 const port = process.env.PORT || 3000;
-
-connectDB();
 
 // initialize app
 const app = express();
@@ -20,8 +20,7 @@ app.use(express.urlencoded({ extended: false, limit: '5mb' }));
 app.use(cors());
 
 // routing, order matters
-app.use('/api/example1', example1Routes);
-app.use('/api/example2', example2Routes);
+app.use('/api/mangas', mangaRoutes);
 
 // handle error
 app.use(errorHandler);

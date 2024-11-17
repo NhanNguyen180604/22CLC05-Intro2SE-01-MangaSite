@@ -1,7 +1,8 @@
 const cloudinary = require('cloudinary');
+const asyncHandler = require('express-async-handler');
 
 // upload images of a chapter to the cloud
-const upload = async function cloudinaryUploadWrapper(images, folder) {
+const upload = asyncHandler(async function cloudinaryUploadWrapper(images, folder) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
@@ -9,59 +10,124 @@ const upload = async function cloudinaryUploadWrapper(images, folder) {
     });
 
     const urls = await Promise.all(images.map(async (image) => {
-        const uploadResult = await cloudinary.v2.uploader.upload(
-            image,
-            { folder: folder }
-        );
-        return uploadResult.secure_url;
+        try {
+            // Remove the data URL prefix if present
+            const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, 'base64');
+
+            // Upload the image using a stream
+            const uploadResult = await new Promise((resolve, reject) => {
+                const stream = cloudinary.v2.uploader.upload_stream(
+                    { folder },
+                    (error, result) => {
+                        if (error) {
+                            reject(error);
+                        }
+                        else {
+                            resolve(result);
+                        }
+                    }
+                );
+                stream.end(buffer);
+            });
+
+            // Return the secure URL
+            return uploadResult.secure_url;
+        }
+        catch (error) {
+            for (const [key, value] of Object.entries(error)) {
+                console.error(`${key}:`);
+            }
+            throw new Error(error.error);
+        }
     }));
 
     return urls;
-};
+});
 
 // delete all images of a chapter on the cloud
-const deleteImages = async function cloudinaryDeleteWrapper(folder) {
+const deleteImages = asyncHandler(async function cloudinaryDeleteWrapper(folder) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
         api_secret: process.env.CLOUDINARY_SECRET
     });
 
-    await cloudinary.v2.api.delete_resources_by_prefix(folder);
-};
+    try {
+        await cloudinary.v2.api.delete_resources_by_prefix(folder);
+    }
+    catch (error) {
+        throw new Error(error.error);
+    }
+});
 
 // upload a cover of a manga to the cloud
-const uploadCover = async function cloudinaryUploadWrapper(image, folder) {
+const uploadCover = asyncHandler(async function cloudinaryUploadWrapper(image, folder) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
         api_secret: process.env.CLOUDINARY_SECRET
     });
 
-    const url = await cloudinary.v2.uploader.upload(image, { folder: folder });
-    return [url.public_id, url.secure_url];
-};
+    try {
+        // Remove the data URL prefix if present
+        const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        // Upload the image using a stream
+        const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.v2.uploader.upload_stream(
+                { folder },
+                (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        resolve(result);
+                    }
+                }
+            );
+            stream.end(buffer);
+        });
+
+        // Return the secure URL
+        return [uploadResult.public_id, uploadResult.secure_url];
+    }
+    catch (error) {
+        throw new Error(error.error);
+    }
+});
 
 // delete resources on the cloud
-const deleteResources = async function cloudinaryDeleteResourcesWrapper(publicIDs) {
+const deleteResources = asyncHandler(async function cloudinaryDeleteResourcesWrapper(publicIDs) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
         api_secret: process.env.CLOUDINARY_SECRET
     });
 
-    await cloudinary.v2.api.delete_resources(publicIDs);
-};
+    try {
+        await cloudinary.v2.api.delete_resources(publicIDs);
+    }
+    catch (error) {
+        throw new Error(error.error);
+    }
+});
 
 // delete a folder
-const deleteFolder = async function cloudinaryDeleteFolderWrapper(folder) {
+const deleteFolder = asyncHandler(async function cloudinaryDeleteFolderWrapper(folder) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
         api_secret: process.env.CLOUDINARY_SECRET
     });
 
-    await cloudinary.v2.api.delete_folder(folder);
-}
+    try {
+        await cloudinary.v2.api.delete_folder(folder);
+    }
+    catch (error) {
+        throw new Error(error.error);
+    }
+});
 
 module.exports = { upload, uploadCover, deleteResources, deleteImages, deleteFolder };
