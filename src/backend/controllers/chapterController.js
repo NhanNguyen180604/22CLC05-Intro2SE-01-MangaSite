@@ -21,8 +21,36 @@ const getChapter = asyncHandler(async (req, res) => {
 // @route GET /api/mangas/:id/chapters
 // @access public
 const getChapterList = asyncHandler(async (req, res) => {
-    const chapters = await Chapter.find({ manga: req.params.id }).select('_id title number');
-    res.status(200).json(chapters);
+    let page = req.query.page ? parseInt(req.query.page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 20;
+
+    // Validation.
+    if (Number.isNaN(page) || !Number.isSafeInteger(page) || page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query page.");
+    }
+
+    if (Number.isNaN(per_page) || !Number.isSafeInteger(per_page) || per_page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query per_page.");
+    }
+
+    const count = await Chapter.countDocuments();
+    const total_pages = Math.ceil(count / per_page);
+    page = Math.min(page, total_pages);
+    const skip = (page - 1) * per_page;
+
+    const chapters = await Chapter.find({ manga: req.params.id })
+        .skip(skip)
+        .limit(per_page)
+        .select('_id title number');
+    res.status(200).json({
+        chapters: chapters,
+        page: page,
+        per_page: per_page,
+        total_pages: total_pages,
+        total: count,
+    });
 });
 
 // @description get chapter's list

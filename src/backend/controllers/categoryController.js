@@ -11,17 +11,18 @@ const Category = require("../models/categoryModel");
  * - Returns { categories: {_id, name}[], page, per_page, total_pages, total }
  */
 const getCategories = expressAsyncHandler(async (req, res) => {
-  const page = req.query.page ? req.query.page : 1;
-  const perPage = req.query.per_page ? req.query.per_page : 20;
+  let page = req.query.page ? parseInt(req.query.page) : 1;
+  const perPage = req.query.per_page ? parseInt(req.query.per_page) : 20;
 
+  // Validation.
   if (Number.isNaN(page) || !Number.isSafeInteger(page) || page <= 0) {
     res.status(400);
-    throw new Error("Bad request: Invalid page query.");
+    throw new Error("Bad Request: Invalid query page.");
   }
 
   if (Number.isNaN(perPage) || !Number.isSafeInteger(perPage) || perPage <= 0) {
     res.status(400);
-    throw new Error("Bad request: Invalid per_page query.");
+    throw new Error("Bad Request: Invalid query per_page.");
   }
 
   const total = await Category.countDocuments({});

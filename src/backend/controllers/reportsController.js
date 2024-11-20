@@ -86,14 +86,14 @@ const sendReport = expressAsyncHandler(async (req, res) => {
   }
 
   // Create the report.
-  const res = await Report.create({
+  const result = await Report.create({
     informant: req.user._id,
     description: req.body.description,
     manga: req.body.manga,
     chapter: req.body.chapter,
     comment: req.body.comment,
   });
-  return res.status(200).json(res);
+  return res.status(200).json(result);
 });
 
 /**

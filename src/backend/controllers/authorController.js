@@ -1,6 +1,6 @@
-import asyncHandler from "express-async-handler";
-import Author from "../models/authorModel";
-import User from "../models/userModel";
+const asyncHandler = require('express-async-handler');
+const Author = require('../models/authorModel');
+const User = require('../models/userModel');
 
 /**
  * GET /api/authors: get all victims as a list.
@@ -102,7 +102,7 @@ const updateAuthor = asyncHandler(async (req, res) => {
 
   // Deny if that name is already taken. Because they should tell their parents to rename them, right?
   // I was named Maria you better change your legal name to Mario dude.
-  if ((await Author.countDocuments({ _id: req.params.id })) > 0) {
+  if ((await Author.countDocuments({ name: req.body.name })) > 0) {
     res.status(400);
     throw new Error("Bad request. That name is already taken.");
   }

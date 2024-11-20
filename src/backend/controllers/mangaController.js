@@ -9,8 +9,20 @@ const { deleteByPrefix, deleteFolder } = require('../others/cloudinaryWrapper');
 // @route GET /api/mangas
 // @access public
 const getMangas = asyncHandler(async (req, res) => {
-    let page = req.query.page ? req.query.page : 1;
-    const per_page = req.query.per_page ? req.query.per_page : 20;
+    const page = req.query.page ? parseInt(req.query.page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 20;
+
+    // Validation.
+    if (Number.isNaN(page) || !Number.isSafeInteger(page) || page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query page.");
+    }
+
+    if (Number.isNaN(per_page) || !Number.isSafeInteger(per_page) || per_page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query per_page.");
+    }
+    
     const count = await Manga.countDocuments();
     const total_pages = Math.ceil(count / per_page);
     page = Math.min(page, total_pages);
