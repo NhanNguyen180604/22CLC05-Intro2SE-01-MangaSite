@@ -58,7 +58,7 @@ const uploadChapter = asyncHandler(async (req, res) => {
     // if chapter exists, append the images
     if (chapter) {
         // upload images to cloud
-        const urls = await cloudinaryWrapper.upload(req.body.images, `${manga.id}/${req.body.number}`);
+        const urls = await cloudinaryWrapper.uploadImages(req.body.images, `${manga.id}/${req.body.number}`);
         chapter.images = [...chapter.images, ...urls];
     }
     // if chapter doesn't exist, create one
@@ -69,7 +69,7 @@ const uploadChapter = asyncHandler(async (req, res) => {
             title: req.body.title ? req.body.title : 'No title'
         });
         // upload images to cloud
-        const urls = await cloudinaryWrapper.upload(req.body.images, `${manga.id}/${req.body.number}`);
+        const urls = await cloudinaryWrapper.uploadImages(req.body.images, `${manga.id}/${req.body.number}`);
         chapter.images = urls;
     }
 
@@ -119,7 +119,7 @@ const updateChapter = asyncHandler(async (req, res) => {
     if (req.body.images && req.body.images.length > 0) {
         updated = true;
         await cloudinaryWrapper.deleteImages(`${manga.id}/${chapter.number}`);
-        chapter.images = await cloudinaryWrapper.upload(req.body.images, `${manga.id}/${chapter.number}`);
+        chapter.images = await cloudinaryWrapper.uploadImages(req.body.images, `${manga.id}/${chapter.number}`);
     }
 
     if (updated) {
@@ -172,7 +172,7 @@ const deleteChapter = asyncHandler(async (req, res) => {
     res.status(200).json({ manga: manga.id, chapterNumber: chapter.number });
 });
 
-const deleteAllChapters = async (mangaID, deleteFolder = false) => {
+const deleteAllChapters = asyncHandler(async (mangaID) => {
     const chapters = await Chapter.find({ manga: mangaID });
     if (chapters.length === 0) {
         return;
@@ -182,13 +182,7 @@ const deleteAllChapters = async (mangaID, deleteFolder = false) => {
     for (let chapter of chapters) {
         await chapter.deleteOne();
     }
-
-    // delete on the cloud
-    await cloudinaryWrapper.deleteImages(mangaID);
-    if (deleteFolder) {
-        await cloudinaryWrapper.deleteFolder(mangaID);
-    }
-}
+});
 
 module.exports = {
     getChapter,

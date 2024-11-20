@@ -47,6 +47,11 @@ const uploadCover = asyncHandler(async (req, res) => {
         throw new Error("Not authorize to upload cover");
     }
 
+    if (!req.body.number) {
+        res.status(400);
+        throw new Error("Need a number for cover");
+    }
+
     if (!req.body.image) {
         res.status(400);
         throw new Error("No cover image to upload");
@@ -59,7 +64,7 @@ const uploadCover = asyncHandler(async (req, res) => {
         throw new Error("Cover already exists");
     }
 
-    const [publicID, url] = await cloudinaryWrapper.uploadCover(req.body.image, `${manga.id}/cover`);
+    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(req.body.image, `${manga.id}/cover`);
     cover = await Cover.create({
         manga: manga.id,
         number: req.body.number,
@@ -145,9 +150,21 @@ const deleteCover = asyncHandler(async (req, res) => {
     res.status(200).json({ number: req.params.coverNumber, publicID: cover.imagePublicID });
 });
 
+const deleteAllCovers = asyncHandler(async (mangaID) => {
+    const covers = await Cover.find({ manga: mangaID });
+    if (covers.length === 0)
+        return;
+
+    // delete covers info in the database
+    for (let cover of covers) {
+        await cover.deleteOne();
+    }
+});
+
 module.exports = {
     getCovers,
     uploadCover,
     changeCover,
     deleteCover,
+    deleteAllCovers,
 };

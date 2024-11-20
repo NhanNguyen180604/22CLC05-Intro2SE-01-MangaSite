@@ -2,7 +2,7 @@ const cloudinary = require('cloudinary');
 const asyncHandler = require('express-async-handler');
 
 // upload images of a chapter to the cloud
-const upload = asyncHandler(async function cloudinaryUploadWrapper(images, folder) {
+const uploadImages = asyncHandler(async function cloudinaryUploadWrapper(images, folder) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
@@ -45,8 +45,8 @@ const upload = asyncHandler(async function cloudinaryUploadWrapper(images, folde
     return urls;
 });
 
-// delete all images of a chapter on the cloud
-const deleteImages = asyncHandler(async function cloudinaryDeleteWrapper(folder) {
+// delete all resources by prefix on the cloud
+const deleteByPrefix = asyncHandler(async function cloudinaryDeleteWrapper(folder) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
@@ -61,8 +61,8 @@ const deleteImages = asyncHandler(async function cloudinaryDeleteWrapper(folder)
     }
 });
 
-// upload a cover of a manga to the cloud
-const uploadCover = asyncHandler(async function cloudinaryUploadWrapper(image, folder) {
+// upload an image to the cloud
+const uploadSingleImage = asyncHandler(async function cloudinaryUploadWrapper(image, folder) {
     cloudinary.v2.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
@@ -130,4 +130,4 @@ const deleteFolder = asyncHandler(async function cloudinaryDeleteFolderWrapper(f
     }
 });
 
-module.exports = { upload, uploadCover, deleteResources, deleteImages, deleteFolder };
+module.exports = { uploadImages, uploadSingleImage, deleteResources, deleteByPrefix, deleteFolder };

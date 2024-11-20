@@ -1,6 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const Manga = require('../models/mangaModel');
 const User = require('../models/userModel');
+const { deleteAllChapters } = require('../controllers/chapterController');
+const { deleteAllCovers } = require('../controllers/coverController');
+const { deleteByPrefix, deleteFolder } = require('../others/cloudinaryWrapper');
 
 // @description get all mangas, filtered by user's blacklist
 // @route GET /api/mangas
@@ -196,8 +199,15 @@ const deleteManga = asyncHandler(async (req, res) => {
         throw new Error("Not authorized to delete");
     }
 
-    // delete all chapters
+    // delete all chapters info in the database
+    await deleteAllChapters(manga.id);
 
+    // delete all cover images info in the database
+    await deleteAllCovers(manga.id);
+
+    // delete the folders on Cloudinary
+    await deleteByPrefix(manga.id);
+    await deleteFolder(manga.id);
 
     // delete the manga
     await manga.deleteOne();
