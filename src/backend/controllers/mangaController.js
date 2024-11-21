@@ -9,7 +9,7 @@ const { deleteByPrefix, deleteFolder } = require('../others/cloudinaryWrapper');
 // @route GET /api/mangas
 // @access public
 const getMangas = asyncHandler(async (req, res) => {
-    const page = req.query.page ? parseInt(req.query.page) : 1;
+    let page = req.query.page ? parseInt(req.query.page) : 1;
     const per_page = req.query.per_page ? parseInt(req.query.per_page) : 20;
 
     // Validation.
@@ -22,7 +22,7 @@ const getMangas = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Bad Request: Invalid query per_page.");
     }
-    
+
     const count = await Manga.countDocuments();
     const total_pages = Math.ceil(count / per_page);
     page = Math.min(page, total_pages);
@@ -226,6 +226,27 @@ const deleteManga = asyncHandler(async (req, res) => {
     res.status(200).json({ message: `Deleted manga, id: ${req.params.id}` });
 });
 
+const deleteAllMangas = asyncHandler(async (authorID) => {
+    const mangas = await Manga.find({ authors: authorID });
+    if (mangas.length === 0)
+        return;
+
+    for (let manga of mangas) {
+        // delete all chapters info in the database
+        await deleteAllChapters(manga.id);
+
+        // delete all cover images info in the database
+        await deleteAllCovers(manga.id);
+
+        // delete the folders on Cloudinary
+        await deleteByPrefix(manga.id);
+        await deleteFolder(manga.id);
+
+        // delete the manga in the database
+        await manga.deleteOne();
+    }
+});
+
 module.exports = {
-    getMangas, getMangaByID, uploadManga, updateManga, deleteManga
+    getMangas, getMangaByID, uploadManga, updateManga, deleteManga, deleteAllMangas
 }
