@@ -114,7 +114,7 @@ const deleteReport = expressAsyncHandler(async (req, res) => {
     throw new Error("Not Found: that report doesn't exist.");
   }
 
-  const q = await Report.deleteOne({ _id: req.params.id });
+  const q = await Report.findOneAndDelete({ _id: req.params.id });
   return res.status(200).json({ _id: q._id });
 });
 
@@ -137,7 +137,11 @@ const updateReportState = expressAsyncHandler(async (req, res) => {
     throw new Error("Not Found: that report doesn't exist.");
   }
 
-  const q = await Report.updateOne({ _id: req.params.id }, { processed: !report.processed });
+  const q = await Report.findOneAndUpdate(
+    { _id: req.params.id },
+    { processed: !report.processed },
+    { returnDocument: "after" },
+  );
   return res.status(200).json(q);
 });
 
