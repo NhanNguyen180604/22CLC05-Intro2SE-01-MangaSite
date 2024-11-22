@@ -23,46 +23,27 @@ const getMangas = asyncHandler(async (req, res) => {
         throw new Error("Bad Request: Invalid query per_page.");
     }
 
-    const count = await Manga.countDocuments();
-    const total_pages = Math.ceil(count / per_page);
-    page = Math.min(page, total_pages);
-    const skip = (page - 1) * per_page;
-
     // if user is logged in, check their blacklist
     let filter = {};
     if (req.user) {
         if (req.user.blacklist.categories.length > 0) {
-            req.user = await req.user.populate({
-                path: 'blacklist.categories',
-                model: 'Category',
-                select: '_id'
-            });
-
-            const ids = await Promise.all(req.user.blacklist.categories.map(async category => {
-                return category.id;
-            }));
-
-            filter.categories = { $nin: ids };
+            filter.categories = { $nin: req.user.blacklist.categories };
         }
 
         if (req.user.blacklist.authors.length > 0) {
-            req.user = await req.user.populate({
-                path: 'blacklist.authors',
-                model: 'Author',
-                select: '_id'
-            });
-
-            const ids = await Promise.all(req.user.blacklist.authors.map(async author => {
-                return author.id;
-            }));
-
-            filter.authors = { $nin: ids };
+            filter.authors = { $nin: req.user.blacklist.authors };
         }
     }
 
-    const mangas = await Manga.find(filter)
-        .skip(skip)
-        .limit(per_page);
+    let mangas = await Manga.find(filter);
+
+    const count = mangas.length;
+    const total_pages = Math.ceil(count / per_page);
+    page = Math.min(page, total_pages);
+    page = Math.max(page, 1);
+    const skip = (page - 1) * per_page;
+
+    mangas = mangas.slice(skip, skip + per_page);
 
     res.status(200).json({
         page: page,
@@ -89,7 +70,7 @@ const getMangaByID = asyncHandler(async (req, res) => {
         .populate({ path: 'categories', model: 'Category', select: 'name' });
 
     if (!manga) {
-        res.status(400);
+        res.status(404);
         throw new Error("Manga not found");
     }
 
