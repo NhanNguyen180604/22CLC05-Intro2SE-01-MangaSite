@@ -1,6 +1,6 @@
-const asyncHandler = require('express-async-handler');
-const Author = require('../models/authorModel');
-const User = require('../models/userModel');
+const asyncHandler = require("express-async-handler");
+const Author = require("../models/authorModel");
+const User = require("../models/userModel");
 
 /**
  * GET /api/authors: get all victims as a list.
@@ -71,12 +71,11 @@ const uploadAuthor = asyncHandler(async (req, res) => {
 
   // Let's go another author to steal from. I love stealing.
   const doc = await Author.create({ name: req.body.name });
-  // await User.updateOne({ name: req.body.name }, { accountType: "approved" });
   return res.status(200).json({ _id: doc._id, name: doc.name });
 });
 
 /**
- * POST /api/authors/:id, update a victim's name
+ * POST /api/authors/:id, update a victim's name.
  *
  * - Access: admins only
  * - Accepts: { name: string }
@@ -102,13 +101,17 @@ const updateAuthor = asyncHandler(async (req, res) => {
 
   // Deny if that name is already taken. Because they should tell their parents to rename them, right?
   // I was named Maria you better change your legal name to Mario dude.
-  if ((await Author.countDocuments({ name: req.body.name })) > 0) {
+  if (await Author.exists({ name: req.body.name })) {
     res.status(400);
     throw new Error("Bad request. That name is already taken.");
   }
 
   // Update user's pen name.
-  const doc = await Author.updateOne({ _id: req.params.id }, { name: req.body.name });
+  const doc = await Author.findOneAndUpdate(
+    { _id: req.params.id },
+    { name: req.body.name },
+    { returnDocument: "after" },
+  );
   return res.status(200).json({ _id: doc._id, name: doc.name });
 });
 
@@ -131,7 +134,7 @@ const deleteAuthor = asyncHandler(async (req, res) => {
   }
 
   // Delete author and remove approved status.
-  const doc = await Author.deleteOne({ _id: req.params.id });
+  const doc = await Author.findOneAndDelete({ _id: req.params.id });
   return res.status(200).json({ _id: doc._id, name: doc.name });
 });
 
