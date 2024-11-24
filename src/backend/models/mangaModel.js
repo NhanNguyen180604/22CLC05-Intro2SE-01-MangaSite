@@ -41,7 +41,11 @@ const mangaSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: true,
-    }
+    },
+    overallRating: {
+        type: Number,
+        default: 0,
+    },
 },
     { timestamps: true }
 );

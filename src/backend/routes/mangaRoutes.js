@@ -3,13 +3,21 @@ const router = express.Router();
 const mangaController = require('../controllers/mangaController');
 const chapterController = require('../controllers/chapterController');
 const coverController = require('../controllers/coverController');
+const ratingController = require('../controllers/ratingController');
 const { authorize, checkUser } = require('../middlewares/authMiddleware');
 
 // temporary importing until all modules are written
 require('../models/mangaModel');
 require('../models/userModel');
-require('../models/authorModel');
-require('../models/categoryModel');
+
+// rating routes
+// /api/mangas/:id/ratings
+router.route('/:id/ratings')
+    .get(ratingController.getRatings)
+    .post(authorize, ratingController.sendRating);
+
+router.route('/:id/ratings/one')
+    .get(authorize, ratingController.getOneRating);
 
 // cover routes
 // /api/mangas/:id/covers

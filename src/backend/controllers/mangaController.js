@@ -35,15 +35,59 @@ const getMangas = asyncHandler(async (req, res) => {
         }
     }
 
-    let mangas = await Manga.find(filter);
-
-    const count = mangas.length;
+    const count = await Manga.countDocuments(filter);
     const total_pages = Math.ceil(count / per_page);
     page = Math.min(page, total_pages);
     page = Math.max(page, 1);
     const skip = (page - 1) * per_page;
+    let mangas;
 
-    mangas = mangas.slice(skip, skip + per_page);
+    if (req.query.type === 'top-rating' || req.query.type === 'recently-updated') {
+        const sortField = req.query.type === 'top-rating' ? 'overallRating' : 'updatedAt';
+        const sortOrder = req.query.type === 'top-rating' ? 1 : -1;
+        mangas = await Manga.aggregate([
+            { $match: filter },
+            { $sort: { [sortField]: sortOrder } },
+            { $skip: skip },
+            { $limit: per_page },
+            {
+                $lookup: {
+                    from: 'authors',
+                    localField: 'authors',
+                    foreignField: '_id',
+                    as: 'authors',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'categories',
+                    foreignField: '_id',
+                    as: 'categories',
+                },
+            },
+            {
+                $project: {
+                    name: 1,
+                    status: 1,
+                    uploader: 1,
+                    description: 1,
+                    canComment: 1,
+                    cover: 1,
+                    overallRating: 1,
+                    authors: { _id: 1, name: 1 },
+                    categories: { _id: 1, name: 1 },
+                },
+            },
+        ]);
+    }
+    else {
+        mangas = await Manga.find(filter)
+            .populate([
+                { path: 'authors', model: 'Author', select: 'name' },
+                { path: 'categories', model: 'Category', select: 'name' }
+            ]);
+    }
 
     res.status(200).json({
         page: page,
@@ -131,7 +175,8 @@ const uploadManga = asyncHandler(async (req, res) => {
         description: req.body.description ? req.body.description : '',
         status: req.body.status,
         canComment: true,
-        uploader: req.user.id
+        uploader: req.user.id,
+        overallRating: 0,
     });
 
     res.status(200).json(manga);
@@ -163,6 +208,10 @@ const updateManga = asyncHandler(async (req, res) => {
     if (!req.body) {
         res.status(400);
         throw new Error("No new information to update");
+    }
+    else if (req.body.rating) {
+        res.status(400);
+        throw new Error("Not allowed to update overall rating");
     }
 
     const updatedManga = await Manga.findByIdAndUpdate(req.params.id, req.body, { new: true })
@@ -229,5 +278,10 @@ const deleteAllMangas = asyncHandler(async (authorID) => {
 });
 
 module.exports = {
-    getMangas, getMangaByID, uploadManga, updateManga, deleteManga, deleteAllMangas
+    getMangas,
+    getMangaByID,
+    uploadManga,
+    updateManga,
+    deleteManga,
+    deleteAllMangas
 }
