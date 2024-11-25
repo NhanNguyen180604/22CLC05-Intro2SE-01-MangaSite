@@ -1,0 +1,106 @@
+.reportForm {
+	padding: 20px;
+	color: white;
+	display: flex;
+	flex-direction: column;
+	row-gap: 10px;
+	width: 30%;
+	height: 60%;
+	background: #144272;
+	border-radius: 20px;
+	font-size: 1.2em;
+}
+
+.reportForm > div:first-of-type {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.reportForm > div:not(:first-of-type) {
+	display: flex;
+	flex-direction: column;
+}
+
+.reportForm > textarea {
+	border-radius: 10px;
+	outline: none;
+	background: #04101d;
+	color: white;
+	border: none;
+	height: 80%;
+	line-height: 100%;
+	resize: none;
+	padding: 10px;
+	font-family: inherit;
+	font-size: 1em;
+	transition: box-shadow 0.2s ease-in-out;
+}
+
+.reportForm > textarea:focus {
+	box-shadow: 5px 5px 5px #0a2647;
+}
+
+.reportForm > button {
+	padding: 10px 0;
+	display: block;
+	background: #e78f8f;
+	border: none;
+	border-radius: 15px;
+	font-weight: bold;
+	font-size: 1em;
+	cursor: pointer;
+	transition: background 0.2s ease-in-out;
+}
+
+.reportForm > button:disabled {
+	background: #cb898943;
+}
+
+.reportForm > button:not(:disabled):hover {
+	background: #e78f8f77;
+	cursor: pointer;
+}
+
+/* https://moderncss.dev/pure-css-custom-checkbox-style/ */
+.formControl > [type="checkbox"] {
+	appearance: none;
+	margin: 0;
+	font: inherit;
+	box-sizing: border-box;
+	width: 1em;
+	height: 1em;
+	border: 0.15em solid white;
+	border-radius: 0.15em;
+	cursor: pointer;
+	display: grid;
+	place-content: center;
+}
+
+.formControl > input[type="checkbox"]::before {
+	content: "";
+	width: 0.65em;
+	height: 0.65em;
+	transform: scale(0);
+	transition: 120ms transform ease-in-out;
+	box-shadow: inset 1em 1em white;
+	transform-origin: bottom left;
+	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.formControl > input[type="checkbox"]:checked::before {
+	transform: scale(1);
+}
+
+.formControl {
+	display: grid;
+	grid-template-columns: 1em auto;
+	align-items: center;
+	gap: 0.5em;
+	cursor: pointer;
+}
+
+@media only screen and (max-width: 800px) {
+	.reportForm {
+		width: 70%;
+	}
+}

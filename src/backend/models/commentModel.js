@@ -17,7 +17,10 @@ const commentSchema = new mongoose.Schema({
     },
     chapter: {
         type: Number,
-        required: true,
+    },
+    replyTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
     },
 },
     { timestamps: true }

@@ -1,0 +1,35 @@
+.mainContainer {
+	height: 40vh;
+	margin-bottom: 50px;
+}
+
+.mangaListTitle {
+	height: 10%;
+}
+
+.mangaListContainer {
+	height: 90%;
+	display: flex;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	margin-left: 20px;
+}
+
+.mangaListContainer li {
+	margin: 0 10px;
+}
+
+.mangaListContainer li:hover {
+	cursor: pointer;
+}
+
+img {
+	object-fit: contain;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+img + div {
+	text-align: center;
+}

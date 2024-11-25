@@ -1,0 +1,39 @@
+/* https://stackoverflow.com/questions/49343074/css-for-star-ratings-via-fontawesome */
+.score {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+	height: 100%;
+}
+
+.scoreWrap {
+	display: inline-block;
+	position: relative;
+}
+
+.starsActive {
+	color: #ffb458;
+	position: relative;
+	z-index: 10;
+	display: inline-block;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.starsInactive {
+	color: #ffb458;
+	position: absolute;
+	top: 0;
+	left: 0;
+	-webkit-text-stroke: initial;
+	/* overflow: hidden; */
+}
+
+.ratingCount {
+	margin-left: 5px;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.container {
+	display: inline-flex;
+}

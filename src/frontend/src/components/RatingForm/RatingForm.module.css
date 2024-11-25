@@ -1,0 +1,84 @@
+.ratingForm {
+	padding: 20px;
+	color: white;
+	display: flex;
+	flex-direction: column;
+	width: fit-content;
+	height: auto;
+	background: #144272;
+	border-radius: 20px;
+	font-size: 1.2em;
+}
+
+.ratingForm > div {
+	margin-bottom: 10px;
+}
+
+.ratingForm > div:first-of-type {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.ratingForm > div:not(:first-of-type) {
+	text-align: center;
+}
+
+.overallRating {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.container {
+	display: flex;
+	align-items: center;
+}
+
+.ratingForm > button {
+	padding: 5px 0;
+	display: block;
+	background: #e78f8f;
+	border: none;
+	border-radius: 15px;
+	font-weight: bold;
+	font-size: 1em;
+	transition: background 0.2s ease-in-out;
+}
+
+.ratingForm > button:disabled {
+	background: #cb898943;
+}
+
+.ratingForm > button:not(:disabled):hover {
+	background: #e78f8f77;
+	cursor: pointer;
+}
+
+.ratingInput {
+	align-self: center;
+	width: 100%;
+}
+
+.ratingCount {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.starInputRadio {
+	visibility: hidden;
+	height: 0;
+	width: 0;
+	margin: 0;
+}
+
+.starInputLabel {
+	cursor: pointer;
+}
+
+.starInputDiv {
+	text-align: center;
+}
+
+.starInputDiv:not(:first-of-type) {
+	font-size: 1.2em;
+	font-weight: bold;
+}

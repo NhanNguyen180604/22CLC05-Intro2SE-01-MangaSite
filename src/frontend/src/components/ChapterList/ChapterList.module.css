@@ -1,0 +1,76 @@
+.chapterListContainer {
+	margin-bottom: 50px;
+}
+
+.chapterListContainer > div:first-of-type {
+	font-weight: bold;
+	font-size: 1.2em;
+	margin-bottom: 10px;
+	color: white;
+}
+
+.chapterList {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	column-gap: 10px;
+	row-gap: 10px;
+	color: white;
+}
+
+.chapterContainer {
+	background: #144272;
+	padding: 10px;
+	border-radius: 15px;
+	border: 2px solid #144272;
+	box-sizing: border-box;
+	transition: border 0.2s ease-in-out;
+	cursor: pointer;
+}
+
+.chapterContainer:hover {
+	border: 2px solid #a2c9ec;
+	box-shadow: 2px 2px 5px black;
+}
+
+.togglePagination {
+	display: flex;
+	justify-content: center;
+	padding-top: 10px;
+}
+
+.togglePagination > button {
+	position: relative;
+	border: none;
+	background: none;
+	color: white;
+	font-family: inherit;
+	font-size: 1.2em;
+	font-weight: lighter;
+	margin-left: auto;
+	margin-right: auto;
+	cursor: pointer;
+}
+
+.togglePagination > button:after {
+	position: absolute;
+	content: "";
+	height: 1px;
+	background: white;
+	width: 100%;
+	left: 0px;
+	bottom: -2px;
+}
+
+@media only screen and (max-width: 700px) {
+	.chapterList {
+		display: flex;
+		flex-direction: column;
+		column-gap: 10px;
+		row-gap: 10px;
+		color: white;
+	}
+
+	.chapterListContainer {
+		margin-bottom: 80px;
+	}
+}

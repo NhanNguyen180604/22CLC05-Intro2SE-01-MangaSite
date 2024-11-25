@@ -42,10 +42,11 @@ const getChapterList = asyncHandler(async (req, res) => {
     const skip = (page - 1) * per_page;
 
     const chapters = await Chapter.find({ manga: req.params.id })
+        .sort({ number: 1 })
         .skip(skip)
         .limit(per_page)
         .select('_id title number');
-        
+
     res.status(200).json({
         chapters: chapters,
         page: page,
