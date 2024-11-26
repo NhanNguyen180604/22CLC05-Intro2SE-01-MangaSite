@@ -1,4 +1,4 @@
-import { getMangas } from "../../api/mangaService"
+import { getMangas } from "../../service/mangaService"
 import { useEffect, useState } from "react"
 import MangaSlide from "../../components/MangaSlide";
 import styles from './HomePage.module.css';

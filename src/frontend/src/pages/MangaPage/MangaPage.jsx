@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getMangaByID, getRatings } from "../../api/mangaService"
+import { getMangaByID, getRatings } from "../../service/mangaService"
 import { useParams } from "react-router-dom"
 import { FaFlag, FaCommentAlt } from "react-icons/fa"
 import { FaGear } from "react-icons/fa6"

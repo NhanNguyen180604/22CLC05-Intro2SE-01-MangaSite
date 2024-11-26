@@ -1,6 +1,6 @@
 import styles from "./ChapterList.module.css";
 import { useState, useEffect } from 'react';
-import { getChapterList } from "../../api/mangaService"
+import { getChapterList } from "../../service/mangaService"
 import Pagination from "../Pagination";
 
 const ChapterList = ({ mangaID }) => {
