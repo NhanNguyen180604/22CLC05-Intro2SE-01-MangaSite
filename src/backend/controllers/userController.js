@@ -221,6 +221,43 @@ const updateBlacklist = asyncHandler(async (req, res) => {
     res.json(updateUser.blacklist);
 });
 
+const banUser = asyncHandler(async (req, res) => {
+    const {banEmail, reason} = req.body
+    const accountType = req.user.accountType
+    if (accountType !== "admin") {
+        res.status(401);
+        throw new Error("Permission denied")
+    }
 
-module.exports = {getMe, getUsers, getUserById, registerUser, loginUser, requestApproval, changeUserRole, getLibrary, updateLibrary, deleteFromLibrary, getLibraryTab, getBlacklist, updateBlacklist};
+    const banUserExists = await BanList.findOne({email: banEmail});
+    if (banUserExists) {
+        res.status(400);
+        throw new Error("The email is already banned");
+    }
+
+    const banUser = await BanList.create({
+        user: req.user.id,
+        reason: reason,
+    });
+
+    res.json(banUser);
+});
+
+
+module.exports = {
+    getMe,
+    getUsers,
+    getUserById,
+    registerUser,
+    loginUser,
+    requestApproval,
+    changeUserRole,
+    getLibrary,
+    updateLibrary,
+    deleteFromLibrary,
+    getLibraryTab,
+    getBlacklist,
+    updateBlacklist,
+    banUser,
+};
 
