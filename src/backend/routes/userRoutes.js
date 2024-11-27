@@ -11,12 +11,11 @@ router.route('/blacklist').get(authorize, userController.getBlacklist).put(autho
 
 router.route('/').get(authorize, userController.getUsers);
 router.route('/me').get(authorize, userController.getMe);
+router.route('/notifications').post(authorize, userController.notifyUser).get(authorize, userController.getUserNoti);
 router.route('/:id').get(authorize, userController.getUserById).put(authorize, userController.changeUserRole);
 router.route('/login').post(userController.loginUser);
 router.route('/register').post(userController.registerUser);
 router.route('/approval').post(authorize, userController.requestApproval);
 router.route('/ban').post(authorize, userController.banUser);
-
-
 
 module.exports = router;

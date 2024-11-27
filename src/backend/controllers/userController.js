@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
 const Approval = require('../models/approvalRequestModel');
 const BanList = require('../models/banUserModel');
+const UserNoti = require("../models/userNotificationModel");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -244,6 +245,32 @@ const banUser = asyncHandler(async (req, res) => {
 });
 
 
+const notifyUser = asyncHandler(async (req, res) => {
+  const { id: userId, message } = req.body;
+
+  if (req.user.accountType !== "admin") {
+    res.status(401);
+    throw new Error("Permission denied");
+  }
+
+  const userNotification = await UserNoti.create({
+    user: userId,
+    message,
+    createdAt: new Date(),
+  });
+
+  res.json(userNotification);
+});
+
+const getUserNoti = asyncHandler(async (req, res) => {
+    const userNotifications = await UserNoti.find({
+        user: req.user.id,
+    });
+
+    res.json(userNotifications);
+});
+
+
 module.exports = {
     getMe,
     getUsers,
@@ -259,5 +286,7 @@ module.exports = {
     getBlacklist,
     updateBlacklist,
     banUser,
+    notifyUser,
+    getUserNoti,
 };
 
