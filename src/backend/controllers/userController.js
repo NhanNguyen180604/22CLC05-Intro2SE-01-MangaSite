@@ -270,7 +270,6 @@ const getUserNoti = asyncHandler(async (req, res) => {
     res.json(userNotifications);
 });
 
-
 module.exports = {
     getMe,
     getUsers,
