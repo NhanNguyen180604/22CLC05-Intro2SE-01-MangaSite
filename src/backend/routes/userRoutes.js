@@ -15,7 +15,6 @@ router.route('/:id').get(authorize, userController.getUserById).put(authorize, u
 router.route('/login').post(userController.loginUser);
 router.route('/register').post(userController.registerUser);
 router.route('/approval').post(authorize, userController.requestApproval);
-router.route('/ban').post(authorize, userController.banUser);
 
 
 
