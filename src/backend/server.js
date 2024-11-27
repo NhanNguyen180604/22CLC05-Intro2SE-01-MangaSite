@@ -12,7 +12,6 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const authorRoutes = require("./routes/authorRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const userRoutes = require("./routes/userRoutes");
-const banUserRoutes = require("./routes/banUserRoutes");
 
 const port = process.env.PORT || 3000;
 
@@ -30,7 +29,6 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/users", banUserRoutes);
 
 // handle error
 app.use(errorHandler);
