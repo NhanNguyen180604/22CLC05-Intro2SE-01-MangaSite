@@ -33,7 +33,7 @@
 }
 
 .actionBTNsContainer {
-	font-size: 1.5em;
+	font-size: 3rem;
 	color: white;
 }
 
@@ -51,7 +51,7 @@
 .leftColumnContainer > button,
 .leftColumnContainer > div > button {
 	font-weight: 600;
-	font-size: 1.1em;
+	font-size: 1.1rem;
 	border-radius: 15px;
 	border: none;
 	padding: 5px 10px;
@@ -112,12 +112,14 @@
 	margin-top: 0;
 }
 
-h1{
+.rightColumnContainer h1{
 	margin: 0;
+	font-size: 2rem;
+	font-weight: bold;
 }
 
 .authorName {
-	font-size: 1.5em;
+	font-size: 1.5rem;
 	font-weight: bold;
 	color: #2c74b3;
 	cursor: pointer;

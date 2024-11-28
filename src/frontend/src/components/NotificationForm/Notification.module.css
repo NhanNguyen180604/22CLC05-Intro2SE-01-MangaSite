@@ -1,8 +1,8 @@
 .notiContainer {
 	padding: 40px 20px;
 	color: white;
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-column: 1;
 	width: 50%;
 	height: auto;
 	background: #144272;
@@ -10,12 +10,11 @@
 	font-size: 1.2em;
 }
 
-.notiContainer > div {
-	text-align: center;
-}
-
-.notiContainer > div:first-of-type{
+.notiContainer div:first-of-type{
+	display: flex;
+	justify-self: center;
 	font-size: 2.5em;
+	margin-bottom: 10px;
 }
 
 .notiContainer > div:nth-of-type(2){
@@ -25,7 +24,7 @@
 }
 
 .notiContainer > div:not(:first-of-type) {
-	display: block;
+	text-align: center;
 }
 
 @media only screen and (max-width: 700px){

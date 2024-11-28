@@ -58,17 +58,18 @@ const RatingForm = ({ ratings, setShowThis, setNotiFormDetails, setShowNotiForm 
                     {[...Array(5)].map((star, index) => {
                         const currentRate = index + 1;
                         return (
-                            <span key={ratingTerms[index]}>
-                                <label className={styles.starInputLabel}>
-                                    <input type='radio' name='rate' className={styles.starInputRadio}
-                                        value={currentRate}
-                                        onClick={() => setRating(currentRate)}
-                                    />
+                            <label
+                                key={ratingTerms[index]}
+                                className={styles.starInputLabel}
+                            >
+                                <input type='radio' name='rate' className={styles.starInputRadio}
+                                    value={currentRate}
+                                    onClick={() => setRating(currentRate)}
+                                />
 
-                                    <FaStar color={currentRate <= rating ? "#ffb458" : "grey"}
-                                        className={styles.lmao} />
-                                </label>
-                            </span>
+                                <FaStar color={currentRate <= rating ? "#ffb458" : "grey"}
+                                    className={styles.myStar} />
+                            </label>
                         )
                     })}
                 </div>
