@@ -7,6 +7,9 @@ export default {
         josefin: ["Josefin Sans", "sans-serif"],
         inter: ["Inter", "sans-serif"],
       },
+      fontSize: {
+        xxs: "0.625rem",
+      },
       colors: {
         "dark-navy": "rgb(10, 38, 71)",
         "medium-navy": "rgb(20, 66, 114)",

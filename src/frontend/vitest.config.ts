@@ -7,6 +7,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       mockReset: false,
+      fileParallelism: false,
       css: true,
       coverage: {
         provider: "istanbul",

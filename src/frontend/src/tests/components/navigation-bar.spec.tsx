@@ -98,7 +98,7 @@ describe("navigation bar", () => {
     const publishButton = page.getByRole("link", { name: "Publish" });
 
     await expect.element(link).toBeVisible();
-    await expect.element(publishButton).not.toBeInTheDocument();
+    expect(publishButton.elements()).toHaveLength(0);
 
     fireEvent.mouseEnter(navBar);
     await expect.element(publishButton).toBeInTheDocument();

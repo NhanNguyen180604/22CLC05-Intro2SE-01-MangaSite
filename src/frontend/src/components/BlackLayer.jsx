@@ -7,6 +7,9 @@ export default function BlackLayer() {
     <div
       className={`z-40 size-full bg-black/50 ${show ? "fixed" : "hidden"}`}
       data-testid="black-layer"
+      onClickCapture={() =>
+        document.dispatchEvent(new Event("blackLayerClick"))
+      }
     ></div>
   );
 }
