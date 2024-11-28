@@ -6,6 +6,7 @@ export default function BlackLayer() {
   return (
     <div
       className={`z-40 size-full bg-black/50 ${show ? "fixed" : "hidden"}`}
+      data-testid="black-layer"
     ></div>
   );
 }
