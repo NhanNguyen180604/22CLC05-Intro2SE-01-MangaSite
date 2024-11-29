@@ -1,11 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
+  content: [
+    "./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}",
+    "./index.html",
+  ],
   theme: {
     extend: {
       fontFamily: {
         josefin: ["Josefin Sans", "sans-serif"],
         inter: ["Inter", "sans-serif"],
+      },
+      fontSize: {
+        xxs: "0.625rem",
       },
       colors: {
         "dark-navy": "rgb(10, 38, 71)",

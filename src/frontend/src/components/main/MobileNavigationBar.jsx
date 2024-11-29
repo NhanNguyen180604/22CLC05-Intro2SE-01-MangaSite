@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { MdAddCircleOutline, MdOutlineNotifications } from "react-icons/md";
-import { getMe } from "../service/userService";
-import IconBookmark from "./icons/IconBookmark";
-import IconHome from "./icons/IconHome";
+import { getMe } from "../../service/userService";
+import IconBookmark from "../icons/IconBookmark";
+import IconHome from "../icons/IconHome";
 
 export default function MobileNavigationBar() {
   let [me, setMe] = useState(null);
@@ -16,7 +16,10 @@ export default function MobileNavigationBar() {
   return createPortal(
     <>
       {/* Mobile version (fixed at bottom at screen, disappears at iPad Pro size) */}
-      <div className="fixed bottom-0 z-50 flex w-full flex-row items-center justify-around gap-6 bg-darker-navy px-10 py-4 lg:hidden">
+      <div
+        data-testid="mobile-nav-bar"
+        className="fixed bottom-0 z-50 flex w-full flex-row items-center justify-around gap-6 bg-darker-navy px-10 py-4 lg:hidden"
+      >
         <a href="/" aria-label="Home">
           <IconHome className="size-8 fill-icon-white" />
         </a>
