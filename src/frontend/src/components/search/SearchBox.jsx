@@ -1,10 +1,10 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { useLocalSWR } from "../service/service.js";
-import { $showBlackLayer } from "../stores/black-layer.js";
-import { $searchGenres, $searchText } from "../stores/search.js";
-import IconSearch from "./icons/IconSearch.jsx";
+import { useLocalSWR } from "../../service/service.js";
+import { $showBlackLayer } from "../../stores/black-layer.js";
+import { $searchGenres, $searchText } from "../../stores/search.js";
+import IconSearch from "../icons/IconSearch.jsx";
 
 function SearchFilterList({ tags }) {
   const searchGenres = useStore($searchGenres);

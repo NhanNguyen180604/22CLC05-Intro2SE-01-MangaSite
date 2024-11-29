@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import BlackLayer from "../../components/BlackLayer";
 import MangaSlide from "../../components/MangaSlide";
 import { getMangas } from "../../service/mangaService";
 
@@ -19,7 +18,6 @@ const HomePage = () => {
 
   return (
     <>
-      <BlackLayer />
       <MangaSlide title="Trending" mangas={mangas} />
       <MangaSlide title="Top rated" mangas={mangas} />
     </>

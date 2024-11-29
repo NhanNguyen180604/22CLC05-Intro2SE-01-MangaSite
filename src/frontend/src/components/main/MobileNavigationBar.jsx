@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { MdAddCircleOutline, MdOutlineNotifications } from "react-icons/md";
-import { getMe } from "../service/userService";
-import IconBookmark from "./icons/IconBookmark";
-import IconHome from "./icons/IconHome";
+import { getMe } from "../../service/userService";
+import IconBookmark from "../icons/IconBookmark";
+import IconHome from "../icons/IconHome";
 
 export default function MobileNavigationBar() {
   let [me, setMe] = useState(null);

@@ -2,8 +2,8 @@ import { cleanup, render } from "@testing-library/react";
 import { page, userEvent } from "@vitest/browser/context";
 import axios from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import BlackLayer from "../../components/BlackLayer.jsx";
-import SearchBox from "../../components/SearchBox.jsx";
+import BlackLayer from "../../components/misc/BlackLayer.jsx";
+import SearchBox from "../../components/search/SearchBox.jsx";
 
 describe("search box", () => {
   const categoriesData = ["Shojo", "Romcom", "Princess", "Wet"];

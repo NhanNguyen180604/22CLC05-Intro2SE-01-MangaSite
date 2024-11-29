@@ -2,8 +2,8 @@ import { cleanup, fireEvent, render } from "@testing-library/react";
 import { page, userEvent } from "@vitest/browser/context";
 import axios from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import DesktopNavigationBar from "../../components/DesktopNavigationBar.jsx";
-import MobileNavigationBar from "../../components/MobileNavigationBar.jsx";
+import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
+import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx";
 
 describe("navigation bar", () => {
   beforeEach(async () => {

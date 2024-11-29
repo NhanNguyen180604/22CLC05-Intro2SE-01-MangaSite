@@ -1,7 +1,7 @@
 import { cleanup, render } from "@testing-library/react";
 import { page } from "@vitest/browser/context";
 import { afterEach, describe, expect, it } from "vitest";
-import BlackLayer from "../../components/BlackLayer.jsx";
+import BlackLayer from "../../components/misc/BlackLayer.jsx";
 import { $showBlackLayer } from "../../stores/black-layer.js";
 
 describe("black layer", () => {

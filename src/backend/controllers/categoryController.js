@@ -31,7 +31,13 @@ const getCategories = expressAsyncHandler(async (req, res) => {
     .skip(perPage * (page - 1))
     .limit(perPage);
 
-  return res.status(200).json({ categories: query, page, per_page: perPage, total_pages: totalPages, total });
+  return res.status(200).json({
+    categories: query,
+    page,
+    per_page: perPage,
+    total_pages: totalPages,
+    total,
+  });
 });
 
 /**
