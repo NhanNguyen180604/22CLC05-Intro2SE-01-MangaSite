@@ -3,6 +3,8 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const { authorize, checkUser } = require('../middlewares/authMiddleware');
 
+router.route('/avatar').put(authorize, userController.updateUserAvatar).delete(authorize, userController.deleteUserAvatar);
+
 router.route('/library').get(authorize, userController.getLibrary);
 router.route('/library/:tab').get(authorize, userController.getLibraryTab).put(authorize, userController.updateLibrary);
 router.route('/library/:tab/:id').delete(authorize, userController.deleteFromLibrary);
