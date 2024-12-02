@@ -310,6 +310,35 @@ const updateHistory = asyncHandler(async (req, res) => {
     res.json(updatedReadingHistory);
 });
 
+const getHistory = asyncHandler(async (req, res) => {
+    const mangaId = req.params.id
+
+    const readingHistory = await ReadingHistory.findOne({
+        user: req.user.id,
+        manga: mangaId,
+    })
+
+    res.json(readingHistory)
+});
+
+const deleteHistory = asyncHandler(async (req, res) => {
+    const mangaId = req.params.id
+
+    const readingHistory = await ReadingHistory.findOne({
+        user: req.user.id,
+        manga: mangaId,
+    })
+
+    if (!readingHistory) {
+        res.status(404)
+        throw new Error('The manga/history is not found')
+    }
+
+    await readingHistory.deleteOne()
+
+    res.json(readingHistory)
+});
+
 module.exports = {
     getMangas,
     getMangaByID,
@@ -318,4 +347,6 @@ module.exports = {
     deleteManga,
     deleteAllMangas,
     updateHistory,
+    getHistory,
+    deleteHistory,
 }
