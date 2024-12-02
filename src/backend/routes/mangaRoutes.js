@@ -53,4 +53,8 @@ router.route('/:id')
     .put(authorize, mangaController.updateManga)
     .delete(authorize, mangaController.deleteManga);
 
+// /api/mangas/:id/readingHistory
+router.route('/:id/readingHistory')
+    .put(authorize, mangaController.updateHistory)
+
 module.exports = router;

@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Manga = require('../models/mangaModel');
-const User = require('../models/userModel');
+const ReadingHistory = require('../models/readingHistoryModel');
 const { deleteAllChapters } = require('../controllers/chapterController');
 const { deleteAllCovers } = require('../controllers/coverController');
 const { deleteByPrefix, deleteFolder } = require('../others/cloudinaryWrapper');
@@ -277,11 +277,45 @@ const deleteAllMangas = asyncHandler(async (authorID) => {
     }
 });
 
+const updateHistory = asyncHandler(async (req, res) => {
+    const mangaId = req.params.id
+    let { newChapters, deleteChapters } = req.body;
+    if (!newChapters) newChapters = []
+    if (!deleteChapters) deleteChapters = []
+
+    let readingHistory = await ReadingHistory.findOne({
+        user: req.user.id,
+        manga: mangaId,
+    })
+
+    if (readingHistory === null) {
+        readingHistory = new ReadingHistory({
+            user: req.user.id,
+            manga: mangaId,
+            chapters: newChapters,
+        });
+    } else {
+        readingHistory.chapters = readingHistory.chapters.filter((chapter) => {
+            return !deleteChapters.some(deleteChapter => chapter.equals(deleteChapter))
+        });
+        
+        newChapters.forEach((newChapter) => {
+            if (!readingHistory.chapters.some(chapter => chapter.equals(newChapter)))
+                readingHistory.chapters.push(newChapter)
+        })
+    }
+
+    const updatedReadingHistory = await readingHistory.save();
+
+    res.json(updatedReadingHistory);
+});
+
 module.exports = {
     getMangas,
     getMangaByID,
     uploadManga,
     updateManga,
     deleteManga,
-    deleteAllMangas
+    deleteAllMangas,
+    updateHistory,
 }
