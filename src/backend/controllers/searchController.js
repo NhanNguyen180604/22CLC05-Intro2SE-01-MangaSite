@@ -1,7 +1,7 @@
 const expressAsyncHandler = require("express-async-handler");
 const z = require("zod");
 const Manga = require("../models/mangaModel");
-const { default: mongoose } = require("mongoose");
+const Category = require("../models/categoryModel");
 
 function escapeRegex(input) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -22,83 +22,62 @@ function escapeRegex(input) {
  */
 const searchHandler = expressAsyncHandler(async (req, res) => {
   const schema = z.object({
-    q: z.string().min(1, "Query is not optional"),
+    q: z.string(),
     include_categories: z
       .string()
-      .regex(/^\w(,\w)*$/, "Must be a string separated by commas")
+      .regex(/^(\w+(,\w+)*)?$/, "Must be a string separated by commas")
       .optional()
-      .default(""),
+      .default("")
+      .transform((arg) => (arg.trim() != "" ? arg.trim().split(",") : [])),
     exclude_categories: z
       .string()
-      .regex(/^\w(,\w)*$/, "Must be a string separated by commas")
+      .regex(/^(\w+(,\w+)*)?$/, "Must be a string separated by commas")
       .optional()
-      .default(""),
+      .default("")
+      .transform((arg) => (arg.trim() != "" ? arg.trim().split(",") : [])),
     include_authors: z
       .string()
-      .regex(/^\w(,\w)*$/, "Must be a string separated by commas")
+      .regex(/^(\w+(,\w+)*)?$/, "Must be a string separated by commas")
       .optional()
-      .default(""),
+      .default("")
+      .transform((arg) => (arg.trim() != "" ? arg.trim().split(",") : [])),
     exclude_authors: z
       .string()
-      .regex(/^\w(,\w)*$/, "Must be a string separated by commas")
+      .regex(/^(\w+(,\w+)*)?$/, "Must be a string separated by commas")
       .optional()
-      .default(""),
-    page: z.number().int("Must be an integer").min(1, "Must be greater than 0").optional().default(1),
-    per_page: z.number().int("Must be an integer").min(1, "Must be greater than 0").optional.default(20),
+      .default("")
+      .transform((arg) => (arg.trim() != "" ? arg.trim().split(",") : [])),
+    page: z.coerce.number().int("Must be an integer").min(1, "Must be greater than 0").default(1),
+    per_page: z.coerce.number().int("Must be an integer").min(1, "Must be greater than 0").default(20),
   });
   const parsed = schema.safeParse(req.query);
 
-  console.log(parsed.success, parsed.data);
   if (!parsed.success) {
     res.status(400);
-    throw new Error(parsed.error.issues[0].message);
+    throw new Error(`${parsed.error.issues[0].path}: ${parsed.error.issues[0].message}`);
   }
 
-  const results = await Manga.aggregate([
-    {
-      $match: {
-        authors: {
-          $in: parsed.data.include_authors.split(",").map(mongoose.Schema.Types.ObjectId),
-          $nin: parsed.data.exclude_authors.split(",").map(mongoose.Schema.Types.ObjectId),
-        },
-        name: {
-          $regex: RegExp(escapeRegex(parsed.data.q), "i"),
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: "Category",
-        localField: "categories",
-        foreignField: "_id",
-        as: "categoryDetails",
-      },
-    },
-    {
-      $match: {
-        "categoryDetails.name": {
-          $in: parsed.data.include_categories.split(",").map(mongoose.Schema.Types.ObjectId),
-          $nin: parsed.data.exclude_categories.split(",").map(mongoose.Schema.Types.ObjectId),
-        },
-      },
-    },
-    {
-      $facet: {
-        counting: [
-          {
-            $count: "count",
-          },
-        ],
-        results: [
-          {
-            $skip: (parsed.data.page - 1) * parsed.data.per_page,
-            $limit: parsed.data.per_page,
-          },
-        ],
-      },
-    },
-  ]);
+  // Pipeline for authors.
+  const authorPipeline = {
+    ...(parsed.data.include_authors.length > 0 && { $in: parsed.data.include_authors }),
+    ...(parsed.data.exclude_authors.length > 0 && { $nin: parsed.data.exclude_authors }),
+  };
 
+  // Pipeline for categories
+  const categoryPipeline = {
+    ...(parsed.data.include_categories.length > 0 && { $in: parsed.data.include_categories }),
+    ...(parsed.data.exclude_categories.length > 0 && { $nin: parsed.data.exclude_categories }),
+  };
+
+  const results = await Manga.aggregate()
+    .match(Object.keys(authorPipeline).length > 0 ? { authors: authorPipeline } : {})
+    .match({ name: { $regex: RegExp(escapeRegex(parsed.data.q), "i") } })
+    .lookup({ from: "categories", localField: "categories", foreignField: "_id", as: "categories" })
+    .match(Object.keys(categoryPipeline).length > 0 ? { "categories.name": categoryPipeline } : {})
+    .facet({
+      counting: [{ $count: "count" }],
+      results: [{ $skip: (parsed.data.page - 1) * parsed.data.per_page }, { $limit: parsed.data.per_page }],
+    });
   const totalCount = results[0].counting[0]?.count || 0; // Get total count (handle if no matches)
   const paginatedResults = results[0].results;
 
