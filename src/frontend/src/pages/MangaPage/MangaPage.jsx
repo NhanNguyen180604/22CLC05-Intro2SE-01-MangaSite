@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
 import { getMangaByID, getRatings } from "../../service/mangaService"
 import { useParams } from "react-router-dom"
-import { FaFlag, FaCommentAlt } from "react-icons/fa"
+import { FaFlag, FaCommentAlt, FaBookmark } from "react-icons/fa"
 import { FaGear } from "react-icons/fa6"
 import styles from './MangaPage.module.css'
-import ChapterList from "../../components/ChapterList/ChapterList"
+import TabComponents from "../../components/Tab"
+const { Tab, TabPanel } = TabComponents;
+import ChapterList from "../../components/ChapterList"
+import CoverGallery from "../../components/CoverGallery"
 import ReportForm from "../../components/ReportForm"
 import StarRating from "../../components/StarRating"
 import RatingForm from "../../components/RatingForm"
@@ -66,7 +69,7 @@ const MangaPage = () => {
 					<img src={manga.cover} />
 
 					<div className={styles.actionBTNsContainer}>
-						<FaGear />
+						<FaBookmark />
 						<FaFlag onClick={() => togglePopup(setShowReportForm, showReportForm)} />
 						<FaCommentAlt />
 						<FaGear />
@@ -81,7 +84,8 @@ const MangaPage = () => {
 						)}
 					</div>
 
-					<button>
+					{/* on click, redirect to the latest page in reading history, or chapter 1 if is guest */}
+					<button className={styles.startReadingBTN}>
 						Start Reading
 					</button>
 				</div>
@@ -111,7 +115,15 @@ const MangaPage = () => {
 						</div>
 					</div>
 
-					<ChapterList mangaID={id} />
+					<Tab>
+						<TabPanel title='Chapters'>
+							<ChapterList mangaID={id} />
+						</TabPanel>
+						<TabPanel title='Art'>
+							<CoverGallery id={id} />
+						</TabPanel>
+					</Tab>
+
 				</div>
 			</div>
 

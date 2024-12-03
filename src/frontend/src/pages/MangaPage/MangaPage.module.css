@@ -10,6 +10,7 @@
 	flex-direction: column;
 	align-items: center;
 	justify-items: center;
+	color: black;
 }
 
 .leftColumnContainer > * {
@@ -44,39 +45,36 @@
 	border-radius: 10px;
 }
 
-.actionBTNsContainer > *:hover {
-	background: #144272;
+.actionBTNsContainer *:hover {
+	background: var(--medium-navy);
 }
 
-.leftColumnContainer > button,
-.leftColumnContainer > div > button {
+.leftColumnContainer button {
 	font-weight: 600;
 	font-size: 1.1rem;
 	border-radius: 15px;
 	border: none;
 	padding: 5px 10px;
-	background: #a2c9ec;
-	transition: background 0.1s ease-in-out;
+	background: var(--very-light-blue);
+	transition: opacity 0.2s ease-in-out;
 	cursor: pointer;
 }
 
-.leftColumnContainer > div > button:hover {
-	background: #a2c9ec75;
-}
-
-.leftColumnContainer > button {
+.leftColumnContainer .startReadingBTN {
 	width: 90%;
+	font-size: 1.3rem;
 	padding: 10px 0;
 	display: block;
-	background: #e78f8f;
+	background: var(--light-red);
 }
 
-.leftColumnContainer > button:hover {
-	background: #e78f8f87;
+.leftColumnContainer button:hover {
+	opacity: 0.6;
 }
 
 .rightColumnContainer {
 	display: flex;
+	width: 100%;
 	flex-direction: column;
 	align-items: center;
 }
@@ -104,8 +102,14 @@
 
 .synopsis {
 	flex: 1;
-	overflow-y: auto;
+	overflow-y: scroll;
 	color: rgba(255, 255, 255, 0.75);
+	-ms-overflow-style: none;  /* IE and Edge */
+	scrollbar-width: none;  /* Firefox */
+}
+
+.synopsis::-webkit-scrollbar{
+	display: none;
 }
 
 .synopsis > * {
@@ -121,14 +125,14 @@
 .authorName {
 	font-size: 1.5rem;
 	font-weight: bold;
-	color: #2c74b3;
+	color: var(--light-blue);
 	cursor: pointer;
 	transition: color 0.2s ease-in-out;
 	display: inline-block;
 }
 
 .authorName:hover {
-	color: #a2c9ec;
+	color: var(--very-light-blue);
 }
 
 .popupContainer {
@@ -142,6 +146,18 @@
 	align-items: center;
 	background: rgba(0, 0, 0, 0.5);
 	z-index: 100;
+}
+
+@media only screen and (max-width: 1000px) {
+	.mainContainer {
+		grid-template-columns: 30fr 70fr;
+	}
+}
+
+@media only screen and (max-width: 800px) {
+	.mainContainer {
+		grid-template-columns: 40fr 60fr;
+	}
 }
 
 @media only screen and (max-width: 700px) {
@@ -168,17 +184,5 @@
 	.synopsis {
 		flex: 0;
 		overflow-y: none;
-	}
-}
-
-@media only screen and (max-width: 800px) {
-	.mainContainer {
-		grid-template-columns: 40fr 60fr;
-	}
-}
-
-@media only screen and (max-width: 1000px) {
-	.mainContainer {
-		grid-template-columns: 30fr 70fr;
 	}
 }

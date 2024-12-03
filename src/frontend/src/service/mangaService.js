@@ -86,3 +86,16 @@ export const getChapter = async (mangaID, chapterNumber) => {
 
     }
 };
+
+// get covers
+export const getCovers = async (mangaID) => {
+    try {
+        const response = await axios.get(API_URL + mangaID + `/covers`);
+        return { status: response.status, covers: response.data }
+    } catch (error) {
+        return {
+            status: 500,
+            message: "server is dead",
+        }
+    }
+};

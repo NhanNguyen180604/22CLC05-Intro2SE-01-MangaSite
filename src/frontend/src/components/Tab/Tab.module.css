@@ -1,0 +1,42 @@
+.tabContainer{
+    position: relative;
+    width: 100%;
+}
+
+.tabHeaders {
+    display: inline-flex;
+    background: var(--medium-navy);
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.tabHeaders button{
+    padding: 5px 10px;
+    font-size: 1.1rem;
+    transition: color 0.2s ease-in-out;
+    border-radius: 5px;
+}
+
+.tabHeaders button:hover{
+    color: white;
+}
+
+.activeHeader{
+    background: var(--darker-navy);
+    color: white;
+    font-weight: bold;
+}
+
+.inactiveHeader{
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.activeTab{
+    display: block;
+}
+
+.inactiveTab{
+    display: none;
+}

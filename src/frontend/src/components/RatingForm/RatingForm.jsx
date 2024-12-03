@@ -51,7 +51,7 @@ const RatingForm = ({ ratings, setShowThis, setNotiFormDetails, setShowNotiForm 
         <form className={styles.ratingForm}>
             <div>Rate</div>
             <div className={styles.overallRating}>
-                <span>Overall Rating: {calAvgRating(ratings)}</span> <FaStar color='#ffb458' /><span className={styles.ratingCount}>({ratings.length.toLocaleString()} ratings)</span>
+                <span>Overall Rating:</span> <span className={styles.idkWhatToNameThis}>{calAvgRating(ratings)}<FaStar className={styles.activeStar}/></span><span className={styles.ratingCount}>({ratings.length.toLocaleString()} ratings)</span>
             </div>
             <div className={styles.ratingInput}>
                 <div className={styles.starInputDiv}>
@@ -67,8 +67,7 @@ const RatingForm = ({ ratings, setShowThis, setNotiFormDetails, setShowNotiForm 
                                     onClick={() => setRating(currentRate)}
                                 />
 
-                                <FaStar color={currentRate <= rating ? "#ffb458" : "grey"}
-                                    className={styles.myStar} />
+                                <FaStar className={currentRate <= rating ? styles.activeStar : styles.inactiveStar} />
                             </label>
                         )
                     })}

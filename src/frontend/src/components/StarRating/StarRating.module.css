@@ -12,7 +12,7 @@
 }
 
 .starsActive {
-	color: #ffb458;
+	color: var(--gold);
 	position: relative;
 	z-index: 10;
 	display: inline-block;
@@ -21,7 +21,7 @@
 }
 
 .starsInactive {
-	color: #ffb458;
+	color: var(--gold);
 	position: absolute;
 	top: 0;
 	left: 0;

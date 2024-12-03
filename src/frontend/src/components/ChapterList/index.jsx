@@ -1,1 +1,1 @@
-export { default } from "./ChapterList";
+export { default } from "./ChapterList.jsx";
