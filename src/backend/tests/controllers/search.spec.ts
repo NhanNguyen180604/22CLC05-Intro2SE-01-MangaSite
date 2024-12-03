@@ -1,7 +1,8 @@
+import { sign } from "jsonwebtoken";
 import supertest from "supertest";
 import { beforeAll, describe, expect, it } from "vitest";
 import server from "../../server";
-import { populateAuthors, populateCategories, populateMangas, populateUsers } from "../populators";
+import { getUser, populateAuthors, populateBlockList, populateCategories, populateMangas, populateUsers } from "../populators";
 
 describe("search controller", async () => {
   beforeAll(async () => {
@@ -12,6 +13,7 @@ describe("search controller", async () => {
     await populateAuthors();
     await populateCategories();
     await populateMangas();
+    await populateBlockList();
   });
 
   it("returns 400 with no query param", async () => {
@@ -75,5 +77,39 @@ describe("search controller", async () => {
     expect(res.body.total).toBe(5);
     expect(res.body.total_pages).toBe(5);
     expect(res.body.per_page).toBe(1);
+  });
+
+  it("doesn't return even if matched when blacklisted category", async () => {
+    // Get a login token. Strawberry was populated to block category "Yoshi".
+    const strawberry = await getUser("strawberry");
+    const token = sign({ id: strawberry.id }, process.env.JWT_SECRET!);
+
+    const res = await supertest(server).get("/api/search")
+      .query({
+        q: "",
+        include_categories: "Yoshi",
+      })
+      .set("Authorization", `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.total).toBe(0); // Yoshi was blocked, but is an included category. So nothing returns.
+  });
+
+  it("doesn't return even if matched when blacklisted author", async () => {
+    // Get a login token. Blueberry was populated to block author "Peach".
+    const blueberry = await getUser("blueberry");
+    const token = sign({ id: blueberry.id }, process.env.JWT_SECRET!);
+
+    const res = await supertest(server).get("/api/search")
+      .query({
+        q: "",
+        exclude_categories: "Paranormal,Shojo",
+      })
+      .set("Authorization", `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.total).toBe(2); // Only Daisy's and Yoshi's book are returned.
   });
 });

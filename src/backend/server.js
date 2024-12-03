@@ -39,3 +39,7 @@ app.listen(port, () => {
   console.log(`Server starts on port ${port}`);
 });
 
+// THIS IS MANDATORY!
+// WITHOUT THIS, SUPERTEST WON'T RUN.
+// My bad, I put export default lol, forgor.
+module.exports = app;

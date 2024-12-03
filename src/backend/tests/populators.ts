@@ -137,3 +137,14 @@ export async function populateMangas() {
     uploader: await getUser("elderberry"),
   }]);
 }
+
+/**
+ * Simple blocking relationships.
+ * 
+ * Strawberry will block category "Yoshi".
+ * Blueberry will block authors "Peach".
+ */
+export async function populateBlockList() {
+  await userModel.updateOne({ name: "strawberry" }, { blacklist: { categories: await mapCategoriesToId("Yoshi") } });
+  await userModel.updateOne({ name: "blueberry" }, { blacklist: { authors: await mapAuthorsToId("Peach") } });
+}

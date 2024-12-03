@@ -69,7 +69,16 @@ const searchHandler = expressAsyncHandler(async (req, res) => {
     ...(parsed.data.exclude_categories.length > 0 && { $nin: parsed.data.exclude_categories }),
   };
 
+  // If they're logged in and have a user's blacklist.
+  let userPipeline = {};
+  if (req.user) {
+    const blacklist = req.user.blacklist;
+    if (blacklist.categories.length > 0) userPipeline.categories = { $nin: blacklist.categories };
+    if (blacklist.authors.length > 0) userPipeline.authors = { $nin: blacklist.authors };
+  }
+
   const results = await Manga.aggregate()
+    .match(userPipeline)
     .match(Object.keys(authorPipeline).length > 0 ? { authors: authorPipeline } : {})
     .match({ name: { $regex: RegExp(escapeRegex(parsed.data.q), "i") } })
     .lookup({ from: "categories", localField: "categories", foreignField: "_id", as: "categories" })
