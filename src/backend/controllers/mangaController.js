@@ -1,8 +1,11 @@
 const asyncHandler = require('express-async-handler');
 const Manga = require('../models/mangaModel');
+const Chapter = require('../models/chapterModel');
+const Cover = require('../models/coverModel');
 const ReadingHistory = require('../models/readingHistoryModel');
-const { deleteAllChapters } = require('../controllers/chapterController');
-const { deleteAllCovers } = require('../controllers/coverController');
+const Comment = require('../models/commentModel');
+const MangaNoti = require('../models/mangaNotificationModel');
+const Report = require('../models/reportModel');
 const { deleteByPrefix, deleteFolder } = require('../others/cloudinaryWrapper');
 
 // @description get all mangas, filtered by user's blacklist
@@ -241,11 +244,14 @@ const deleteManga = asyncHandler(async (req, res) => {
         throw new Error("Not authorized to delete");
     }
 
-    // delete all chapters info in the database
-    await deleteAllChapters(manga.id);
-
-    // delete all cover images info in the database
-    await deleteAllCovers(manga.id);
+    // temporary code, hope so
+    // delete relating documents in the database
+    await Chapter.deleteMany({ manga: manga._id });
+    await Cover.deleteMany({ manga: manga._id });
+    await ReadingHistory.deleteMany({ manga: manga._id });
+    await Comment.deleteMany({ manga: manga._id });
+    await MangaNoti.deleteMany({ manga: manga._id });
+    await Report.deleteMany({ manga: manga._id });
 
     // delete the folders on Cloudinary
     await deleteByPrefix(manga.id);
@@ -262,11 +268,14 @@ const deleteAllMangas = asyncHandler(async (authorID) => {
         return;
 
     for (let manga of mangas) {
-        // delete all chapters info in the database
-        await deleteAllChapters(manga.id);
-
-        // delete all cover images info in the database
-        await deleteAllCovers(manga.id);
+        // temporary code, hope so
+        // delete relating documents in the database
+        await Chapter.deleteMany({ manga: manga._id });
+        await Cover.deleteMany({ manga: manga._id });
+        await ReadingHistory.deleteMany({ manga: manga._id });
+        await Comment.deleteMany({ manga: manga._id });
+        await MangaNoti.deleteMany({ manga: manga._id });
+        await Report.deleteMany({ manga: manga._id });
 
         // delete the folders on Cloudinary
         await deleteByPrefix(manga.id);

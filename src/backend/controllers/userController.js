@@ -8,8 +8,8 @@ const bcrypt = require('bcryptjs');
 const cloudinaryWrapper = require('../others/cloudinaryWrapper');
 
 const getMe = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id).select('name email accountType');
-    if(!user){
+    const user = await User.findById(req.user.id).select('name email accountType avatar.url');
+    if (!user) {
         res.status(401);
         throw new Error('You are not logged in');
     }
@@ -18,22 +18,22 @@ const getMe = asyncHandler(async (req, res) => {
 
 const getUsers = asyncHandler(async (req, res) => {
     const { accountType } = await User.findById(req.user.id);
-    if( accountType !== 'admin'){
+    if (accountType !== 'admin') {
         res.status(401);
         throw new Error('You are not admin');
     }
-    const users = await User.find().select('email name accountType');
+    const users = await User.find().select('email name accountType avatar.url');
     res.json(users.filter(user => user.accountType !== 'admin'));
 });
 
 const getUserById = asyncHandler(async (req, res) => {
     const { accountType } = await User.findById(req.user.id);
-    if( accountType !== 'admin'){
+    if (accountType !== 'admin') {
         res.status(401);
         throw new Error('You are not admin');
     }
-    const user = await User.findById(req.params.id).select('email name accountType');
-    if(!user){
+    const user = await User.findById(req.params.id).select('email name accountType avatar.url');
+    if (!user) {
         res.status(400);
         throw new Error('Wrong user id');
     }
@@ -42,49 +42,49 @@ const getUserById = asyncHandler(async (req, res) => {
 
 const changeUserRole = asyncHandler(async (req, res) => {
     const { accountType } = await User.findById(req.user.id);
-    if( accountType !== 'admin'){
+    if (accountType !== 'admin') {
         res.status(401);
         throw new Error('You are not admin');
     }
     const user = await User.findById(req.params.id);
-    if(!user){
+    if (!user) {
         res.status(404);
         throw new Error('Wrong user id');
     }
-    const userUpdate = await User.findByIdAndUpdate(req.params.id, req.body, {new: true}).select('email name accountType');
-    res.json(userUpdate);    
+    const userUpdate = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('email name accountType');
+    res.json(userUpdate);
 });
 
 const generateToken = id => {
-    return jwt.sign({id}, process.env.JWT_SECRET);
+    return jwt.sign({ id }, process.env.JWT_SECRET);
 }
 
 const loginUser = asyncHandler(async (req, res) => {
-    const {email, password} = req.body;
-    const user = await User.findOne({email});
-    if(!user){
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
         res.status(400);
         throw new Error('Email is not registered');
     }
-    if(!await bcrypt.compare(password, user.password)){
+    if (!await bcrypt.compare(password, user.password)) {
         res.status(400);
         throw new Error('Wrong password');
-    } 
-    if(await BanList.findOne({user: user._id})){
+    }
+    if (await BanList.findOne({ user: user._id })) {
         res.status(401);
         throw new Error('The user is banned');
-    }    
-    res.status(201).json({token: generateToken(user._id)});    
+    }
+    res.status(201).json({ token: generateToken(user._id) });
 });
 
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
-    if ( !name || !email || !password ){
+    if (!name || !email || !password) {
         res.status(400);
         throw new Error('Lack of name, email or password');
     }
 
-    const userExists = await User.findOne({email});
+    const userExists = await User.findOne({ email });
     if (userExists) {
         res.status(400);
         throw new Error('Email already exists');
@@ -99,12 +99,12 @@ const registerUser = asyncHandler(async (req, res) => {
         password: hashPassword,
         accountType: 'user',
     });
-    res.status(201).json({ token: generateToken(user._id)});
+    res.status(201).json({ token: generateToken(user._id) });
 });
 
 const requestApproval = asyncHandler(async (req, res) => {
     const { _id } = await User.findById(req.user.id);
-    if(!_id){
+    if (!_id) {
         res.status(401);
         throw new Error('You are not logged in');
     }
@@ -117,8 +117,8 @@ const requestApproval = asyncHandler(async (req, res) => {
 });
 
 const getLibrary = asyncHandler(async (req, res) => {
-    const {library} = await User.findById(req.user.id);
-    if(!library){
+    const { library } = await User.findById(req.user.id);
+    if (!library) {
         res.status(401);
         throw new Error('You are not logged in');
     }
@@ -131,18 +131,18 @@ const getLibrary = asyncHandler(async (req, res) => {
 });
 
 const getLibraryTab = asyncHandler(async (req, res) => {
-    const {library} = await User.findById(req.user.id);
-    const {tab} = req.params;
-    if(!library){
+    const { library } = await User.findById(req.user.id);
+    const { tab } = req.params;
+    if (!library) {
         res.status(401);
         throw new Error("You are not logged in");
     }
     const validTab = ['reading', 're_reading', 'completed'];
-    if(!validTab.includes(tab)){
+    if (!validTab.includes(tab)) {
         res.status(404);
         throw new Error("Invalid tab name");
     }
-    const mangaList = await library.populate({path: 'reading', model: 'Manga'});
+    const mangaList = await library.populate({ path: 'reading', model: 'Manga' });
     res.json(
         mangaList[tab]
     );
@@ -150,23 +150,23 @@ const getLibraryTab = asyncHandler(async (req, res) => {
 
 const updateLibrary = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id);
-    const {tab} = req.params;
-    const {id} = req.body;
-    if(!user){
+    const { tab } = req.params;
+    const { id } = req.body;
+    if (!user) {
         res.status(401);
         throw new Error("You are not logged in");
     }
     const validTab = ['reading', 're_reading', 'completed'];
-    if(!validTab.includes(tab)){
+    if (!validTab.includes(tab)) {
         res.status(400);
         throw new Error("Invalid tab name");
     }
     validTab.forEach(t => {
-        if(t !== tab){
+        if (t !== tab) {
             user.library[t] = user.library[t].filter(mangaId => mangaId.toString() !== id);
         }
     })
-    if (!user.library[tab].includes(id)){
+    if (!user.library[tab].includes(id)) {
         user.library[tab].push(id);
     }
     await user.save();
@@ -178,17 +178,17 @@ const updateLibrary = asyncHandler(async (req, res) => {
 
 const deleteFromLibrary = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id);
-    const {tab, id} = req.params;
-    if(!user){
+    const { tab, id } = req.params;
+    if (!user) {
         res.status(401);
         throw new Error("You are not logged in");
     }
     const validTab = ['reading', 're_reading', 'completed'];
-    if(!validTab.includes(tab)){
+    if (!validTab.includes(tab)) {
         res.status(400);
         throw new Error("Invalid tab name");
     }
-    if (!user.library[tab].includes(id)){
+    if (!user.library[tab].includes(id)) {
         res.status(404);
         throw new Error("Manga not found in the library");
     }
@@ -201,8 +201,8 @@ const deleteFromLibrary = asyncHandler(async (req, res) => {
 });
 
 const getBlacklist = asyncHandler(async (req, res) => {
-    const {blacklist} = await User.findById(req.user.id);
-    if(!blacklist){
+    const { blacklist } = await User.findById(req.user.id);
+    if (!blacklist) {
         res.status(401);
         throw new Error("You are not logged in");
     }
@@ -211,27 +211,27 @@ const getBlacklist = asyncHandler(async (req, res) => {
 
 const updateBlacklist = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id);
-    if(!user){
+    if (!user) {
         res.status(401);
         throw new Error("You are not logged in");
     }
-    if(!req.body.blacklist && !req.body.blacklist.categories && !req.body.blacklist.authors){
+    if (!req.body.blacklist && !req.body.blacklist.categories && !req.body.blacklist.authors) {
         res.status(400);
         throw new Error("No categories or authors");
     }
-    const updateUser = await User.findByIdAndUpdate(req.user.id, req.body, {new: true}); 
+    const updateUser = await User.findByIdAndUpdate(req.user.id, req.body, { new: true });
     res.json(updateUser.blacklist);
 });
 
 const banUser = asyncHandler(async (req, res) => {
-    const {id, reason} = req.body
+    const { id, reason } = req.body
     const accountType = req.user.accountType
     if (accountType !== "admin") {
         res.status(401);
         throw new Error("Permission denied")
     }
 
-    const banUserExists = await BanList.findOne({user: id});
+    const banUserExists = await BanList.findOne({ user: id });
     if (banUserExists) {
         res.status(400);
         throw new Error("The user is already banned");
@@ -246,14 +246,14 @@ const banUser = asyncHandler(async (req, res) => {
 });
 
 const unbanUser = asyncHandler(async (req, res) => {
-    const {id} = req.body
+    const { id } = req.body
     const accountType = req.user.accountType
     if (accountType !== "admin") {
         res.status(401);
         throw new Error("Permission denied")
     }
 
-    const banUserExists = await BanList.findOne({user: id});
+    const banUserExists = await BanList.findOne({ user: id });
     if (!banUserExists) {
         res.status(400);
         throw new Error("Fails to un-ban (lacking id/user not found in banned list)");
@@ -261,24 +261,24 @@ const unbanUser = asyncHandler(async (req, res) => {
 
     await banUserExists.deleteOne();
 
-    res.json({message: "success"});
+    res.json({ message: "success" });
 });
 
 const notifyUser = asyncHandler(async (req, res) => {
-  const { id: userId, message } = req.body;
+    const { id: userId, message } = req.body;
 
-  if (req.user.accountType !== "admin") {
-    res.status(401);
-    throw new Error("Permission denied");
-  }
+    if (req.user.accountType !== "admin") {
+        res.status(401);
+        throw new Error("Permission denied");
+    }
 
-  const userNotification = await UserNoti.create({
-    user: userId,
-    message,
-    createdAt: new Date(),
-  });
+    const userNotification = await UserNoti.create({
+        user: userId,
+        message,
+        createdAt: new Date(),
+    });
 
-  res.json(userNotification);
+    res.json(userNotification);
 });
 
 const getUserNoti = asyncHandler(async (req, res) => {
@@ -292,48 +292,48 @@ const getUserNoti = asyncHandler(async (req, res) => {
 const updateUserAvatar = asyncHandler(async (req, res) => {
     const { img } = req.body;
     const user = await User.findById(req.user.id);
-    if(!user){
+    if (!user) {
         res.status(401);
         throw new Error("You are not logged in");
     }
-    if(!img){
+    if (!img) {
         res.status(400);
         throw new Error("No image provided");
     }
-    if(user.avatar && user.avatar.publicID){
+    if (user.avatar && user.avatar.publicID) {
         await cloudinaryWrapper.deleteResources(user.avatar.publicID);
     }
     const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(img, `${req.user.id}`);
     const newAvatar = {
-      avatar:{url,publicID}  
+        avatar: { url, publicID }
     };
-    const updateAvatarUser = await User.findByIdAndUpdate(req.user.id, newAvatar, {new: true});
+    const updateAvatarUser = await User.findByIdAndUpdate(req.user.id, newAvatar, { new: true });
     // user.updateOne(newAvatar, {new: true})
-    if(!updateAvatarUser){
-        res.status(400);
+    if (!updateAvatarUser) {
+        res.status(500);
         throw new Error("Failed to update user avatar");
     }
-    res.status(201).json(updateAvatarUser.avatar);
+    res.status(201).json(updateAvatarUser.avatar.url);
 });
 
 const deleteUserAvatar = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id);
-    if(!user){
+    if (!user) {
         res.status(401);
         throw new Error("You are not logged in");
     }
-    if(!user.avatar.publicID){
+    if (!user.avatar.publicID) {
         res.status(400);
         throw new Error("You don't have an avatar");
     }
-    
+
     await cloudinaryWrapper.deleteResources(user.avatar.publicID);
     const deletedAvatar = {
-        avatar:{url:"",publicID:""}  
+        avatar: { url: "", publicID: "" }
     };
-    await User.findByIdAndUpdate(req.user.id, deletedAvatar, {new: true});
+    await User.findByIdAndUpdate(req.user.id, deletedAvatar, { new: true });
     // user.updateOne(newAvatar, {new: true})    
-    res.json({message: 'Succesfully deleted avatar'});
+    res.json({ message: 'Succesfully deleted avatar' });
 })
 
 

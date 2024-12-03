@@ -45,10 +45,7 @@ const getMangaComments = asyncHandler(async (req, res) => {
         .populate({
             path: 'user',
             model: 'User',
-            select: 'name avatar',
-            populate: {
-                path: 'avatar.url'
-            }
+            select: 'name avatar.url',
         });
 
     res.status(200).json({
@@ -110,10 +107,7 @@ const getChapterComments = asyncHandler(async (req, res) => {
         .populate({
             path: 'user',
             model: 'User',
-            select: 'name avatar',
-            populate: {
-                path: 'avatar.url'
-            }
+            select: 'name avatar.url',
         });
 
     res.status(200).json({

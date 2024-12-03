@@ -216,23 +216,10 @@ const deleteChapter = asyncHandler(async (req, res) => {
     res.status(200).json({ manga: manga.id, chapterNumber: chapter.number });
 });
 
-const deleteAllChapters = asyncHandler(async (mangaID) => {
-    const chapters = await Chapter.find({ manga: mangaID });
-    if (chapters.length === 0) {
-        return;
-    }
-
-    // delete chapters info in the database
-    for (let chapter of chapters) {
-        await chapter.deleteOne();
-    }
-});
-
 module.exports = {
     getChapter,
     getChapterList,
     uploadChapter,
     updateChapter,
     deleteChapter,
-    deleteAllChapters,
 };

@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Author = require("../models/authorModel");
 const User = require("../models/userModel");
+const { deleteAllMangas } = require('./mangaController');
 
 /**
  * GET /api/authors: get all victims as a list.
@@ -132,6 +133,9 @@ const deleteAuthor = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Bad request. No author exists with that ID.");
   }
+
+  // delete author's mangas
+  await deleteAllMangas(req.params.id);
 
   // Delete author and remove approved status.
   const doc = await Author.findOneAndDelete({ _id: req.params.id });
