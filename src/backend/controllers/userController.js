@@ -5,6 +5,7 @@ const BanList = require('../models/banUserModel');
 const UserNoti = require("../models/userNotificationModel");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const cloudinaryWrapper = require('../others/cloudinaryWrapper');
 
 const getMe = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id).select('name email accountType');
@@ -214,7 +215,7 @@ const updateBlacklist = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error("You are not logged in");
     }
-    if(!req.body.blacklist.categories && !req.body.blacklist.authors){
+    if(!req.body.blacklist && !req.body.blacklist.categories && !req.body.blacklist.authors){
         res.status(400);
         throw new Error("No categories or authors");
     }
@@ -288,6 +289,54 @@ const getUserNoti = asyncHandler(async (req, res) => {
     res.json(userNotifications);
 });
 
+const updateUserAvatar = asyncHandler(async (req, res) => {
+    const { img } = req.body;
+    const user = await User.findById(req.user.id);
+    if(!user){
+        res.status(401);
+        throw new Error("You are not logged in");
+    }
+    if(!img){
+        res.status(400);
+        throw new Error("No image provided");
+    }
+    if(user.avatar && user.avatar.publicID){
+        await cloudinaryWrapper.deleteResources(user.avatar.publicID);
+    }
+    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(img, `${req.user.id}`);
+    const newAvatar = {
+      avatar:{url,publicID}  
+    };
+    const updateAvatarUser = await User.findByIdAndUpdate(req.user.id, newAvatar, {new: true});
+    // user.updateOne(newAvatar, {new: true})
+    if(!updateAvatarUser){
+        res.status(400);
+        throw new Error("Failed to update user avatar");
+    }
+    res.status(201).json(updateAvatarUser.avatar);
+});
+
+const deleteUserAvatar = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id);
+    if(!user){
+        res.status(401);
+        throw new Error("You are not logged in");
+    }
+    if(!user.avatar.publicID){
+        res.status(400);
+        throw new Error("You don't have an avatar");
+    }
+    
+    await cloudinaryWrapper.deleteResources(user.avatar.publicID);
+    const deletedAvatar = {
+        avatar:{url:"",publicID:""}  
+    };
+    await User.findByIdAndUpdate(req.user.id, deletedAvatar, {new: true});
+    // user.updateOne(newAvatar, {new: true})    
+    res.json({message: 'Succesfully deleted avatar'});
+})
+
+
 module.exports = {
     getMe,
     getUsers,
@@ -306,5 +355,7 @@ module.exports = {
     unbanUser,
     notifyUser,
     getUserNoti,
+    updateUserAvatar,
+    deleteUserAvatar
 };
 

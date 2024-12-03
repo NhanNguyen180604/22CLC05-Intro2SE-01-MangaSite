@@ -12,6 +12,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const authorRoutes = require("./routes/authorRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const userRoutes = require("./routes/userRoutes");
+const searchRoutes = require("./routes/searchRoutes");
 
 const port = process.env.PORT || 3000;
 
@@ -29,6 +30,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/search", searchRoutes);
 
 // handle error
 app.use(errorHandler);
@@ -36,3 +38,5 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log(`Server starts on port ${port}`);
 });
+
+export default app;
