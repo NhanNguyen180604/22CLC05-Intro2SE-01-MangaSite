@@ -21,6 +21,19 @@ const getChapter = asyncHandler(async (req, res) => {
 // @route GET /api/mangas/:id/chapters
 // @access public
 const getChapterList = asyncHandler(async (req, res) => {
+    // check valid id
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+        res.status(400);
+        throw new Error("Invalid ID");
+    }
+
+    // check if manga exists
+    const manga = await Manga.findById(req.params.id);
+    if (!manga) {
+        res.status(404);
+        throw new Error("Manga not found");
+    }
+
     let page = req.query.page ? parseInt(req.query.page) : 1;
     const per_page = req.query.per_page ? parseInt(req.query.per_page) : 20;
 
@@ -35,13 +48,13 @@ const getChapterList = asyncHandler(async (req, res) => {
         throw new Error("Bad Request: Invalid query per_page.");
     }
 
-    const count = await Chapter.countDocuments();
+    const count = await Chapter.countDocuments({ manga: manga.id });
     const total_pages = Math.ceil(count / per_page);
     page = Math.min(page, total_pages);
     page = Math.max(page, 1);
     const skip = (page - 1) * per_page;
 
-    const chapters = await Chapter.find({ manga: req.params.id })
+    const chapters = await Chapter.find({ manga: manga.id })
         .sort({ number: 1 })
         .skip(skip)
         .limit(per_page)

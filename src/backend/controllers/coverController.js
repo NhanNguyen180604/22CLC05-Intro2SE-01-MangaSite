@@ -14,7 +14,7 @@ const getCovers = asyncHandler(async (req, res) => {
     }
 
     // check if manga exists
-    const manga = await Manga.findById(req.params.id).select('-manga -imagePublicID');
+    const manga = await Manga.findById(req.params.id);
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found");
@@ -35,7 +35,7 @@ const uploadCover = asyncHandler(async (req, res) => {
     }
 
     // check if manga exists
-    const manga = await Manga.findById(req.params.id).select('-manga -imagePublicID');
+    const manga = await Manga.findById(req.params.id);
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found");
@@ -85,7 +85,7 @@ const changeCover = asyncHandler(async (req, res) => {
     }
 
     // check if manga exists
-    const manga = await Manga.findById(req.params.id).select('-manga -imagePublicID');
+    const manga = await Manga.findById(req.params.id);
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found");
@@ -122,7 +122,7 @@ const deleteCover = asyncHandler(async (req, res) => {
     }
 
     // check if manga exists
-    const manga = await Manga.findById(req.params.id).select('-manga -imagePublicID');
+    const manga = await Manga.findById(req.params.id);
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found");

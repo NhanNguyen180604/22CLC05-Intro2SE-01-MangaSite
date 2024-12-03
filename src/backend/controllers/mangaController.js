@@ -277,6 +277,33 @@ const deleteAllMangas = asyncHandler(async (authorID) => {
     }
 });
 
+// @description toggle the permission to comment on a manga
+// @route PUT /api/mangas/:id/comments
+// @access manga's uploader only, require token
+const toggleComment = asyncHandler(async (req, res) => {
+    // check valid id
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+        res.status(400);
+        throw new Error("Invalid ID");
+    }
+
+    // check if manga exists
+    const manga = await Manga.findById(req.params.id);
+    if (!manga) {
+        res.status(404);
+        throw new Error("Manga not found");
+    }
+
+    if (req.user.id !== manga.uploader.toString()) {
+        res.status(401);
+        throw new Error("Not authorized to toggle comment for this manga");
+    }
+
+    manga.canComment = !manga.canComment;
+    await manga.save();
+    res.status(200).json({ message: `Successfully toggle comment permission, canComment: ${manga.canComment}` });
+});
+
 const updateHistory = asyncHandler(async (req, res) => {
     const mangaId = req.params.id
     let { newChapters, deleteChapters } = req.body;
@@ -298,7 +325,7 @@ const updateHistory = asyncHandler(async (req, res) => {
         readingHistory.chapters = readingHistory.chapters.filter((chapter) => {
             return !deleteChapters.some(deleteChapter => chapter.equals(deleteChapter))
         });
-        
+
         newChapters.forEach((newChapter) => {
             if (!readingHistory.chapters.some(chapter => chapter.equals(newChapter)))
                 readingHistory.chapters.push(newChapter)
@@ -346,6 +373,7 @@ module.exports = {
     updateManga,
     deleteManga,
     deleteAllMangas,
+    toggleComment,
     updateHistory,
     getHistory,
     deleteHistory,

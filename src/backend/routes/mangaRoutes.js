@@ -3,6 +3,7 @@ const router = express.Router();
 const mangaController = require('../controllers/mangaController');
 const chapterController = require('../controllers/chapterController');
 const coverController = require('../controllers/coverController');
+const commentController = require('../controllers/commentController');
 const ratingController = require('../controllers/ratingController');
 const { authorize, checkUser } = require('../middlewares/authMiddleware');
 
@@ -18,6 +19,19 @@ router.route('/:id/ratings')
 
 router.route('/:id/ratings/one')
     .get(authorize, ratingController.getOneRating);
+
+// comment routes
+// exception, I suck, I dont know how to properly make this route
+router.route('/comments/:id')
+    .delete(authorize, commentController.deleteComment);
+
+// /api/mangas/:id/comments
+router.route('/:id/comments')
+    .get(commentController.getMangaComments)
+    .post(authorize, commentController.postComment)
+    .put(authorize, mangaController.toggleComment);
+router.route('/:id/chapters/:chapterNumber/comments')
+    .get(commentController.getChapterComments);
 
 // cover routes
 // /api/mangas/:id/covers
