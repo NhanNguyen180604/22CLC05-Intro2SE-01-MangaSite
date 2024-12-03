@@ -1,5 +1,4 @@
-import authorModel from "../models/authorModel";
-import categoryModel from "../models/categoryModel";
+import { default as authorModel, default as categoryModel } from "../models/authorModel";
 import mangaModel from "../models/mangaModel";
 import userModel from "../models/userModel";
 
@@ -8,15 +7,15 @@ export async function getUser(name: string) {
 }
 
 export async function getAuthor(name: string) {
-  return await authorModel.findOne({ name });
+  return await categoryModel.findOne({ name });
 }
 
 export async function mapAuthorsToId(...names: string[]) {
-  return (await authorModel.find({ name: { $in: names } }).select("_id")).map(node => node._id);
+  return (await categoryModel.find({ name: { $in: names } }).select("_id")).map(node => node._id);
 }
 
 export async function getCategory(name: string) {
-  return await authorModel.findOne({ name });
+  return await categoryModel.findOne({ name });
 }
 
 export async function mapCategoriesToId(...names: string[]) {
@@ -28,7 +27,7 @@ export async function mapCategoriesToId(...names: string[]) {
  * Strawberry, Blueberry, Blackberry are users. Raspberry is an approved user and Elderberry is an admin.
  */
 export async function populateUsers() {
-  await userModel.insertMany([{
+  const users = [{
     name: "strawberry",
     email: "strawberry@fruits.com",
     password: "1234",
@@ -53,54 +52,50 @@ export async function populateUsers() {
     email: "elderberry@fruits.com",
     password: "1234",
     accountType: "admin",
-  }]);
+  }];
+
+  await userModel.bulkWrite(users.map(user => ({
+    updateOne: {
+      filter: { name: user.name },
+      update: { $setOnInsert: user },
+      upsert: true,
+    }
+  })));
 }
 
 /**
  * Populates a list of authors for testing purposes.
  */
 export async function populateAuthors() {
-  await authorModel.insertMany([{
-    name: "Mario",
-  }, {
-    name: "Luigi",
-  }, {
-    name: "Peach",
-  }, {
-    name: "Daisy",
-  }, {
-    name: "Yoshi",
-  }, {
-    name: "Bowser",
-  }]);
+  const authors = ["Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Bowser"].map(author => ({ name: author }));
+  await authorModel.bulkWrite(authors.map(author => ({
+    updateOne: {
+      filter: { name: author.name },
+      update: { $setOnInsert: author },
+      upsert: true,
+    }
+  })));
 }
 
 /**
  * Populates a list of categories for testing purposes.
  */
 export async function populateCategories() {
-  await categoryModel.insertMany([{
-    name: "Paranormal",
-  }, {
-    name: "Romance",
-  }, {
-    name: "Battle",
-  }, {
-    name: "Action",
-  }, {
-    name: "Fantasy",
-  }, {
-    name: "Shojo",
-  }, {
-    name: "Yoshi",
-  }]);
+  const categories = ["Paranormal", "Romance", "Battle", "Action", "Fantasy", "Shojo"].map(cat => ({ name: cat }));
+  await categoryModel.bulkWrite(categories.map(cat => ({
+    updateOne: {
+      filter: { name: cat.name },
+      update: { $setOnInsert: cat },
+      upsert: true,
+    }
+  })));
 }
 
 /**
  * Populates a fake list of mangas for testing purposes.
  */
 export async function populateMangas() {
-  await mangaModel.insertMany([{
+  const mangas = [{
     name: "Where have you been all my life?",
     authors: await mapAuthorsToId("Mario", "Peach"),
     categories: await mapCategoriesToId("Fantasy", "Romance"),
@@ -135,7 +130,14 @@ export async function populateMangas() {
     description: "Two young girls travel a multiverse of destroyed civilizations, gathering what remains from memory fragments.",
     status: "In progress",
     uploader: await getUser("elderberry"),
-  }]);
+  }];
+  await mangaModel.bulkWrite(mangas.map(manga => ({
+    updateOne: {
+      filter: { name: manga.name },
+      update: { $setOnInsert: manga },
+      upsert: true,
+    }
+  })));
 }
 
 /**
@@ -147,4 +149,14 @@ export async function populateMangas() {
 export async function populateBlockList() {
   await userModel.updateOne({ name: "strawberry" }, { blacklist: { categories: await mapCategoriesToId("Yoshi") } });
   await userModel.updateOne({ name: "blueberry" }, { blacklist: { authors: await mapAuthorsToId("Peach") } });
+}
+
+/**
+ * Clears all data.
+ */
+export async function depopulate() {
+  await userModel.deleteMany();
+  await authorModel.deleteMany();
+  await categoryModel.deleteMany();
+  await mangaModel.deleteMany();
 }
