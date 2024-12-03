@@ -50,6 +50,13 @@ describe("author controller", () => {
     expect(res.body.total).toBe(6);
   });
 
+  it("returns 200 even with page too large", async () => {
+    const res = await supertest(app).get("/api/authors").query({ page: 3 }).send();
+    expect(res.statusCode).toBe(200);
+    expect(res.body.total_pages).toBe(1);
+    expect(res.body.page).toBe(1);
+  });
+
   it("returns 401 if not logged in to upload author", async () => {
     const res = await supertest(app).post("/api/authors").send();
     expect(res.statusCode).toBe(401);
@@ -86,7 +93,7 @@ describe("author controller", () => {
   });
 
   it("returns 400 if update ID doesn't conform with MongoDB", async () => {
-    const res = await supertest(app).put("/api/authors/Random24LettersMongoDBID").set("Authorization", `Bearer ${adminToken}`).send();
+    const res = await supertest(app).put("/api/authors/notmongoid").set("Authorization", `Bearer ${adminToken}`).send();
     expect(res.statusCode).toBe(400);
   });
 
@@ -122,7 +129,7 @@ describe("author controller", () => {
 
   // This should be 404 (Not Found) but backend design says 400.
   it("returns 400 if delete ID doesn't exist", async () => {
-    const res = await supertest(app).delete("/api/authors/Random24LettersMongoDBID").set("Authorization", `Bearer ${adminToken}`).send();
+    const res = await supertest(app).delete("/api/authors/f322eef10bf1fdfdede8de4e").set("Authorization", `Bearer ${adminToken}`).send();
     expect(res.statusCode).toBe(400);
   });
 

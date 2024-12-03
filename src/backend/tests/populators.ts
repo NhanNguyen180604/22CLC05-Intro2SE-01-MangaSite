@@ -1,4 +1,5 @@
-import { default as authorModel, default as categoryModel } from "../models/authorModel";
+import authorModel from "../models/authorModel";
+import categoryModel from "../models/categoryModel";
 import mangaModel from "../models/mangaModel";
 import userModel from "../models/userModel";
 
@@ -11,7 +12,7 @@ export async function getAuthor(name: string) {
 }
 
 export async function mapAuthorsToId(...names: string[]) {
-  return (await categoryModel.find({ name: { $in: names } }).select("_id")).map(node => node._id);
+  return (await authorModel.find({ name: { $in: names } }).select("_id")).map(node => node._id);
 }
 
 export async function getCategory(name: string) {
@@ -53,14 +54,15 @@ export async function populateUsers() {
     password: "1234",
     accountType: "admin",
   }];
+  await userModel.insertMany(users);
 
-  await userModel.bulkWrite(users.map(user => ({
-    updateOne: {
-      filter: { name: user.name },
-      update: { $setOnInsert: user },
-      upsert: true,
-    }
-  })));
+  // await userModel.bulkWrite(users.map(user => ({
+  //   updateOne: {
+  //     filter: { name: user.name },
+  //     update: { $setOnInsert: user },
+  //     upsert: true,
+  //   }
+  // })));
 }
 
 /**
@@ -68,27 +70,29 @@ export async function populateUsers() {
  */
 export async function populateAuthors() {
   const authors = ["Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Bowser"].map(author => ({ name: author }));
-  await authorModel.bulkWrite(authors.map(author => ({
-    updateOne: {
-      filter: { name: author.name },
-      update: { $setOnInsert: author },
-      upsert: true,
-    }
-  })));
+  await authorModel.insertMany(authors);
+  // await authorModel.bulkWrite(authors.map(author => ({
+  //   updateOne: {
+  //     filter: { name: author.name },
+  //     update: { $setOnInsert: author },
+  //     upsert: true,
+  //   }
+  // })));
 }
 
 /**
  * Populates a list of categories for testing purposes.
  */
 export async function populateCategories() {
-  const categories = ["Paranormal", "Romance", "Battle", "Action", "Fantasy", "Shojo"].map(cat => ({ name: cat }));
-  await categoryModel.bulkWrite(categories.map(cat => ({
-    updateOne: {
-      filter: { name: cat.name },
-      update: { $setOnInsert: cat },
-      upsert: true,
-    }
-  })));
+  const categories = ["Paranormal", "Romance", "Battle", "Action", "Fantasy", "Shojo", "Yoshi"].map(cat => ({ name: cat }));
+  await categoryModel.insertMany(categories);
+  // await categoryModel.bulkWrite(categories.map(cat => ({
+  //   updateOne: {
+  //     filter: { name: cat.name },
+  //     update: { $setOnInsert: cat },
+  //     upsert: true,
+  //   }
+  // })));
 }
 
 /**
@@ -131,13 +135,15 @@ export async function populateMangas() {
     status: "In progress",
     uploader: await getUser("elderberry"),
   }];
-  await mangaModel.bulkWrite(mangas.map(manga => ({
-    updateOne: {
-      filter: { name: manga.name },
-      update: { $setOnInsert: manga },
-      upsert: true,
-    }
-  })));
+  await mangaModel.insertMany(mangas);
+
+  // await mangaModel.bulkWrite(mangas.map(manga => ({
+  //   updateOne: {
+  //     filter: { name: manga.name },
+  //     update: { $setOnInsert: manga },
+  //     upsert: true,
+  //   }
+  // })));
 }
 
 /**
