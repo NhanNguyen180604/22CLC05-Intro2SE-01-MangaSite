@@ -5,8 +5,8 @@ process.env.VITEST = "true";
 
 export default defineConfig({
   test: {
-    fileParallelism: false, // Database tests shouldn't be parallel
-    reporters: process.env.GITHUB ? ["github-actions", "verbose", ["tap", { outputFile: "./test-results/tap.txt" }]] : "basic",
+    // fileParallelism: false, // Database tests shouldn't be parallel?
+    reporters: process.env.GITHUB ? ["github-actions", "verbose"] : "basic",
     coverage: {
       provider: "v8", // Istanbul doesn't work because express was written in CommonJS. Fuck CommonJS.
       reportsDirectory: "coverage",

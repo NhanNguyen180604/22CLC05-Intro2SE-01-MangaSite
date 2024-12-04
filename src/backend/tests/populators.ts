@@ -32,26 +32,41 @@ export async function populateUsers() {
     name: "strawberry",
     email: "strawberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://www.allrecipes.com/thmb/1c99SWam7_FM6vUzpDDzIKffMR4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/ALR-strawberry-fruit-or-vegetable-f6dd901427714e46af2d706a57b9016f.jpg",
+    },
     accountType: "user",
   }, {
     name: "blueberry",
     email: "blueberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlPNkMXg2WT2QA3oRCM_ujTilLNWgi5owEbw&s",
+    },
     accountType: "user",
   }, {
     name: "blackberry",
     email: "blackberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://prairiegardens.org/wp-content/uploads/2021/02/Chester-Blackberry-1.jpg",
+    },
     accountType: "user",
   }, {
     name: "raspberry",
     email: "raspberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://www.diggers.com.au/cdn/shop/products/raspberry-willamette-wraw_611f6bfe-4b8e-44a1-8e0f-d8c661ab493c_2048x.jpg?v=1637122646",
+    },
     accountType: "approved",
   }, {
     name: "elderberry",
     email: "elderberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://h2.commercev3.net/cdn.gurneys.com/images/800/03177A.jpg",
+    },
     accountType: "admin",
   }];
   await userModel.insertMany(users);
