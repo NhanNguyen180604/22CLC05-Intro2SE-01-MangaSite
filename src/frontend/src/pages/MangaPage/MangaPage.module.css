@@ -148,10 +148,6 @@
 	z-index: 100;
 }
 
-.noScroll {
-	overflow-y: hidden;
-}
-
 @media only screen and (max-width: 1600px) {
 	.mainContainer {
 		grid-template-columns: 30fr 70fr;

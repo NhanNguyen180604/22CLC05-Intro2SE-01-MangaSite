@@ -1,10 +1,11 @@
 import styles from "./CommentForm.module.css"
 import { useState, useEffect } from "react";
-import { getMangaComments } from "../../service/mangaService.js";
+import { getMangaComments, getChapterComments } from "../../service/mangaService.js";
 import { useParams } from "react-router-dom";
+import { FaXmark } from "react-icons/fa6";
 
 function CommentForm({ setShowThis, setNotiFormDetails, setShowNotiForm }) {
-    const { id } = useParams();
+    const { id, chapterNumber } = useParams();
 
     const [comments, setComments] = useState([]);
     const [page, setPage] = useState(1);
@@ -31,7 +32,7 @@ function CommentForm({ setShowThis, setNotiFormDetails, setShowNotiForm }) {
     }
 
     const fetchData = async (page = 1, per_page = 20) => {
-        const response = await getMangaComments(id, page, per_page);
+        const response = !chapterNumber ? await getMangaComments(id, page, per_page) : await getChapterComments(id, chapterNumber, page, per_page);
         if (response.status === 200) {
             setTotalPages(response.comments.total_pages);
 
@@ -87,7 +88,17 @@ function CommentForm({ setShowThis, setNotiFormDetails, setShowNotiForm }) {
 
     return (
         <form className={styles.commentForm}>
-            <div>Comments</div>
+            <div className={styles.formTitle}>
+                <div>Comments</div>
+                <button
+                    onClick={() => {
+                        setShowThis(false);
+                        document.body.classList.remove(`noScrollY`);
+                    }}
+                >
+                    <FaXmark />
+                </button>
+            </div>
             <div className={styles.commentList}>
                 {comments.length ? comments.map((comment, index) => (
                     <div key={`comment-${index + 1}`}>

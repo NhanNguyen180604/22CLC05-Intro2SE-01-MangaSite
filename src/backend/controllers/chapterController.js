@@ -14,7 +14,8 @@ const getChapter = asyncHandler(async (req, res) => {
         throw new Error("Invalid ID");
     }
 
-    const chapter = await Chapter.findOne({ manga: req.params.id, number: req.params.chapterNumber });
+    const chapter = await Chapter.findOne({ manga: req.params.id, number: req.params.chapterNumber })
+        .populate({path: 'manga', model: 'Manga', select: 'name'});
     res.status(200).json(chapter);
 });
 
@@ -33,6 +34,20 @@ const getChapterList = asyncHandler(async (req, res) => {
     if (!manga) {
         res.status(404);
         throw new Error("Manga not found");
+    }
+
+    if (req.query.all === 'true') {
+        const chapters = await Chapter.find({ manga: manga.id })
+            .sort({ number: 1 })
+            .select('_id title number');
+
+        return res.status(200).json({
+            chapters: chapters,
+            page: 1,
+            per_page: chapters.length,
+            total_pages: 1,
+            total: chapters.length,
+        });
     }
 
     let page = req.query.page ? parseInt(req.query.page) : 1;

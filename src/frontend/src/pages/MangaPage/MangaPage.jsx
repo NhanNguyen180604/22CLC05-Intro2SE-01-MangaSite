@@ -19,6 +19,8 @@ import DesktopLogo from "../../components/main/DesktopLogo.jsx"
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx"
 import MainLayout from "../../components/main/MainLayout.jsx"
 import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx"
+import SearchBox from "../../components/search/SearchBox.jsx"
+import SearchTabSelection from "../../components/search/SearchTabSelection.jsx"
 
 const MangaPage = () => {
 	const { id } = useParams();
@@ -49,8 +51,8 @@ const MangaPage = () => {
 	const togglePopup = (setCallback, attribute) => {
 		setCallback(!attribute);
 		if (!attribute)
-			document.body.classList.add(`${styles.noScroll}`);
-		else document.body.classList.remove(`${styles.noScroll}`);
+			document.body.classList.add(`noScrollY`);
+		else document.body.classList.remove(`noScrollY`);
 	}
 
 	const handlePopupClick = (id, setCallback, attribute) => {
@@ -94,6 +96,7 @@ const MangaPage = () => {
 			<header className="flex w-full flex-row items-center justify-between">
 				<DesktopLogo />
 				<div className="flex w-full flex-row items-center gap-8 lg:w-fit">
+					<SearchBox />
 					<DesktopNavigationBar />
 				</div>
 			</header>
@@ -103,7 +106,7 @@ const MangaPage = () => {
 					<img src={manga.cover} />
 
 					<div className={styles.actionBTNsContainer}>
-						<FaBookmark onClick={() => togglePopup(setShowLibraryForm, showLibaryForm)}/>
+						<FaBookmark onClick={() => togglePopup(setShowLibraryForm, showLibaryForm)} />
 						<FaFlag onClick={() => togglePopup(setShowReportForm, showReportForm)} />
 						<FaCommentAlt onClick={() => togglePopup(setShowCommentForm, showCommentForm)} />
 						<FaGear />
@@ -125,7 +128,7 @@ const MangaPage = () => {
 
 					{/* on click, redirect to the latest page in reading history, or chapter 1 if is guest */}
 					<button
-						onClick={(e) => navigate(`/mangas/${id}/chapters/${firstChapter}`)}
+						onClick={() => navigate(`/mangas/${id}/chapters/${firstChapter}`)}
 						className={styles.startReadingBTN}
 					>
 						Start Reading

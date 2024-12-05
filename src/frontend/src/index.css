@@ -44,3 +44,7 @@ body {
     scrollbar-width: thin;
 	scrollbar-color: var(--medium-navy) var(--darker-navy);
 }
+
+.noScrollY {
+	overflow-y: hidden;
+}

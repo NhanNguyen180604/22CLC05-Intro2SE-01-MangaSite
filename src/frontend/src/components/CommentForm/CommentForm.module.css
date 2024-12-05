@@ -11,8 +11,26 @@
 	font-size: 1rem;
 }
 
-.commentForm div:first-of-type {
+.commentForm .formTitle {
 	font-weight: bold;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 5px;
+}
+
+.commentForm .formTitle button{
+	height: 30px;
+	width: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	transition: background 0.2s ease-in-out;
+}
+
+.commentForm .formTitle button:hover{
+	background: var(--dark-navy);
 }
 
 .commentList{
@@ -89,7 +107,7 @@
 	padding: 4px 10px;
 	border-radius: 8px;
 	box-shadow: 0px 5px 5px var(--dark-navy);
-	min-width: 75%;
+	min-width: 70%;
 	transition: border 0.2s ease-in-out;
 	border: 1px solid var(--dark-navy);
 }
@@ -126,8 +144,7 @@
 @media only screen and (max-width: 800px) {
 	.commentForm {
 		width: 100%;
-		height: 95%;
-		transform: translateY(5%);
+		height: 100%;
 		border-radius: 0;
 	}
 
