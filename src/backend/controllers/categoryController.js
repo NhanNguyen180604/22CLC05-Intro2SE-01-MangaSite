@@ -1,5 +1,6 @@
 const expressAsyncHandler = require("express-async-handler");
 const Category = require("../models/categoryModel");
+const { z } = require("zod");
 
 /**
  * Get all categories
@@ -11,30 +12,28 @@ const Category = require("../models/categoryModel");
  * - Returns { categories: {_id, name}[], page, per_page, total_pages, total }
  */
 const getCategories = expressAsyncHandler(async (req, res) => {
-  let page = req.query.page ? parseInt(req.query.page) : 1;
-  const perPage = req.query.per_page ? parseInt(req.query.per_page) : 20;
+  const schema = z.object({
+    page: z.coerce.number().int().positive().safe().default(1),
+    per_page: z.coerce.number().int().positive().safe().default(20),
+  });
 
-  // Validation.
-  if (Number.isNaN(page) || !Number.isSafeInteger(page) || page <= 0) {
+  const result = schema.safeParse(req.query);
+  if (result.error) {
     res.status(400);
-    throw new Error("Bad Request: Invalid query page.");
+    throw new Error(`Invalid query ${result.error.issues[0].path}: ${result.error.issues[0].message}`);
   }
 
-  if (Number.isNaN(perPage) || !Number.isSafeInteger(perPage) || perPage <= 0) {
-    res.status(400);
-    throw new Error("Bad Request: Invalid query per_page.");
-  }
-
+  const { page, per_page } = result.data;
   const total = await Category.countDocuments({});
-  const totalPages = Math.ceil(total / perPage);
+  const totalPages = Math.ceil(total / per_page);
   const query = await Category.find({})
-    .skip(perPage * (page - 1))
-    .limit(perPage);
+    .skip(per_page * (page - 1))
+    .limit(per_page);
 
   return res.status(200).json({
     categories: query,
     page,
-    per_page: perPage,
+    per_page,
     total_pages: totalPages,
     total,
   });
