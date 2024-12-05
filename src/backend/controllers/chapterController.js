@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Chapter = require('../models/chapterModel');
 const Manga = require('../models/mangaModel');
+const MangaNoti = require('../models/mangaNotificationModel');
 const cloudinaryWrapper = require('../others/cloudinaryWrapper');
 
 // @description get a chapter by number
@@ -117,8 +118,17 @@ const uploadChapter = asyncHandler(async (req, res) => {
         chapter.images = urls;
     }
 
-    chapter.updatedAt = new Date(0);
+    chapter.updatedAt = new Date();
     await chapter.save();
+
+    // create notification when finish uploading (upload may be called more than once)
+    if (req.body.finish) {
+        const mangaNoti = await MangaNoti.create({
+            manga: chapter.manga,
+            message: `${updatedManga.name}, chapter ${chapter.number} just got uploaded`,
+            createdAt: new Date(),
+        });
+    }
 
     res.status(200).json(chapter);
 });
@@ -167,9 +177,17 @@ const updateChapter = asyncHandler(async (req, res) => {
     }
 
     if (updated) {
-        manga.updatedAt = new Date(0);
+        manga.updatedAt = new Date();
         await chapter.save();
         await manga.save();
+
+        // create notification
+        const mangaNoti = await MangaNoti.create({
+            manga: manga.id,
+            message: `${updatedManga.name}, chapter ${chapter.number} just got updated`,
+            createdAt: new Date(),
+        });
+
         res.status(200).json(chapter);
     }
     else {
@@ -211,7 +229,7 @@ const deleteChapter = asyncHandler(async (req, res) => {
     await cloudinaryWrapper.deleteImages(`${manga.id}/${chapter.number}`);
 
     await chapter.deleteOne();
-    manga.updatedAt = new Date(0);
+    manga.updatedAt = new Date();
     await manga.save();
     res.status(200).json({ manga: manga.id, chapterNumber: chapter.number });
 });

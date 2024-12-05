@@ -34,22 +34,35 @@ const getMangaComments = asyncHandler(async (req, res) => {
         throw new Error("Bad Request: Invalid query per_page.");
     }
 
-    const count = await Comment.countDocuments({ manga: manga.id, chapter: undefined });
+    const count = await Comment.countDocuments({ manga: manga.id, chapter: undefined, replyTo: undefined });
     const total_pages = Math.ceil(count / per_page);
     page = Math.min(page, total_pages);
     page = Math.max(page, 1);
     const skip = (page - 1) * per_page;
 
-    const comments = await Comment.find({ manga: manga.id, chapter: undefined })
+    const comments = await Comment.find({ manga: manga.id, chapter: undefined, replyTo: undefined })
         .skip(skip)
+        .limit(per_page)
         .populate({
             path: 'user',
             model: 'User',
             select: 'name avatar.url',
         });
 
+    // get replies
+    let result = [...comments];
+    for (const comment of comments) {
+        let replies = await Comment.find({ replyTo: comment._id })
+            .populate({
+                path: 'user',
+                model: 'User',
+                select: 'name avatar.url',
+            });;
+        result = [...result, ...replies];
+    }
+
     res.status(200).json({
-        comments: comments,
+        comments: result,
         page: page,
         total_pages: total_pages,
         per_page: per_page,
@@ -96,22 +109,35 @@ const getChapterComments = asyncHandler(async (req, res) => {
         throw new Error("Bad Request: Invalid query per_page.");
     }
 
-    const count = await Comment.countDocuments({ manga: manga.id, chapter: chapter.number });
+    const count = await Comment.countDocuments({ manga: manga.id, chapter: chapter.number, replyTo: undefined });
     const total_pages = Math.ceil(count / per_page);
     page = Math.min(page, total_pages);
     page = Math.max(page, 1);
     const skip = (page - 1) * per_page;
 
-    const comments = await Comment.find({ manga: manga.id, chapter: chapter.number })
+    const comments = await Comment.find({ manga: manga.id, chapter: chapter.number, replyTo: undefined })
         .skip(skip)
+        .limit(per_page)
         .populate({
             path: 'user',
             model: 'User',
             select: 'name avatar.url',
         });
 
+    // get replies
+    let result = [...comments];
+    for (const comment of comments) {
+        let replies = await Comment.find({ replyTo: comment._id })
+            .populate({
+                path: 'user',
+                model: 'User',
+                select: 'name avatar.url',
+            });;
+        result = [...result, ...replies];
+    }
+
     res.status(200).json({
-        comments: comments,
+        comments: result,
         page: page,
         total_pages: total_pages,
         per_page: per_page,
@@ -174,10 +200,6 @@ const postComment = asyncHandler(async (req, res) => {
             res.status(400);
             throw new Error("The replied comment is not on the same chapter, or one of the two comment is on the manga, while the other is on a chapter");
         }
-    }
-    else {
-        res.status(400);
-        throw new Error("Invalid replied comment's id");
     }
 
     const commentDoc = await Comment.create(comment);

@@ -114,7 +114,8 @@ const getMangaByID = asyncHandler(async (req, res) => {
     // check if manga exists
     const manga = await Manga.findById(req.params.id)
         .populate({ path: 'authors', model: 'Author', select: 'name' })
-        .populate({ path: 'categories', model: 'Category', select: 'name' });
+        .populate({ path: 'categories', model: 'Category', select: 'name' })
+        .populate({ path: 'uploader', model: 'User', select: 'name' });
 
     if (!manga) {
         res.status(404);
@@ -217,7 +218,7 @@ const updateManga = asyncHandler(async (req, res) => {
         throw new Error("Not allowed to update overall rating");
     }
 
-    const updatedManga = await Manga.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    const updatedManga = await Manga.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(updatedManga);
 });
 
