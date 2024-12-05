@@ -19,9 +19,10 @@ const connectDB = async () => {
   }
 };
 
-process.on("SIGTERM", async () => {
+async function disconnectDB() {
   await mongoose.disconnect();
   if (db) db.stop();
-});
+}
 
-module.exports = connectDB;
+process.on("SIGTERM", disconnectDB);
+module.exports = { connectDB, disconnectDB };

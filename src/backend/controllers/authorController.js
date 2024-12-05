@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Author = require("../models/authorModel");
-const User = require("../models/userModel");
-const { deleteAllMangas } = require('./mangaController');
+const { deleteAllMangas } = require("./mangaController");
+const { z } = require("zod");
 
 /**
  * GET /api/authors: get all victims as a list.
@@ -11,36 +11,28 @@ const { deleteAllMangas } = require('./mangaController');
  * - Per page (number): number of authors per page.
  */
 const getAuthors = asyncHandler(async (req, res) => {
-  // Check if the query parameters are cute.
-  if (req.query.page && (isNaN(parseInt(req.query.page)) || !Number.isSafeInteger(parseInt(req.query.page)))) {
-    res.status(401);
-    throw new Error("Bad request. Invalid query page.");
+  const schema = z.object({
+    page: z.coerce.number().int().positive().safe().default(1),
+    per_page: z.coerce.number().int().positive().safe().default(20),
+  });
+  const result = schema.safeParse(req.query);
+  if (result.error) {
+    res.status(400);
+    throw new Error(`Bad request. Invalid query ${result.error.issues[0].path}`);
   }
 
-  if (
-    req.query.per_page &&
-    (isNaN(parseInt(req.query.per_page)) || !Number.isSafeInteger(parseInt(req.query.per_page)))
-  ) {
-    res.status(401);
-    throw new Error("Bad request. Invalid query per_page");
-  }
-
-  let page = req.query.page ? parseInt(req.query.page) : 1;
-  const perPage = req.query.per_page ? parseInt(req.query.per_page) : 20;
   const total = await Author.countDocuments();
-  const totalPages = Math.ceil(total / perPage);
-
-  if (page > totalPages) page = totalPages;
-
+  const totalPages = Math.ceil(total / result.data.per_page);
+  const page = result.data.page > totalPages ? totalPages : result.data.page;
   const body = await Author.find()
-    .skip((page - 1) * perPage)
-    .limit(perPage)
+    .skip((page - 1) * result.data.per_page)
+    .limit(result.data.per_page)
     .select("_id name");
 
   return res.status(200).json({
     authors: body,
     page,
-    per_page: perPage,
+    per_page: result.data.per_page,
     total_pages: totalPages,
     total,
   });
@@ -76,7 +68,7 @@ const uploadAuthor = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/authors/:id, update a victim's name.
+ * PUT /api/authors/:id, update a victim's name.
  *
  * - Access: admins only
  * - Accepts: { name: string }
@@ -108,11 +100,7 @@ const updateAuthor = asyncHandler(async (req, res) => {
   }
 
   // Update user's pen name.
-  const doc = await Author.findOneAndUpdate(
-    { _id: req.params.id },
-    { name: req.body.name },
-    { returnDocument: "after" },
-  );
+  const doc = await Author.findOneAndUpdate({ _id: req.params.id }, { name: req.body.name }, { returnDocument: "after" });
   return res.status(200).json({ _id: doc._id, name: doc.name });
 });
 
@@ -126,20 +114,25 @@ const updateAuthor = asyncHandler(async (req, res) => {
 const deleteAuthor = asyncHandler(async (req, res) => {
   if (req.user.accountType != "admin") return res.status(401).json({ message: "Unauthorized" });
 
-  // Block bad requests
-  if (!req.params.id.match(/[\w\d]{24}/)) return res.status(400).json({ message: "Bad request. ID is invalid." });
-
-  if (!(await Author.exists({ _id: req.params.id }))) {
+  let doc;
+  try {
+    doc = await Author.findById(req.params.id);
+  } catch (castError) {
     res.status(400);
-    throw new Error("Bad request. No author exists with that ID.");
+    throw new Error("Bad request. Invalid ID");
+  }
+
+  if (doc == null) {
+    res.status(400);
+    throw new Error("Bad request. ID not found.");
   }
 
   // delete author's mangas
   await deleteAllMangas(req.params.id);
 
   // Delete author and remove approved status.
-  const doc = await Author.findOneAndDelete({ _id: req.params.id });
-  return res.status(200).json({ _id: doc._id, name: doc.name });
+  const newDoc = await Author.findOneAndDelete({ _id: req.params.id });
+  return res.status(200).json({ _id: newDoc._id, name: newDoc.name });
 });
 
 module.exports = { getAuthors, uploadAuthor, updateAuthor, deleteAuthor };

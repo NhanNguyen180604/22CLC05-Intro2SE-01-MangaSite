@@ -8,7 +8,7 @@ export async function getUser(name: string) {
 }
 
 export async function getAuthor(name: string) {
-  return await authorModel.findOne({ name });
+  return await categoryModel.findOne({ name });
 }
 
 export async function mapAuthorsToId(...names: string[]) {
@@ -16,7 +16,7 @@ export async function mapAuthorsToId(...names: string[]) {
 }
 
 export async function getCategory(name: string) {
-  return await authorModel.findOne({ name });
+  return await categoryModel.findOne({ name });
 }
 
 export async function mapCategoriesToId(...names: string[]) {
@@ -28,79 +28,93 @@ export async function mapCategoriesToId(...names: string[]) {
  * Strawberry, Blueberry, Blackberry are users. Raspberry is an approved user and Elderberry is an admin.
  */
 export async function populateUsers() {
-  await userModel.insertMany([{
+  const users = [{
     name: "strawberry",
     email: "strawberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://www.allrecipes.com/thmb/1c99SWam7_FM6vUzpDDzIKffMR4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/ALR-strawberry-fruit-or-vegetable-f6dd901427714e46af2d706a57b9016f.jpg",
+    },
     accountType: "user",
   }, {
     name: "blueberry",
     email: "blueberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlPNkMXg2WT2QA3oRCM_ujTilLNWgi5owEbw&s",
+    },
     accountType: "user",
   }, {
     name: "blackberry",
     email: "blackberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://prairiegardens.org/wp-content/uploads/2021/02/Chester-Blackberry-1.jpg",
+    },
     accountType: "user",
   }, {
     name: "raspberry",
     email: "raspberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://www.diggers.com.au/cdn/shop/products/raspberry-willamette-wraw_611f6bfe-4b8e-44a1-8e0f-d8c661ab493c_2048x.jpg?v=1637122646",
+    },
     accountType: "approved",
   }, {
     name: "elderberry",
     email: "elderberry@fruits.com",
     password: "1234",
+    avatar: {
+      url: "https://h2.commercev3.net/cdn.gurneys.com/images/800/03177A.jpg",
+    },
     accountType: "admin",
-  }]);
+  }];
+  await userModel.insertMany(users);
+
+  // await userModel.bulkWrite(users.map(user => ({
+  //   updateOne: {
+  //     filter: { name: user.name },
+  //     update: { $setOnInsert: user },
+  //     upsert: true,
+  //   }
+  // })));
 }
 
 /**
  * Populates a list of authors for testing purposes.
  */
 export async function populateAuthors() {
-  await authorModel.insertMany([{
-    name: "Mario",
-  }, {
-    name: "Luigi",
-  }, {
-    name: "Peach",
-  }, {
-    name: "Daisy",
-  }, {
-    name: "Yoshi",
-  }, {
-    name: "Bowser",
-  }]);
+  const authors = ["Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Bowser"].map(author => ({ name: author }));
+  await authorModel.insertMany(authors);
+  // await authorModel.bulkWrite(authors.map(author => ({
+  //   updateOne: {
+  //     filter: { name: author.name },
+  //     update: { $setOnInsert: author },
+  //     upsert: true,
+  //   }
+  // })));
 }
 
 /**
  * Populates a list of categories for testing purposes.
  */
 export async function populateCategories() {
-  await categoryModel.insertMany([{
-    name: "Paranormal",
-  }, {
-    name: "Romance",
-  }, {
-    name: "Battle",
-  }, {
-    name: "Action",
-  }, {
-    name: "Fantasy",
-  }, {
-    name: "Shojo",
-  }, {
-    name: "Yoshi",
-  }]);
+  const categories = ["Paranormal", "Romance", "Battle", "Action", "Fantasy", "Shojo", "Yoshi"].map(cat => ({ name: cat }));
+  await categoryModel.insertMany(categories);
+  // await categoryModel.bulkWrite(categories.map(cat => ({
+  //   updateOne: {
+  //     filter: { name: cat.name },
+  //     update: { $setOnInsert: cat },
+  //     upsert: true,
+  //   }
+  // })));
 }
 
 /**
  * Populates a fake list of mangas for testing purposes.
  */
 export async function populateMangas() {
-  await mangaModel.insertMany([{
+  const mangas = [{
     name: "Where have you been all my life?",
     authors: await mapAuthorsToId("Mario", "Peach"),
     categories: await mapCategoriesToId("Fantasy", "Romance"),
@@ -135,5 +149,35 @@ export async function populateMangas() {
     description: "Two young girls travel a multiverse of destroyed civilizations, gathering what remains from memory fragments.",
     status: "In progress",
     uploader: await getUser("elderberry"),
-  }]);
+  }];
+  await mangaModel.insertMany(mangas);
+
+  // await mangaModel.bulkWrite(mangas.map(manga => ({
+  //   updateOne: {
+  //     filter: { name: manga.name },
+  //     update: { $setOnInsert: manga },
+  //     upsert: true,
+  //   }
+  // })));
+}
+
+/**
+ * Simple blocking relationships.
+ * 
+ * Strawberry will block category "Yoshi".
+ * Blueberry will block authors "Peach".
+ */
+export async function populateBlockList() {
+  await userModel.updateOne({ name: "strawberry" }, { blacklist: { categories: await mapCategoriesToId("Yoshi") } });
+  await userModel.updateOne({ name: "blueberry" }, { blacklist: { authors: await mapAuthorsToId("Peach") } });
+}
+
+/**
+ * Clears all data.
+ */
+export async function depopulate() {
+  await userModel.deleteMany();
+  await authorModel.deleteMany();
+  await categoryModel.deleteMany();
+  await mangaModel.deleteMany();
 }
