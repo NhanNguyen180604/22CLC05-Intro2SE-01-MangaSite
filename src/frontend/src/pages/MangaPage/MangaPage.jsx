@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import { getMangaByID, getRatings } from "../../service/mangaService"
+import { Link, useNavigate } from "react-router-dom"
+import { getMangaByID, getRatings, getChapterList } from "../../service/mangaService"
 import { useParams } from "react-router-dom"
 import { FaFlag, FaCommentAlt, FaBookmark } from "react-icons/fa"
 import { FaGear } from "react-icons/fa6"
@@ -8,17 +9,28 @@ import TabComponents from "../../components/Tab"
 const { Tab, TabPanel } = TabComponents;
 import ChapterList from "../../components/ChapterList"
 import CoverGallery from "../../components/CoverGallery"
+import LibraryForm from "../../components/LibraryForm"
 import ReportForm from "../../components/ReportForm"
+import CommentForm from "../../components/CommentForm"
 import StarRating from "../../components/StarRating"
 import RatingForm from "../../components/RatingForm"
 import NotificationForm from "../../components/NotificationForm"
+import DesktopLogo from "../../components/main/DesktopLogo.jsx"
+import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx"
+import MainLayout from "../../components/main/MainLayout.jsx"
+import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx"
 
 const MangaPage = () => {
 	const { id } = useParams();
 
-	const [manga, setManga] = useState({ a: 'a' });
+	const [manga, setManga] = useState({});
+	const [firstChapter, setFirstChapter] = useState(0);
+
+	const [showLibaryForm, setShowLibraryForm] = useState(false);
 
 	const [showReportForm, setShowReportForm] = useState(false);
+
+	const [showCommentForm, setShowCommentForm] = useState(false);
 
 	const [ratings, setRatings] = useState([]);
 	const [showRatingForm, setShowRatingForm] = useState(false);
@@ -30,8 +42,15 @@ const MangaPage = () => {
 		details: '',
 	});
 
+	const [showMore, setShowMore] = useState(false);
+
+	const navigate = useNavigate();
+
 	const togglePopup = (setCallback, attribute) => {
 		setCallback(!attribute);
+		if (!attribute)
+			document.body.classList.add(`${styles.noScroll}`);
+		else document.body.classList.remove(`${styles.noScroll}`);
 	}
 
 	const handlePopupClick = (id, setCallback, attribute) => {
@@ -53,6 +72,14 @@ const MangaPage = () => {
 				else {
 					console.log("Couldn't get ratings");
 				}
+
+				const chapterResponse = await getChapterList(id, 1, 1);
+				if (chapterResponse.status === 200) {
+					setFirstChapter(chapterResponse.chaptersInfo.chapters[0].number);
+				}
+				else {
+					setFirstChapter(1);  //pray this number is correct
+				}
 			}
 			else {
 				console.log(response.message);
@@ -60,18 +87,25 @@ const MangaPage = () => {
 		}
 
 		fetchData()
-	}, [])
+	}, []);
 
 	return (
-		<>
+		<MainLayout>
+			<header className="flex w-full flex-row items-center justify-between">
+				<DesktopLogo />
+				<div className="flex w-full flex-row items-center gap-8 lg:w-fit">
+					<DesktopNavigationBar />
+				</div>
+			</header>
+
 			<div className={styles.mainContainer}>
 				<div className={styles.leftColumnContainer}>
 					<img src={manga.cover} />
 
 					<div className={styles.actionBTNsContainer}>
-						<FaBookmark />
+						<FaBookmark onClick={() => togglePopup(setShowLibraryForm, showLibaryForm)}/>
 						<FaFlag onClick={() => togglePopup(setShowReportForm, showReportForm)} />
-						<FaCommentAlt />
+						<FaCommentAlt onClick={() => togglePopup(setShowCommentForm, showCommentForm)} />
 						<FaGear />
 					</div>
 
@@ -79,13 +113,21 @@ const MangaPage = () => {
 						{manga.categories && manga.categories.length > 0 && (
 							manga.categories.map(category => (
 								// onclick filter search by this category
-								<button key={category._id}>{category.name}</button>
+								<button
+									key={category._id}
+									onClick={() => navigate(`/search?includeCategories=${category._id}`)}
+								>
+									{category.name}
+								</button>
 							))
 						)}
 					</div>
 
 					{/* on click, redirect to the latest page in reading history, or chapter 1 if is guest */}
-					<button className={styles.startReadingBTN}>
+					<button
+						onClick={(e) => navigate(`/mangas/${id}/chapters/${firstChapter}`)}
+						className={styles.startReadingBTN}
+					>
 						Start Reading
 					</button>
 				</div>
@@ -93,25 +135,36 @@ const MangaPage = () => {
 					<div className={styles.details}>
 						<div>
 							<h1>{manga.name}</h1>
-							{manga.authors &&
-								manga.authors.map((author, index) => (
-									// onclick filter search by this author
-									<span key={author._id} className={styles.authorName}>
-										{author.name}
-										{index < manga.authors.length - 1 && ',\u00A0'}
-									</span>
-								))
-							}
+							<div className={`${styles.authorName} ${styles.hoverableName}`}>
+								{manga.authors &&
+									manga.authors.map((author, index) => (
+										// onclick filter search by this author
+										<Link
+											key={author._id}
+											to={`/search?includeAuthors=${author._id}`}
+										>
+											{author.name}
+											{index < manga.authors.length - 1 && ',\u00A0'}
+										</Link>
+									))
+								}
+							</div>
+							<div>Status: {manga.status}</div>
+							<div>Upload by: {'\u00A0'}
+								<Link to={`/user/${manga.uploader?._id}`}
+									className={styles.hoverableName}
+								>
+									{manga.uploader?.name}
+								</Link>
+							</div>
 						</div>
 
 						<div onClick={() => togglePopup(setShowRatingForm, showRatingForm)} className={styles.rating}>
 							<StarRating ratings={ratings} />
 						</div>
 
-						<div className={styles.synopsis}>
-							<p>Centuries ago, mankind was slaughtered to near extinction by monstrous humanoid creatures called Titans, forcing humans to hide in fear behind enormous concentric walls. What makes these giants truly terrifying is that their taste for human flesh is not born out of hunger but what appears to be out of pleasure. To ensure their survival, the remnants of humanity began living within defensive barriers, resulting in one hundred years without a single titan encounter. However, that fragile calm is soon shattered when a colossal Titan manages to breach the supposedly impregnable outer wall, reigniting the fight for survival against the man-eating abominations.</p>
-							<p>After witnessing a horrific personal loss at the hands of the invading creatures, Eren Yeager dedicates his life to their eradication by enlisting into the Survey Corps, an elite military unit that combats the merciless humanoids outside the protection of the walls. Eren, his adopted sister Mikasa Ackerman, and his childhood friend Armin Arlert join the brutal war against the Titans and race to discover a way of defeating them before the last walls are breached.</p>
-
+						<div className={`${styles.synopsis}`}>
+							{manga.description}
 						</div>
 					</div>
 
@@ -125,39 +178,66 @@ const MangaPage = () => {
 					</Tab>
 
 				</div>
+
+				{showReportForm && <div className={styles.popupContainer}
+					onClick={(e) => handlePopupClick(e.target.id, setShowReportForm, showReportForm)}
+					id="popupContainer">
+					<ReportForm
+						setShowThis={setShowReportForm}
+						setNotiFormDetails={setNotiFormDetails}
+						setShowNotiForm={setShowNotiForm}
+					/>
+				</div>}
+
+				{showRatingForm && <div className={styles.popupContainer}
+					onClick={(e) => handlePopupClick(e.target.id, setShowRatingForm, showRatingForm)}
+					id="popupContainer">
+					<RatingForm
+						ratings={ratings}
+						setShowThis={setShowRatingForm}
+						setNotiFormDetails={setNotiFormDetails}
+						setShowNotiForm={setShowNotiForm}
+					/>
+				</div>}
+
+				{showNotiForm && <div className={styles.popupContainer}
+					onClick={(e) => handlePopupClick(e.target.id, setShowNotiForm, showNotiForm)}
+					id="popupContainer">
+					<NotificationForm
+						message={notiFormDetails.message}
+						details={notiFormDetails.details}
+						success={notiFormDetails.success}
+					/>
+				</div>}
+
+				{showCommentForm && <div className={styles.popupContainer}
+					onClick={(e) => handlePopupClick(e.target.id, setShowCommentForm, showCommentForm)}
+					id="popupContainer">
+					<CommentForm
+						setShowThis={setShowCommentForm}
+						setNotiFormDetails={setNotiFormDetails}
+						setShowNotiForm={setShowNotiForm}
+					/>
+				</div>}
+
+				{showLibaryForm && <div className={styles.popupContainer}
+					onClick={(e) => handlePopupClick(e.target.id, setShowLibraryForm, showLibaryForm)}
+					id="popupContainer">
+					<LibraryForm
+						title={manga.name}
+						setShowThis={setShowLibraryForm}
+						setNotiFormDetails={setNotiFormDetails}
+						setShowNotiForm={setShowNotiForm}
+					/>
+				</div>}
 			</div>
 
-			{showReportForm && <div className={styles.popupContainer}
-				onClick={(e) => handlePopupClick(e.target.id, setShowReportForm, showReportForm)}
-				id="popupContainer">
-				<ReportForm
-					setShowThis={setShowReportForm}
-					setNotiFormDetails={setNotiFormDetails}
-					setShowNotiForm={setShowNotiForm}
-				/>
-			</div>}
 
-			{showRatingForm && <div className={styles.popupContainer}
-				onClick={(e) => handlePopupClick(e.target.id, setShowRatingForm, showRatingForm)}
-				id="popupContainer">
-				<RatingForm
-					ratings={ratings}
-					setShowThis={setShowRatingForm}
-					setNotiFormDetails={setNotiFormDetails}
-					setShowNotiForm={setShowNotiForm}
-				/>
-			</div>}
 
-			{showNotiForm && <div className={styles.popupContainer}
-				onClick={(e) => handlePopupClick(e.target.id, setShowNotiForm, showNotiForm)}
-				id="popupContainer">
-				<NotificationForm
-					message={notiFormDetails.message}
-					details={notiFormDetails.details}
-					success={notiFormDetails.success}
-				/>
-			</div>}
-		</>
+			<footer>
+				<MobileNavigationBar />
+			</footer>
+		</MainLayout>
 	)
 }
 export default MangaPage

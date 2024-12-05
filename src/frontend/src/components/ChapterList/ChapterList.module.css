@@ -1,6 +1,5 @@
 .chapterListContainer {
 	margin-bottom: 50px;
-	padding: 10px
 }
 
 .chapterListContainer > div:first-of-type {
@@ -91,17 +90,21 @@
 	display: inline-block;
 	padding: 0 10px;
 	cursor: pointer;
+	color: rgba(255, 255, 255, 0.5);
+	transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 .paginationContainer input[type='radio']{
 	display: none;
 }
 
+.paginationContainer label:hover,
 .paginationContainer .activeLabel {
-	background-color: var(--darker-navy);
+	background: var(--darker-navy);
+	color: white;
 }
 
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 1024px) {
 	.chapterList {
 		display: flex;
 		flex-direction: column;

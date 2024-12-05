@@ -39,3 +39,8 @@ body {
 body {
     background: var(--dark-navy);
 }
+
+* {
+    scrollbar-width: thin;
+	scrollbar-color: var(--medium-navy) var(--darker-navy);
+}

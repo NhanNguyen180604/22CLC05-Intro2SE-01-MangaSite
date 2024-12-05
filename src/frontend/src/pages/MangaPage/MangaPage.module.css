@@ -2,6 +2,7 @@
 	display: grid;
 	grid-template-columns: 2fr 8fr;
 	width: 100%;
+	margin-top: 4rem;
 }
 
 .leftColumnContainer {
@@ -34,7 +35,7 @@
 }
 
 .actionBTNsContainer {
-	font-size: 3rem;
+	font-size: 2.5rem;
 	color: white;
 }
 
@@ -85,7 +86,6 @@
 
 .details {
 	margin-bottom: 20px;
-	height: 50vh;
 	display: flex;
 	flex-direction: column;
 	color: white;
@@ -102,17 +102,12 @@
 
 .synopsis {
 	flex: 1;
-	overflow-y: scroll;
 	color: rgba(255, 255, 255, 0.75);
-	-ms-overflow-style: none;  /* IE and Edge */
-	scrollbar-width: none;  /* Firefox */
+	max-height: 35vh;
+	overflow-y: auto;
 }
 
-.synopsis::-webkit-scrollbar{
-	display: none;
-}
-
-.synopsis > * {
+.synopsis * {
 	margin-top: 0;
 }
 
@@ -122,16 +117,20 @@
 	font-weight: bold;
 }
 
-.authorName {
-	font-size: 1.5rem;
-	font-weight: bold;
+.hoverableName{
 	color: var(--light-blue);
 	cursor: pointer;
 	transition: color 0.2s ease-in-out;
-	display: inline-block;
 }
 
-.authorName:hover {
+.authorName {
+	font-size: 1.5rem;
+	font-weight: bold;
+	display: inline-block;
+	margin-bottom: 10px;
+}
+
+.hoverableName:hover {
 	color: var(--very-light-blue);
 }
 
@@ -145,18 +144,29 @@
 	justify-content: center;
 	align-items: center;
 	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(5px);
 	z-index: 100;
 }
 
-@media only screen and (max-width: 1000px) {
+.noScroll {
+	overflow-y: hidden;
+}
+
+@media only screen and (max-width: 1600px) {
 	.mainContainer {
 		grid-template-columns: 30fr 70fr;
 	}
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 1200px) {
 	.mainContainer {
 		grid-template-columns: 40fr 60fr;
+	}
+}
+
+@media only screen and (max-width: 900px) {
+	.mainContainer {
+		grid-template-columns: 45fr 55fr;
 	}
 }
 
@@ -172,8 +182,8 @@
 	}
 
 	.leftColumnContainer > div,
-	.leftColumnContainer > button,
-	.rightColumnContainer > div {
+	.rightColumnContainer > div,
+	.leftColumnContainer .startReadingBTN {
 		width: 75%;
 	}
 
@@ -183,6 +193,6 @@
 
 	.synopsis {
 		flex: 0;
-		overflow-y: none;
+		max-height: max-content;
 	}
 }

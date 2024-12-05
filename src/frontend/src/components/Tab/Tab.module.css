@@ -3,7 +3,7 @@
     width: 100%;
 }
 
-.tabHeaders {
+.tabContainer .tabHeaders {
     display: inline-flex;
     background: var(--medium-navy);
     gap: 10px;
@@ -12,31 +12,20 @@
     border-radius: 5px;
 }
 
-.tabHeaders button{
+.tabContainer .tabHeaders button{
     padding: 5px 10px;
     font-size: 1.1rem;
-    transition: color 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
     border-radius: 5px;
+    color: rgba(255, 255, 255, 0.5);
 }
 
-.tabHeaders button:hover{
-    color: white;
-}
-
-.activeHeader{
+.tabContainer .tabHeaders button:hover,
+.tabContainer .tabHeaders .activeHeader{
     background: var(--darker-navy);
     color: white;
-    font-weight: bold;
 }
 
-.inactiveHeader{
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.activeTab{
-    display: block;
-}
-
-.inactiveTab{
+.tabContainer .inactiveTab{
     display: none;
 }

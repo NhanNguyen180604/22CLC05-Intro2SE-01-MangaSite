@@ -1,0 +1,138 @@
+.commentForm {
+	padding: 1rem 2rem;
+	color: white;
+	display: flex;
+	flex-direction: column;
+	row-gap: 10px;
+	width: 60%;
+	height: 85%;
+	background: var(--medium-navy);
+	border-radius: 20px;
+	font-size: 1rem;
+}
+
+.commentForm div:first-of-type {
+	font-weight: bold;
+}
+
+.commentList{
+	height: 80%;
+	overflow-y: auto;
+	padding-right: 10px;  /* add space for scrollbar */
+}
+
+.commentContainer{
+	background: var(--blue);
+	padding: 1rem;
+	border-radius: 12px;
+}
+
+.replyContainer {
+	width: 95%;
+	transform: translateX(5%);
+}
+
+.commentContainer{
+	margin-bottom: 10px;
+}
+
+.userInfo{
+	height: 2rem;
+	font-size: 1rem;
+}
+
+.userInfo span{
+	margin-left: 10px;
+}
+
+.userAvatar{
+	display: inline;
+	width: 2rem;
+	height: 2rem;
+	object-fit: cover;
+	border-radius: 1rem;
+}
+
+.commentTime{
+	margin-top: 5px;
+	text-align: right;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.showMore {
+	text-align: center;
+}
+
+.showMoreBTN { 
+	border: 2px solid var(--very-light-blue);
+	border-radius: 20px;
+	padding: 5px 10px;
+	font-size: 1rem;
+	transition: background 0.2s ease-in-out;
+}
+
+.showMoreBTN:hover{
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.commentInput{
+	height: 15%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.commentInput input[type='text']{
+	color: white;
+	background: var(--dark-navy);
+	padding: 4px 10px;
+	border-radius: 8px;
+	box-shadow: 0px 5px 5px var(--dark-navy);
+	min-width: 75%;
+	transition: border 0.2s ease-in-out;
+	border: 1px solid var(--dark-navy);
+}
+
+.commentInput input[type='text']:focus{
+	outline: none;
+	border: 1px solid var(--very-light-blue);
+}
+
+.commentInput button{
+	color: black;
+	background: var(--very-light-blue);
+	padding: 4px 8px;
+	border-radius: 8px;
+	font-weight: bold;
+	box-shadow: 0px 5px 5px var(--dark-navy);
+	transition: opacity 0.2s ease-in-out, background 0.1s ease-in-out, color 0.2s ease-in-out;
+}
+
+.commentInput button:disabled{
+	opacity: 0.3;
+	pointer-events: none;
+}
+
+.commentInput button:not(:disabled):hover{
+	opacity: 0.7;
+}
+
+.commentInput button:active{
+	background: var(--blue);
+	color: white;
+}
+
+@media only screen and (max-width: 800px) {
+	.commentForm {
+		width: 100%;
+		height: 95%;
+		transform: translateY(5%);
+		border-radius: 0;
+	}
+
+	.replyContainer {
+		width: 85%;
+		transform: translateX(15%);
+	}
+}

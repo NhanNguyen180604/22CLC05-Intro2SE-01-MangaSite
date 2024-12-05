@@ -1,5 +1,6 @@
 import styles from "./ChapterList.module.css";
-import { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from 'react';
 import { getChapterList } from "../../service/mangaService.js"
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa'
 
@@ -36,10 +37,14 @@ const ChapterList = ({ mangaID }) => {
                         <div className={styles.chapterList}>
                             {chapters.length > 0 && (
                                 chapters.map(chapter => (
-                                    <div key={chapter._id} className={styles.chapterContainer}>
+                                    <Link
+                                        key={chapter._id}
+                                        className={styles.chapterContainer}
+                                        to={`/mangas/${mangaID}/chapters/${chapter.number}`}
+                                    >
                                         <div><b>{`Chapter #${chapter.number}`}</b></div>
                                         <div>{chapter.title}</div>
-                                    </div>
+                                    </Link>
                                 ))
                             )}
                         </div>
@@ -55,6 +60,7 @@ const ChapterList = ({ mangaID }) => {
 }
 
 const Pagination = ({ currentPage, perPage, totalPages, total, callback, children }) => {
+    const pageRefs = useRef([]);
 
     const loadPage = (new_page) => {
         if (new_page === currentPage || new_page > totalPages || new_page === 0)
@@ -63,12 +69,22 @@ const Pagination = ({ currentPage, perPage, totalPages, total, callback, childre
         callback(new_page);
     };
 
+    const scrollToPage = (page) => {
+        if (pageRefs.current[page - 1]) {
+            pageRefs.current[page - 1].scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+            });
+            loadPage(page);
+        }
+    };
+
     return (
         <>
             <div className={styles.paginationContainer}>
                 {/* change page buttons */}
 
-                <button onClick={() => loadPage(currentPage - 1)}>
+                <button onClick={() => scrollToPage(currentPage - 1)}>
                     <FaAngleLeft />
                 </button>
 
@@ -77,26 +93,26 @@ const Pagination = ({ currentPage, perPage, totalPages, total, callback, childre
                         <label
                             key={`page-button-${index + 1}`}
                             className={(index + 1) === currentPage ? styles.activeLabel : ""}
+                            ref={(el) => (pageRefs.current[index] = el)}
                         >
                             <input
                                 type="radio"
                                 name="page-button"
                                 defaultChecked={index + 1 === currentPage}
-                                onClick={() => loadPage(index + 1)}
+                                onClick={() => scrollToPage(index + 1)}
                             />
                             {`${index * perPage + 1} - ${Math.min((index + 1) * perPage, total)}`}
                         </label>
                     ))}
                 </div>
 
-                <button onClick={() => loadPage(currentPage + 1)}>
+                <button onClick={() => scrollToPage(currentPage + 1)}>
                     <FaAngleRight />
                 </button>
             </div>
 
             {children}
         </>
-
     )
 }
 

@@ -17,7 +17,7 @@ const Tab = ({ children }) => {
                     <button
                         key={`tab-header-${index + 1}`}
                         onClick={() => changeTab(index)}
-                        className={activeTab === index ? styles.activeHeader : styles.inactiveHeader}
+                        className={activeTab === index ? styles.activeHeader : ""}
                     >
                         {child.props.title}
                     </button>
@@ -27,7 +27,7 @@ const Tab = ({ children }) => {
             <div className={styles.tabContent}>
                 {childrenArray.map((child, index) => (
                     <div
-                        className={activeTab === index ? styles.activeTab : styles.inactiveTab}
+                        className={activeTab === index ? "" : styles.inactiveTab}
                         key={`tab-content-${index + 1}`}
                     >
                         {child}
