@@ -1,1 +1,3 @@
-export default function SearchQueryDisplay() {}
+
+export default function SearchQueryDisplay() {
+}

@@ -1,29 +1,28 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { page, userEvent } from "@vitest/browser/context";
-import axios from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
 import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx";
 
 describe("navigation bar", () => {
+  const data = {
+    avatar: { url: "https://avatars.githubusercontent.com/u/128211112?v=4" },
+  };
+  const fetchMeMock = vi.fn(
+    async () => new Response(JSON.stringify(data), { status: 200 }),
+  );
+  const fetchErrorMock = vi.fn(async () => new Response(null, { status: 401 }));
+
   beforeEach(async () => {
-    vi.resetModules();
-    vi.mock("axios");
-    vi.spyOn(axios, "get").mockImplementation(
-      vi.fn(async (url) => ({
-        status: 200,
-        data: {
-          name: "luna",
-          email: "luna@example.com",
-        },
-      })),
-    );
+    vi.useFakeTimers();
+    vi.stubGlobal("fetch", fetchMeMock);
   });
 
   afterEach(async () => {
-    vi.unmock("axios");
-    vi.restoreAllMocks();
     cleanup();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("should show mobile version on small screens", async () => {
@@ -53,27 +52,23 @@ describe("navigation bar", () => {
   });
 
   it("should show nothing if not authorized", async () => {
-    vi.resetModules();
-    vi.mock("axios");
-    vi.spyOn(axios, "get").mockImplementation(
-      vi.fn(async (url) => ({ status: 401 })),
-    );
-
+    vi.stubGlobal("fetch", fetchErrorMock);
     render(
       <>
         <MobileNavigationBar />
         <DesktopNavigationBar />
       </>,
     );
+
+    await expect
+      .element(page.getByRole("link", { name: "Login" }))
+      .toBeInTheDocument();
     await expect
       .element(page.getByTestId("mobile-nav-bar"))
       .not.toBeInTheDocument();
     await expect
       .element(page.getByTestId("desktop-nav-bar"))
       .not.toBeInTheDocument();
-
-    vi.unmock("axios");
-    vi.restoreAllMocks();
   });
 
   it("should expand on hover desktop bar", async () => {
