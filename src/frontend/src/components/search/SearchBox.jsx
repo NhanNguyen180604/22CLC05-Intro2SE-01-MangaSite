@@ -1,7 +1,6 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { useLocalSWR } from "../../service/service.js";
+import { getCategories } from "../../service/categoryService.js";
 import { $showBlackLayer } from "../../stores/black-layer.js";
 import { $searchGenres, $searchText } from "../../stores/search.js";
 import IconSearch from "../icons/IconSearch.jsx";
@@ -53,23 +52,32 @@ function SearchFilterListFallback() {
 }
 
 function SearchFilterDialog() {
-  const { data, isLoading, isValidating } = useLocalSWR(
-    "/categories?page=1&per_page=40",
-  );
+  const [categories, setCategories] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load the categories
+  useEffect(() => {
+    getCategories()
+      .then((categories) => {
+        $searchGenres.set(
+          $searchGenres.get().filter((genre) => !categories.includes(genre)),
+        );
+        setCategories(categories);
+      })
+      .then(() => setLoading(false));
+  }, []);
 
   return (
     <div className="absolute -bottom-2 left-0 flex w-full translate-y-full flex-col gap-3 rounded-2xl bg-medium-navy px-6 py-4">
       <h3 className="text-xs font-bold lg:text-base">Genres</h3>
       <div className="flex w-full flex-row flex-wrap gap-2">
-        <ErrorBoundary fallback={<SearchFilterListError />}>
-          {isLoading || isValidating ? (
-            <SearchFilterListFallback />
-          ) : data ? (
-            <SearchFilterList tags={data.categories} />
-          ) : (
-            <SearchFilterListError />
-          )}
-        </ErrorBoundary>
+        {loading ? (
+          <SearchFilterListFallback />
+        ) : categories ? (
+          <SearchFilterList tags={categories} />
+        ) : (
+          <SearchFilterListError />
+        )}
       </div>
     </div>
   );
