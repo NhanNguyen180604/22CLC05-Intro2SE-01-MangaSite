@@ -9,6 +9,7 @@ function SearchQueryLoading() {
         <div
           className="size-full min-h-[11rem] min-w-[7rem] animate-pulse bg-slate-500"
           key={`search-loading-${idx}`}
+          data-testid="search-manga-loading"
         ></div>
       ))}
     </div>

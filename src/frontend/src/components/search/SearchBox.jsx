@@ -1,6 +1,7 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getCategories } from "../../service/categoryService.js";
+import { redirect } from "../../service/service.js";
 import { $showBlackLayer } from "../../stores/black-layer.js";
 import { $searchGenres, $searchText } from "../../stores/search.js";
 import IconSearch from "../icons/IconSearch.jsx";
@@ -59,9 +60,12 @@ function SearchFilterDialog() {
   useEffect(() => {
     getCategories()
       .then((categories) => {
-        $searchGenres.set(
-          $searchGenres.get().filter((genre) => !categories.includes(genre)),
-        );
+        if (categories) {
+          const retrieved = categories.map((cat) => cat.name);
+          $searchGenres.set(
+            $searchGenres.get().filter((genre) => retrieved.includes(genre)),
+          );
+        }
         setCategories(categories);
       })
       .then(() => setLoading(false));
@@ -92,10 +96,6 @@ function SearchBox() {
     setFocused(false);
   }
 
-  function search() {
-    window.location.href = "/search";
-  }
-
   useEffect(() => {
     $showBlackLayer.set(focused);
     if (focused) document.addEventListener("blackLayerClick", handler);
@@ -112,7 +112,11 @@ function SearchBox() {
         }
       }}
     >
-      <button className="group" aria-label="Search" onClick={search}>
+      <button
+        className="group"
+        aria-label="Search"
+        onClick={() => redirect("/search")}
+      >
         <IconSearch className="size-4 fill-icon-white group-hover:fill-sky-blue lg:size-5" />
       </button>
 
@@ -126,7 +130,7 @@ function SearchBox() {
         onChange={(e) => $searchText.set(e.target.value)}
         onFocus={() => setFocused(true)}
         onKeyDown={(e) => {
-          if (e.key == "Enter") search();
+          if (e.key == "Enter") redirect("/search");
         }}
       />
       {focused && <SearchFilterDialog />}

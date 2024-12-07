@@ -1,8 +1,30 @@
 import { cleanup, render } from "@testing-library/react";
 import { page, userEvent } from "@vitest/browser/context";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import BlackLayer from "../../components/misc/BlackLayer.jsx";
-import SearchBox from "../../components/search/SearchBox.jsx";
+import { allTasks } from "nanostores";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import BlackLayer from "../../../components/misc/BlackLayer.jsx";
+import SearchBox from "../../../components/search/SearchBox.jsx";
+import { $searchGenres } from "../../../stores/search.js";
+
+const { redirectMock } = vi.hoisted(() => ({
+  redirectMock: vi.fn((url) => {}),
+}));
+
+vi.mock(import("../../../service/service.js"), async (factory) => {
+  const actual = await factory();
+  return {
+    ...actual,
+    redirect: redirectMock,
+  };
+});
 
 describe("search box", () => {
   const categoriesData = ["Shojo", "Romcom", "Princess", "Wet"];
@@ -25,14 +47,29 @@ describe("search box", () => {
 
   afterEach(() => {
     cleanup();
-    vi.unstubAllGlobals();
+  });
+
+  afterAll(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it("should render", async () => {
     render(<SearchBox />);
     const comp = page.getByRole("textbox");
     await expect.element(comp).toBeVisible();
+  });
+
+  it("should replace localStorage with correct genres if changed", async () => {
+    $searchGenres.set(["Shonen"]);
+    render(<SearchBox />);
+    const input = page.getByRole("textbox");
+    await input.click();
+    await expect.element(input).toHaveFocus();
+    await vi.advanceTimersByTimeAsync(2000);
+
+    await allTasks();
+    expect($searchGenres.get()).not.toContain("Shonen");
   });
 
   it("should throw error if nothing is supplied", async () => {
@@ -119,5 +156,27 @@ describe("search box", () => {
     await userEvent.keyboard("{Escape}");
     await expect.element(blackLayer).not.toBeVisible();
     expect(comp.queryByText("Shojo")).toBeFalsy();
+  });
+
+  it("navigates to search when entered", async () => {
+    // How do we even mock window.location.href.
+    // Answer: we can't.
+    render(<SearchBox />);
+    const input = page.getByRole("textbox");
+    await input.click();
+    await expect.element(input).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+
+    expect(redirectMock).toHaveBeenCalledWith("/search");
+    redirectMock.mockClear();
+  });
+
+  it("navigates to search when clicked on the icon", async () => {
+    render(<SearchBox />);
+
+    const button = page.getByRole("button", { name: "Search" });
+    await button.click();
+    expect(redirectMock).toHaveBeenCalledWith("/search");
+    redirectMock.mockClear();
   });
 });

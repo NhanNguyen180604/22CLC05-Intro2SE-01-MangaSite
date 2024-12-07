@@ -25,7 +25,6 @@ import AuthorsSpread from "./AuthorsSpread.jsx";
 const typeAuthor = propTypes.shape({
   _id: propTypes.string,
   name: propTypes.string,
-  __v: propTypes.number,
 });
 
 /**
@@ -34,10 +33,10 @@ const typeAuthor = propTypes.shape({
 const typeCategory = propTypes.shape({
   _id: propTypes.string,
   name: propTypes.string,
-  __v: propTypes.number,
 });
 
 const MangaResultBox = function ({ manga }) {
+  // console.log(manga);
   return (
     <a
       href={`/mangas/${manga._id}`}

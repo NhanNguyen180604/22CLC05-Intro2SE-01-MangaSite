@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { page, userEvent } from "@vitest/browser/context";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
-import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx";
+import DesktopNavigationBar from "../../../components/main/DesktopNavigationBar.jsx";
+import MobileNavigationBar from "../../../components/main/MobileNavigationBar.jsx";
 
 describe("navigation bar", () => {
   const data = {

@@ -1,7 +1,7 @@
 import { cleanup, render } from "@testing-library/react";
 import { page } from "@vitest/browser/context";
 import { afterEach, describe, expect, it } from "vitest";
-import DesktopLogo from "../../components/main/DesktopLogo.jsx";
+import DesktopLogo from "../../../components/main/DesktopLogo.jsx";
 
 describe("desktop logo", () => {
   afterEach(() => {
