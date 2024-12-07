@@ -4,7 +4,7 @@ export default function useToken() {
   const getToken = () => {
     const tokenString = localStorage.getItem('token');
     const timestampString = localStorage.getItem('tokenTimestamp');
-    const userToken = JSON.parse(tokenString);
+    const userToken = tokenString;
     const tokenTimestamp = JSON.parse(timestampString);
     
     const expirationTime = 60 * 60 * 1000;
