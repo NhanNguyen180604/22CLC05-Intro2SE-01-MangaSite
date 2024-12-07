@@ -67,11 +67,11 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new Error('Email is not registered');
     }
     if (!await bcrypt.compare(password, user.password)) {
-        res.status(400);
+        res.status(401);
         throw new Error('Wrong password');
     }
     if (await BanList.findOne({ user: user._id })) {
-        res.status(401);
+        res.status(402);
         throw new Error('The user is banned');
     }
     res.status(201).json({ token: generateToken(user._id) });
@@ -99,7 +99,7 @@ const registerUser = asyncHandler(async (req, res) => {
         password: hashPassword,
         accountType: 'user',
     });
-    res.status(201).json({ token: generateToken(user._id) });
+    res.status(201).json(user);
 });
 
 const requestApproval = asyncHandler(async (req, res) => {
