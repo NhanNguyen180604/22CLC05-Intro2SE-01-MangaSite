@@ -1,39 +1,79 @@
 import { cleanup, render } from "@testing-library/react";
 import { page, userEvent } from "@vitest/browser/context";
-import axios from "axios";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import BlackLayer from "../../components/misc/BlackLayer.jsx";
-import SearchBox from "../../components/search/SearchBox.jsx";
+import { allTasks } from "nanostores";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import BlackLayer from "../../../components/misc/BlackLayer.jsx";
+import SearchBox from "../../../components/search/SearchBox.jsx";
+import { $searchGenres } from "../../../stores/search.js";
+
+const { redirectMock } = vi.hoisted(() => ({
+  redirectMock: vi.fn((url) => {}),
+}));
+
+vi.mock(import("../../../service/service.js"), async (factory) => {
+  const actual = await factory();
+  return {
+    ...actual,
+    redirect: redirectMock,
+  };
+});
 
 describe("search box", () => {
   const categoriesData = ["Shojo", "Romcom", "Princess", "Wet"];
   const queryData = categoriesData.map((cat) => ({ name: cat }));
 
+  const fetchMock = vi.fn(async (url) => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    return new Response(JSON.stringify({ categories: queryData }), {
+      status: 200,
+    });
+  });
+  const fetchMockError = vi.fn(async (url) => {
+    return new Response(null, { status: 400 });
+  });
+
   beforeEach(() => {
-    vi.resetModules();
-    vi.mock("axios");
+    vi.useFakeTimers();
+    vi.stubGlobal("fetch", fetchMock);
   });
 
   afterEach(() => {
     cleanup();
-    vi.unmock("axios");
-    vi.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it("should render", async () => {
-    vi.spyOn(axios, "get").mockResolvedValueOnce({
-      status: 200,
-      data: { categories: queryData },
-    });
     render(<SearchBox />);
     const comp = page.getByRole("textbox");
     await expect.element(comp).toBeVisible();
   });
 
+  it("should replace localStorage with correct genres if changed", async () => {
+    $searchGenres.set(["Shonen"]);
+    render(<SearchBox />);
+    const input = page.getByRole("textbox");
+    await input.click();
+    await expect.element(input).toHaveFocus();
+    await vi.advanceTimersByTimeAsync(2000);
+
+    await allTasks();
+    expect($searchGenres.get()).not.toContain("Shonen");
+  });
+
   it("should throw error if nothing is supplied", async () => {
-    vi.spyOn(axios, "get").mockImplementationOnce(() => {
-      throw new Error("Placebo");
-    });
+    vi.stubGlobal("fetch", fetchMockError);
     render(
       <>
         <BlackLayer />
@@ -48,16 +88,24 @@ describe("search box", () => {
     await expect.element(page.getByText("Error loading tags")).toBeVisible();
   });
 
+  it("should show loading state while rendering", async () => {
+    render(<SearchBox />);
+    const input = page.getByRole("textbox");
+    await input.click();
+    await expect.element(input).toHaveFocus();
+
+    expect(page.getByTestId("category-loading-box").elements()).toHaveLength(
+      10,
+    );
+  });
+
   it("should show list if it succeeds", async () => {
-    vi.spyOn(axios, "get").mockResolvedValueOnce({
-      status: 200,
-      data: { categories: queryData },
-    });
     render(<SearchBox />);
 
     const input = page.getByRole("textbox");
     await input.click();
     await expect.element(input).toHaveFocus();
+    await vi.advanceTimersByTimeAsync(2001);
 
     const shojo = page.getByText("Shojo");
     await expect.element(shojo).toBeVisible();
@@ -73,10 +121,6 @@ describe("search box", () => {
   });
 
   it("should change search-text in localStorage", async () => {
-    vi.spyOn(axios, "get").mockResolvedValueOnce({
-      status: 200,
-      data: { categories: queryData },
-    });
     render(<SearchBox />);
 
     const input = page.getByRole("textbox");
@@ -87,10 +131,6 @@ describe("search box", () => {
   });
 
   it("should close if click on black layer", async () => {
-    vi.spyOn(axios, "get").mockResolvedValueOnce({
-      status: 200,
-      data: { categories: queryData },
-    });
     const comp = render(
       <>
         <BlackLayer />
@@ -101,6 +141,7 @@ describe("search box", () => {
     const input = page.getByRole("textbox");
     await input.click();
     await expect.element(input).toHaveFocus();
+    await vi.advanceTimersByTimeAsync(2001);
 
     const shojo = page.getByText("Shojo");
     await expect.element(shojo).toBeVisible();
@@ -115,5 +156,27 @@ describe("search box", () => {
     await userEvent.keyboard("{Escape}");
     await expect.element(blackLayer).not.toBeVisible();
     expect(comp.queryByText("Shojo")).toBeFalsy();
+  });
+
+  it("navigates to search when entered", async () => {
+    // How do we even mock window.location.href.
+    // Answer: we can't.
+    render(<SearchBox />);
+    const input = page.getByRole("textbox");
+    await input.click();
+    await expect.element(input).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+
+    expect(redirectMock).toHaveBeenCalledWith("/search");
+    redirectMock.mockClear();
+  });
+
+  it("navigates to search when clicked on the icon", async () => {
+    render(<SearchBox />);
+
+    const button = page.getByRole("button", { name: "Search" });
+    await button.click();
+    expect(redirectMock).toHaveBeenCalledWith("/search");
+    redirectMock.mockClear();
   });
 });

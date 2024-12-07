@@ -1,3 +1,8 @@
+/**
+ * Fetches the API endpoint /users/me.
+ *
+ * @returns the me object, or null if there's an error or not logged in.
+ */
 import axios from "axios";
 import { API_URL } from "./service.js";
 const API = API_URL + '/users/';
@@ -31,12 +36,10 @@ export const postRegister = async (email, username, password) => {
 };
 
 export async function getMe() {
-  return { name: "luna", email: "luna@example.com" };
+  const res = await fetch(API_URL + "/users/me", { method: "GET" });
 
-  // const res = await axios.get(API_URL + "/users/me");
-  // return res.status != 200
-  //   ? null
-  //   : { name: res.data.name, email: res.data.email };
+  if (res.status == 401) return null;
+  return await res.json();
 }
 
 const getErrorMessage = (error) => {
