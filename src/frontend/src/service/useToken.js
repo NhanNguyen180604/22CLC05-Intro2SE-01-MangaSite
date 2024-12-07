@@ -23,7 +23,7 @@ export default function useToken() {
 
   const saveToken = userToken => {
     const currentTime = new Date().getTime();
-    localStorage.setItem('token', JSON.stringify(userToken));
+    localStorage.setItem('token', userToken.token);
     localStorage.setItem('tokenTimestamp', JSON.stringify(currentTime));  // Save timestamp
     setToken(userToken.token);
   };
