@@ -1,0 +1,30 @@
+.comment-popup-content {
+  margin: auto;
+  background: transparent;
+  border: none;
+  width: 50%;
+  height: 85%;
+  border-radius: 20px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+@media only screen and (max-width: 1024px) {
+  .comment-popup-content {
+    width: 70%;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .comment-popup-content {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .replyContainer {
+    width: 80%;
+    transform: translateX(20%);
+  }
+}

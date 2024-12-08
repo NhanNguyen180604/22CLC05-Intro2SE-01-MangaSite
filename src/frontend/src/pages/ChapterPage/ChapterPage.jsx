@@ -1,11 +1,11 @@
 import styles from './ChapterPage.module.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getChapter, getChapterList } from '../../service/mangaService.js';
+import { getMe } from '../../service/userService.js';
 import { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { FaMessage } from 'react-icons/fa6';
-import CommentForm from '../../components/CommentForm';
-import NotificationForm from '../../components/NotificationForm';
+import { FaCommentSlash } from "react-icons/fa";
+import CommentPopup from '../../components/CommentPopup';
 
 const ChapterPage = () => {
     const [showHeader, setShowHeader] = useState(true);
@@ -49,15 +49,17 @@ const ChapterPage = () => {
     useEffect(() => {
         // Add listener
         window.addEventListener('scroll', handleScroll);
-        document.addEventListener('click', handleClick); 
+        document.addEventListener('click', handleClick);
         return () => {
             // Clean up listener when unmount
             window.removeEventListener('scroll', handleScroll);
-            document.removeEventListener('click', handleClick); 
+            document.removeEventListener('click', handleClick);
         };
     }, [lastScrollY]);
 
-
+    const [me, setMe] = useState({
+        loggedIn: false,
+    });
     const { id, chapterNumber } = useParams();
     const [chapter, setChapter] = useState({
         _id: null,
@@ -70,72 +72,62 @@ const ChapterPage = () => {
     const [nextChapterNum, setNextChapterNum] = useState(-1);
     const [prevChapterNum, setPrevChapterNum] = useState(-1);
 
-    useEffect(() => {
-        setShowHeader(true);
-        setShowFooter(true);
+    const fetchData = async () => {
+        const response = await getChapter(id, chapterNumber);
+        if (response.status === 200) {
+            setChapter(response.chapter);
 
-        const fetchData = async () => {
-            const response = await getChapter(id, chapterNumber);
-            if (response.status === 200) {
-                setChapter(response.chapter);
-
-                // reset
-                setShowHeader(true);
-                setShowFooter(true);
-                setNextChapterNum(-1);
-                setPrevChapterNum(-1);
-                const chapterListResponse = await getChapterList(id, 1, 20, true);
-                if (chapterListResponse.status === 200) {
-                    const chapters = chapterListResponse.chaptersInfo.chapters;
-                    const index = chapters.findIndex(obj => obj.number === response.chapter.number);
-                    if (index < chapters.length - 1) {
-                        setNextChapterNum(chapters[index + 1].number);
-                    }
-                    if (index > 0) {
-                        setPrevChapterNum(chapters[index - 1].number);
-                    }
+            // reset
+            setShowHeader(true);
+            setShowFooter(true);
+            setNextChapterNum(-1);
+            setPrevChapterNum(-1);
+            const chapterListResponse = await getChapterList(id, 1, 20, true);
+            if (chapterListResponse.status === 200) {
+                const chapters = chapterListResponse.chaptersInfo.chapters;
+                const index = chapters.findIndex(obj => obj.number === response.chapter.number);
+                if (index < chapters.length - 1) {
+                    setNextChapterNum(chapters[index + 1].number);
                 }
-                else {
-                    console.log("Couldn't fetch chapterList, status code: " + chapterListResponse.status);
-                    console.err(chapterListResponse.message);
+                if (index > 0) {
+                    setPrevChapterNum(chapters[index - 1].number);
                 }
             }
             else {
-                console.log('Server is dead, and we dont know why');
+                console.log("Couldn't fetch chapterList, status code: " + chapterListResponse.status);
+                console.err(chapterListResponse.message);
             }
-        };
+        }
+        else {
+            console.log('Server is dead, and we dont know why');
+        }
+    };
 
-        fetchData();
-
+    const initialize = async () => {
+        await fetchData();
+        setShowHeader(true);
+        setShowFooter(true);
         window.scrollTo({
             top: 0,
         });
+    };
+
+    const fetchMe = async () => {
+        const data = await getMe();
+        if (data) {
+            setMe(data);
+        }
+    };
+
+    useEffect(() => {
+        initialize();
     }, [id, chapterNumber]);
 
+    useEffect(() => {
+        fetchMe();
+    }, []);
 
     const navigate = useNavigate();
-
-
-    const [showNotiForm, setShowNotiForm] = useState(false);
-    const [notiFormDetails, setNotiFormDetails] = useState({
-        success: false,
-        message: '',
-        details: '',
-    });
-    const [showCommentForm, setShowCommentForm] = useState(false);
-
-    const togglePopup = (setCallback, attribute) => {
-        setCallback(!attribute);
-        if (!attribute)
-            document.body.classList.add(`noScrollY`);
-        else document.body.classList.remove(`noScrollY`);
-    }
-
-    const handlePopupClick = (id, setCallback, attribute) => {
-        if (id === 'popupContainer') {
-            togglePopup(setCallback, attribute);
-        }
-    }
 
     return (
         <>
@@ -170,13 +162,13 @@ const ChapterPage = () => {
                     <div><FaChevronLeft /></div>
                     <div>Previous</div>
                 </button>
-                <button
-                    className={`${styles.menuBTN}`}
-                    onClick={() => togglePopup(setShowCommentForm, showCommentForm)}
-                >
-                    <div><FaMessage /></div>
-                    <div>Comments</div>
-                </button>
+                <div className={styles.commentBTN}>
+                    {chapter.manga?.canComment ? (
+                        <span><CommentPopup loggedIn={me.loggedIn} /></span>
+                    ) : (
+                        <span className={styles.disabledBTN}><FaCommentSlash /></span>
+                    )}
+                </div>
                 <button
                     className={styles.menuBTN}
                     disabled={nextChapterNum === -1 ? true : false}
@@ -186,26 +178,6 @@ const ChapterPage = () => {
                     <div><FaChevronRight /></div>
                 </button>
             </div>
-
-            {showCommentForm && <div className={styles.popupContainer}
-                onClick={(e) => handlePopupClick(e.target.id, setShowCommentForm, showCommentForm)}
-                id="popupContainer">
-                <CommentForm
-                    setShowThis={setShowCommentForm}
-                    setNotiFormDetails={setNotiFormDetails}
-                    setShowNotiForm={setShowNotiForm}
-                />
-            </div>}
-
-            {showNotiForm && <div className={styles.popupContainer}
-                onClick={(e) => handlePopupClick(e.target.id, setShowNotiForm, showNotiForm)}
-                id="popupContainer">
-                <NotificationForm
-                    message={notiFormDetails.message}
-                    details={notiFormDetails.details}
-                    success={notiFormDetails.success}
-                />
-            </div>}
         </>
     )
 }

@@ -3,11 +3,11 @@
 	color: white;
 	display: grid;
 	grid-column: 1;
-	width: 50%;
 	height: auto;
 	background: var(--medium-navy);
 	border-radius: 20px;
 	font-size: 1.2em;
+	z-index: 1000;
 }
 
 .notiContainer div:first-of-type{
@@ -35,8 +35,15 @@
 	color: var(--red);
 }
 
-@media only screen and (max-width: 700px){
-	.notiContainer{
-		width: 80%;
-	}
+.confirmBTN{
+	border-radius: 10px;
+	margin-top: 30px;
+	justify-self: center;
+	padding: 5px 10px;
+	transition: background 0.2s ease-in-out;
+	background: var(--dark-navy);
+}
+
+.confirmBTN:hover{
+	background: var(--blue);
 }

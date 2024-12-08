@@ -15,7 +15,7 @@ const getChapter = asyncHandler(async (req, res) => {
     }
 
     const chapter = await Chapter.findOne({ manga: req.params.id, number: req.params.chapterNumber })
-        .populate({path: 'manga', model: 'Manga', select: 'name'});
+        .populate({path: 'manga', model: 'Manga', select: 'name canComment'});
     res.status(200).json(chapter);
 });
 

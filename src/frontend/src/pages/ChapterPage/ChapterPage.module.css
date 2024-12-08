@@ -38,6 +38,10 @@
     font-weight: bold;
 }
 
+.topBar .chapterTitle div:nth-child(2){
+    color: rgba(255, 255, 255, 0.75);
+}
+
 .bottomBar{
     bottom: 0;
     display: grid;
@@ -85,6 +89,27 @@
 }
 
 .menuBTN:disabled{
+    opacity: 0.5;
+}
+
+.commentBTN{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.commentBTN span{
+    font-size: 2rem;
+    transition: background 0.2s ease-in-out;
+    border-radius: 10px;
+}
+
+.commentBTN span:not(.disabledBTN):hover{
+    cursor:pointer;
+    background: var(--dark-navy);
+}
+
+.commentBTN span.disabledBTN{
     opacity: 0.5;
 }
 

@@ -45,6 +45,7 @@ body {
 	scrollbar-color: var(--medium-navy) var(--darker-navy);
 }
 
-.noScrollY {
-	overflow-y: hidden;
+.popup-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
 }

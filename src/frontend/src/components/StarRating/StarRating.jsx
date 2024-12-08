@@ -1,11 +1,12 @@
 import styles from "./StarRating.module.css";
+import PropTypes from "prop-types";
 
 const StarRating = ({ ratings }) => {
     const calAvgRating = (ratings) => {
-        if (ratings.length === 0){
+        if (ratings.length === 0) {
             return 0;
         }
-        
+
         let result = ratings.reduce((accumulator, current) => accumulator + current.score, 0);
         result = Math.ceil(((result / ratings.length) / 5 * 100));
         return result;
@@ -38,3 +39,14 @@ const StarRating = ({ ratings }) => {
     )
 }
 export default StarRating
+
+StarRating.propTypes = {
+    ratings: PropTypes.arrayOf(
+        PropTypes.shape(
+            {
+                _id: PropTypes.string.isRequired,
+                score: PropTypes.number.isRequired,
+            }
+        )
+    ).isRequired,
+}

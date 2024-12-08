@@ -1,11 +1,16 @@
+.toggleBTN{
+    cursor: pointer;
+	padding: 10px;
+}
+
 .reportForm {
 	padding: 20px;
 	color: white;
 	display: flex;
 	flex-direction: column;
 	row-gap: 10px;
-	width: 30%;
-	height: 60%;
+	width: 100%;
+	height: 100%;
 	background: var(--medium-navy);
 	border-radius: 20px;
 	font-size: 1.2em;
@@ -16,7 +21,7 @@
 	margin-bottom: 5px;
 }
 
-.reportForm div:not(:first-of-type) {
+.reportForm div:not(:last-of-type) {
 	display: flex;
 	flex-direction: column;
 }
@@ -32,28 +37,7 @@
 	resize: none;
 	padding: 10px;
 	font-family: inherit;
-	font-size: 1em;
-}
-
-.reportForm button {
-	padding: 10px 0;
-	display: block;
-	background: var(--light-red);
-	border: none;
-	border-radius: 15px;
-	font-weight: bold;
-	font-size: 1em;
-	cursor: pointer;
-	transition: background 0.2s ease-in-out, opacity 0.2s ease-in-out;
-}
-
-.reportForm button:disabled {
-	opacity: 0.7;
-}
-
-.reportForm button:not(:disabled):hover {
-	background: var(--red);
-	cursor: pointer;
+	font-size: 1rem;
 }
 
 /* https://moderncss.dev/pure-css-custom-checkbox-style/ */
@@ -62,8 +46,8 @@
 	margin: 0;
 	font: inherit;
 	box-sizing: border-box;
-	width: 1em;
-	height: 1em;
+	width: 1rem;
+	height: 1rem;
 	border: 0.15em solid white;
 	border-radius: 0.15em;
 	cursor: pointer;
@@ -77,7 +61,7 @@
 	height: 0.65em;
 	transform: scale(0);
 	transition: 120ms transform ease-in-out;
-	box-shadow: inset 1em 1em white;
+	box-shadow: inset 1rem 1rem white;
 	transform-origin: bottom left;
 	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
@@ -88,14 +72,54 @@
 
 .formControl {
 	display: grid;
-	grid-template-columns: 1em auto;
+	grid-template-columns: 1rem auto;
 	align-items: center;
 	gap: 0.5em;
 	cursor: pointer;
 }
 
-@media only screen and (max-width: 800px) {
-	.reportForm {
-		width: 90%;
-	}
+.btnContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.confirmBTN, 
+.cancelBTN {
+	padding: 5px 20px;
+	display: inline;
+    width: fit-content;
+	border: none;
+	border-radius: 15px;
+	font-weight: bold;
+	font-size: 1rem;
+	transition: background 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.confirmBTN{
+	color: black;
+	background: var(--light-red);
+}
+
+.confirmBTN:disabled {
+	opacity: 0.4;
+}
+
+.confirmBTN:not(:disabled):hover {
+	background: var(--red);
+}
+
+.cancelBTN{
+	color: white;
+	background-color: var(--dark-navy);
+}
+
+.cancelBTN:hover{
+	background-color: var(--blue);
+}
+
+.loading{
+	font-size: 2rem;
+	font-weight: bold;
+	font-family: inherit;
 }

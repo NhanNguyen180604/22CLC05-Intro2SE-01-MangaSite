@@ -1,9 +1,13 @@
+.toggleBTN{
+	cursor: pointer;
+	justify-self: start;
+}
+
 .ratingForm {
 	padding: 20px;
 	color: white;
 	display: flex;
 	flex-direction: column;
-	width: fit-content;
 	height: auto;
 	background: var(--medium-navy);
 	border-radius: 20px;
@@ -34,25 +38,42 @@
 	align-items: center;
 }
 
-.ratingForm > button {
-	padding: 5px 0;
+.ratingForm .btnContainer{
+	display: flex;
+	justify-content: space-around;
+}
+
+.confirmBTN, 
+.cancelBTN {
+	padding: 5px 10px;
 	display: block;
-	background: var(--light-red);
-	color: black;
 	border: none;
 	border-radius: 15px;
 	font-weight: bold;
-	font-size: 1em;
+	font-size: 1rem;
 	transition: background 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }
 
-.ratingForm > button:disabled {
+.confirmBTN{
+	color: black;
+	background: var(--light-red);
+}
+
+.confirmBTN:disabled {
 	opacity: 0.4;
 }
 
-.ratingForm > button:not(:disabled):hover {
+.confirmBTN:not(:disabled):hover {
 	background: var(--red);
-	cursor: pointer;
+}
+
+.cancelBTN{
+	color: white;
+	background-color: var(--dark-navy);
+}
+
+.cancelBTN:hover{
+	background-color: var(--blue);
 }
 
 .ratingForm .ratingInput {
@@ -60,7 +81,7 @@
 	width: 100%;
 }
 
-.ratingForm .ratingCount {
+.white-50-opac {
 	color: rgba(255, 255, 255, 0.5);
 }
 
@@ -97,4 +118,10 @@
 .ratingForm .idkWhatToNameThis{
 	display: flex;
 	align-items: center;
+}
+
+.loading{
+	font-weight: bold;
+	font-size: 2rem;
+	font-family: inherit;
 }

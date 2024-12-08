@@ -41,6 +41,7 @@ const getMangaComments = asyncHandler(async (req, res) => {
     const skip = (page - 1) * per_page;
 
     const comments = await Comment.find({ manga: manga.id, chapter: undefined, replyTo: undefined })
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(per_page)
         .populate({
@@ -116,6 +117,7 @@ const getChapterComments = asyncHandler(async (req, res) => {
     const skip = (page - 1) * per_page;
 
     const comments = await Comment.find({ manga: manga.id, chapter: chapter.number, replyTo: undefined })
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(per_page)
         .populate({

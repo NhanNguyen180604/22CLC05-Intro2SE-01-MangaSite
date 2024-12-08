@@ -1,5 +1,6 @@
 import styles from "./Tab.module.css";
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const Tab = ({ children }) => {
     const [activeTab, setActiveTab] = useState(0);
@@ -49,3 +50,11 @@ const TabComponents = {
 }
 
 export default TabComponents
+
+Tab.propTypes = {
+    children: PropTypes.arrayOf(PropTypes.element).isRequired,
+}
+
+TabPanel.propTypes = {
+    children: PropTypes.element.isRequired,
+}

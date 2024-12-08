@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL } from "./service.js";
+import { API_URL, getErrorMessage } from "./service.js";
 const API = API_URL + '/mangas/';
 
 // get mangas
@@ -59,6 +59,54 @@ export const getRatings = async (mangaID) => {
     }
 };
 
+export const getOneRating = async (mangaID) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.get(API + mangaID + '/ratings/one',
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        return { status: response.status, rating: response.data };
+    } catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const sendRating = async (mangaID, ratingScore) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.post(API + mangaID + '/ratings',
+            {
+                score: ratingScore,
+
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        return { status: response.status, rating: response.data };
+    } catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
 // get cover images
 export const getCovers = async (mangaID) => {
     try {
@@ -88,16 +136,30 @@ export const getChapterComments = async (mangaID, chapterNumber, page = 1, per_p
     }
 };
 
-const getErrorMessage = (error) => {
-    if (error.response) {
+export const postComment = async (content, mangaID, chapterNumber = null, replyID = null) => {
+    const token = localStorage.getItem('token');
+    if (!token)
         return {
-            status: error.response.status,
-            message: error.response.data.message
-        }
-    }
+            status: 401,
+            message: 'You are not logged in',
+        };
 
-    return {
-        status: 500,
-        message: "Something went wrong, and we have no idea"
+    const data = {
+        content: content,
+    };
+    if (chapterNumber)
+        data.chapter = chapterNumber;
+    if (replyID)
+        data.replyTo = replyID;
+
+    try {
+        const response = await axios.post(API + mangaID + '/comments', data, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return { status: response.status, comment: response.data };
+    } catch (error) {
+        return getErrorMessage(error);
     }
-}
+};

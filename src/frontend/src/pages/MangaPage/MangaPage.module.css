@@ -1,6 +1,6 @@
 .mainContainer {
 	display: grid;
-	grid-template-columns: 2fr 8fr;
+	grid-template-columns: 25fr 75fr;
 	width: 100%;
 	margin-top: 4rem;
 }
@@ -31,22 +31,30 @@
 	width: 90%;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	align-items: center;
 	row-gap: 5px;
 }
 
 .actionBTNsContainer {
-	font-size: 2.5rem;
+	font-size: 2rem;
 	color: white;
 }
 
-.actionBTNsContainer > * {
+.actionBTNsContainer > span.disabledBTN{
+	opacity: 0.5;
+}
+
+.actionBTNsContainer > .editBTN{
+	padding: 10px;
+}
+
+.actionBTNsContainer > span:not(.disabledBTN) {
 	cursor: pointer;
 	transition: background 0.2s ease-in-out;
-	padding: 10px;
 	border-radius: 10px;
 }
 
-.actionBTNsContainer *:hover {
+.actionBTNsContainer > span:not(.disabledBTN):hover {
 	background: var(--medium-navy);
 }
 
@@ -58,7 +66,10 @@
 	padding: 5px 10px;
 	background: var(--very-light-blue);
 	transition: opacity 0.2s ease-in-out;
-	cursor: pointer;
+}
+
+.leftColumnContainer button:disabled{
+	opacity: 0.5;
 }
 
 .leftColumnContainer .startReadingBTN {
@@ -69,8 +80,9 @@
 	background: var(--light-red);
 }
 
-.leftColumnContainer button:hover {
+.leftColumnContainer button:not(:disabled):hover {
 	opacity: 0.6;
+	cursor: pointer;
 }
 
 .rightColumnContainer {
@@ -150,13 +162,20 @@
 
 @media only screen and (max-width: 1600px) {
 	.mainContainer {
-		grid-template-columns: 30fr 70fr;
+		grid-template-columns: 35fr 65fr;
 	}
 }
 
 @media only screen and (max-width: 1200px) {
 	.mainContainer {
 		grid-template-columns: 40fr 60fr;
+	}
+}
+
+@media only screen and (max-width: 1024px) {
+	.mainContainer {
+		grid-template-columns: 40fr 60fr;
+		margin-bottom: 70px;
 	}
 }
 
@@ -190,5 +209,11 @@
 	.synopsis {
 		flex: 0;
 		max-height: max-content;
+	}
+}
+
+@media only screen and (max-width: 400px){
+	.actionBTNsContainer {
+		font-size: 1.5rem;
 	}
 }

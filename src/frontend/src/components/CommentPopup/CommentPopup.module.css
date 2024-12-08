@@ -1,0 +1,236 @@
+.toggleBTN{
+  font-size: 2rem;
+  padding: 10px;
+}
+
+.commentForm {
+  padding: 1rem 2rem;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  width: 100%;
+  height: 100%;
+  background: var(--medium-navy);
+  border-radius: 20px;
+  font-size: 1rem;
+}
+
+.commentForm .formTitle {
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+}
+
+.commentForm .formTitle button {
+  height: 30px;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  transition: background 0.2s ease-in-out;
+}
+
+.commentForm .formTitle button:hover {
+  background: var(--dark-navy);
+}
+
+.commentList {
+  height: 80%;
+  overflow-y: auto;
+  padding-right: 10px; /* add space for scrollbar */
+}
+
+.commentWrapper {
+  margin-bottom: 15px;
+}
+
+.commentContainer {
+  background: var(--blue);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 5px;
+}
+
+.replyContainer {
+  width: 90%;
+  transform: translateX(10%);
+}
+
+.commentActionBTNs {
+  display: flex;
+  gap: 15px;
+  justify-content: end;
+  padding-right: 5%;
+}
+
+.commentActionBTNs * {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.8rem;
+}
+
+.commentActionBTNs *:hover {
+  text-decoration: underline;
+}
+
+.userInfo {
+  height: 2rem;
+  font-size: 1rem;
+}
+
+.userInfo span {
+  margin-left: 10px;
+}
+
+.userAvatar {
+  display: inline;
+  width: 2rem;
+  height: 2rem;
+  object-fit: fill;
+  border-radius: 50%;
+}
+
+.commentTime {
+  margin-top: 5px;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.showMore {
+  text-align: center;
+}
+
+.showMoreBTN {
+  border: 2px solid var(--very-light-blue);
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 1rem;
+  transition: background 0.2s ease-in-out;
+}
+
+.showMoreBTN:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.commentInputWrapper {
+  height: 15%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.replyInfo {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  transform: translateY(-25%);
+  width: 100%;
+}
+
+.replyInfo button {
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.replyInfo button:hover {
+  background: var(--dark-navy);
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.commentInput {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.commentInput input[type="text"] {
+  color: white;
+  background: var(--dark-navy);
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0px 5px 5px var(--dark-navy);
+  min-width: 60%;
+  transition: border 0.2s ease-in-out;
+  border: 1px solid var(--dark-navy);
+}
+
+.commentInput input[type="text"]:disabled {
+  opacity: 0.5;
+}
+
+.commentInput input[type="text"]:focus {
+  outline: none;
+  border: 1px solid var(--very-light-blue);
+}
+
+.commentInput button {
+  color: black;
+  background: var(--very-light-blue);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0px 5px 5px var(--dark-navy);
+  transition:
+    opacity 0.2s ease-in-out,
+    background 0.1s ease-in-out,
+    color 0.2s ease-in-out;
+}
+
+.commentInput button:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.commentInput button:not(:disabled):hover {
+  opacity: 0.7;
+}
+
+.commentInput button:active {
+  background: var(--blue);
+  color: white;
+}
+
+.commentForm .loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 2rem;
+}
+
+.commentReportContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 100;
+}
+
+@media only screen and (max-width: 800px) {
+  .commentForm {
+    border-radius: 0;
+  }
+
+  .replyContainer {
+    width: 80%;
+    transform: translateX(20%);
+  }
+}
