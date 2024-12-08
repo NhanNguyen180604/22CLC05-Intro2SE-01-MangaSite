@@ -2,8 +2,10 @@ import { useState } from 'react';
 
 export default function useToken() {
   const getToken = () => {
-    const userToken = localStorage.getItem('token');
-    const tokenTimestamp = localStorage.getItem('tokenTimestamp');
+    const tokenString = localStorage.getItem('token');
+    const timestampString = localStorage.getItem('tokenTimestamp');
+    const userToken = tokenString;
+    const tokenTimestamp = JSON.parse(timestampString);
     
     const expirationTime = 60 * 60 * 1000;
     const currentTime = new Date().getTime();
