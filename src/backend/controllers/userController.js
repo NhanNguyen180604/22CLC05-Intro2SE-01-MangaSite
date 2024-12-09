@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const cloudinaryWrapper = require('../others/cloudinaryWrapper');
 
 const getMe = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id).select('name email accountType avatar.url');
+    const user = await User.findById(req.user.id).select('name email accountType avatar.url blacklist');
     if (!user) {
         res.status(401);
         throw new Error('You are not logged in');
@@ -290,20 +290,20 @@ const getUserNoti = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    const { img } = req.body;
+    const {avatar}  = req.files;
     const user = await User.findById(req.user.id);
     if (!user) {
         res.status(401);
         throw new Error("You are not logged in");
     }
-    if (!img) {
+    if (!avatar) {
         res.status(400);
         throw new Error("No image provided");
     }
     if (user.avatar && user.avatar.publicID) {
         await cloudinaryWrapper.deleteResources(user.avatar.publicID);
     }
-    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(img, `${req.user.id}`);
+    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(avatar.data, `${req.user.id}`);
     const newAvatar = {
         avatar: { url, publicID }
     };
