@@ -15,7 +15,7 @@ const getChapter = asyncHandler(async (req, res) => {
     }
 
     const chapter = await Chapter.findOne({ manga: req.params.id, number: req.params.chapterNumber })
-        .populate({path: 'manga', model: 'Manga', select: 'name canComment'});
+        .populate({ path: 'manga', model: 'Manga', select: 'name canComment' });
     res.status(200).json(chapter);
 });
 
@@ -109,16 +109,26 @@ const uploadChapter = asyncHandler(async (req, res) => {
     }
 
     // check body
-    if (!req.body.number || req.body.number < 0 || !req.body.images || req.body.images.length === 0) {
+    if (!req.body.number || req.body.number < 0) {
         res.status(400);
-        throw new Error("Invalid chapter number / Where my images?");
+        throw new Error("Invalid chapter number");
     }
 
+    if (!req.files || !req.files.images) {
+        res.status(400);
+        throw new Error("Please upload images");
+    }
+
+    let uploadedFiles = req.files.images;
+    if (!Array.isArray(uploadedFiles))
+        uploadedFiles = [uploadedFiles];
+
+    // res.status(200).json('ok');
     let chapter = await Chapter.findOne({ manga: manga.id, number: req.body.number });
     // if chapter exists, append the images
     if (chapter) {
         // upload images to cloud
-        const urls = await cloudinaryWrapper.uploadImages(req.body.images, `${manga.id}/${req.body.number}`);
+        const urls = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${req.body.number}`);
         chapter.images = [...chapter.images, ...urls];
     }
     // if chapter doesn't exist, create one
@@ -129,7 +139,7 @@ const uploadChapter = asyncHandler(async (req, res) => {
             title: req.body.title ? req.body.title : 'No title'
         });
         // upload images to cloud
-        const urls = await cloudinaryWrapper.uploadImages(req.body.images, `${manga.id}/${req.body.number}`);
+        const urls = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${req.body.number}`);
         chapter.images = urls;
     }
 
@@ -185,10 +195,14 @@ const updateChapter = asyncHandler(async (req, res) => {
         chapter.title = req.body.title;
     }
 
-    if (req.body.images && req.body.images.length > 0) {
+    if (req.files && req.files.images) {
         updated = true;
-        await cloudinaryWrapper.deleteImages(`${manga.id}/${chapter.number}`);
-        chapter.images = await cloudinaryWrapper.uploadImages(req.body.images, `${manga.id}/${chapter.number}`);
+        let uploadedFiles = req.files.images;
+        if (!Array.isArray(uploadedFiles))
+            uploadedFiles = [uploadedFiles];
+
+        await cloudinaryWrapper.deleteByPrefix(`${manga.id}/${chapter.number}`);
+        chapter.images = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${chapter.number}`);
     }
 
     if (updated) {
@@ -199,7 +213,7 @@ const updateChapter = asyncHandler(async (req, res) => {
         // create notification
         const mangaNoti = await MangaNoti.create({
             manga: manga.id,
-            message: `${updatedManga.name}, chapter ${chapter.number} just got updated`,
+            message: `${manga.name}, chapter ${chapter.number} just got updated`,
             createdAt: new Date(),
         });
 

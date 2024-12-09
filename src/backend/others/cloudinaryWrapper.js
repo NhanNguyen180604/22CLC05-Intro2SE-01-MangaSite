@@ -11,9 +11,7 @@ const uploadImages = asyncHandler(async function cloudinaryUploadWrapper(images,
 
     const urls = await Promise.all(images.map(async (image) => {
         try {
-            // Remove the data URL prefix if present
-            const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-            const buffer = Buffer.from(base64Data, 'base64');
+            const buffer = Buffer.from(image);
 
             // Upload the image using a stream
             const uploadResult = await new Promise((resolve, reject) => {
@@ -70,9 +68,7 @@ const uploadSingleImage = asyncHandler(async function cloudinaryUploadWrapper(im
     });
 
     try {
-        // Remove the data URL prefix if present
-        const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-        const buffer = Buffer.from(base64Data, 'base64');
+        const buffer = Buffer.from(image);
 
         // Upload the image using a stream
         const uploadResult = await new Promise((resolve, reject) => {
