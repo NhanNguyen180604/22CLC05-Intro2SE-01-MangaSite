@@ -44,6 +44,7 @@ const getReports = expressAsyncHandler(async (req, res) => {
 
   // Finally, some action.
   const reports = await Report.find({})
+    .sort({ processed: -1 })
     .skip((page - 1) * per_page)
     .limit(per_page);
   return res.status(200).json({ reports, page, per_page, total_pages, total });
@@ -137,11 +138,7 @@ const updateReportState = expressAsyncHandler(async (req, res) => {
     throw new Error("Not Found: that report doesn't exist.");
   }
 
-  const q = await Report.findOneAndUpdate(
-    { _id: req.params.id },
-    { processed: !report.processed },
-    { returnDocument: "after" },
-  );
+  const q = await Report.findOneAndUpdate({ _id: req.params.id }, { processed: !report.processed }, { returnDocument: "after" });
   return res.status(200).json(q);
 });
 
