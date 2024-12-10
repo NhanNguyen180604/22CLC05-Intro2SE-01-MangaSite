@@ -10,5 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.1.0"
+  },
+  "dependencies": {
+    "react-select": "^5.8.3"
   }
 }

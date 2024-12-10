@@ -96,11 +96,13 @@ const MangaPage = () => {
 						</div>
 
 						<div className={`${styles.synopsis} ${styles.mobileDisplay}`}>
-							{manga.description}
+							{manga.description.split('\n').map((paragraph, index) => (
+								<div key={index}>{paragraph}</div>
+							))}
 						</div>
 
 						<div className={`${styles.actionBTNsContainer} ${styles['flex-margin-bot-20']}`}>
-							<span><LibraryPopup title={manga.title} loggedIn={me.loggedIn} /></span>
+							<span><LibraryPopup title={manga.name} loggedIn={me.loggedIn} /></span>
 							<span><ReportPopup reportField='manga' reportedId={id} loggedIn={me.loggedIn} /></span>
 							{manga.canComment ? (
 								<span><CommentPopup loggedIn={me.loggedIn} /></span>
@@ -149,7 +151,9 @@ const MangaPage = () => {
 							</div>
 
 							<div className={`${styles.synopsis} ${styles.desktopDisplay}`}>
-								{manga.description}
+								{manga.description.split('\n').map((paragraph, index) => (
+									<div key={index}>{paragraph}</div>
+								))}
 							</div>
 						</div>
 

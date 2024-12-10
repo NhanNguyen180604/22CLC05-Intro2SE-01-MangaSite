@@ -11,6 +11,11 @@ const { z } = require("zod");
  * - Per page (number): number of authors per page.
  */
 const getAuthors = asyncHandler(async (req, res) => {
+  if (req.query.all === 'true'){
+    const allAuthors = await Author.find();
+    return res.status(200).json(allAuthors);
+  }
+
   const schema = z.object({
     page: z.coerce.number().int().positive().safe().default(1),
     per_page: z.coerce.number().int().positive().safe().default(20),

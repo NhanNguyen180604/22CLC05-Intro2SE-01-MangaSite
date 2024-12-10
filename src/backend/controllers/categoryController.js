@@ -12,6 +12,11 @@ const { z } = require("zod");
  * - Returns { categories: {_id, name}[], page, per_page, total_pages, total }
  */
 const getCategories = expressAsyncHandler(async (req, res) => {
+  if (req.query.all === 'true'){
+    const allCategories = await Category.find();
+    return res.status(200).json(allCategories);
+  }
+  
   const schema = z.object({
     page: z.coerce.number().int().positive().safe().default(1),
     per_page: z.coerce.number().int().positive().safe().default(20),

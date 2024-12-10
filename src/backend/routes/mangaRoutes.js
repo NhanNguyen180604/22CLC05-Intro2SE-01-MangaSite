@@ -7,10 +7,6 @@ const commentController = require('../controllers/commentController');
 const ratingController = require('../controllers/ratingController');
 const { authorize, checkUser } = require('../middlewares/authMiddleware');
 
-// temporary importing until all modules are written
-require('../models/mangaModel');
-require('../models/userModel');
-
 // rating routes
 // /api/mangas/:id/ratings
 router.route('/:id/ratings')
@@ -38,6 +34,9 @@ router.route('/:id/chapters/:chapterNumber/comments')
 router.route('/:id/covers')
     .get(coverController.getCovers)
     .post(authorize, coverController.uploadCover);
+
+router.route('/covers/default')
+    .get(coverController.getDefaultCover);
 
 router.route('/:id/covers/:coverNumber')
     .put(authorize, coverController.changeCover)

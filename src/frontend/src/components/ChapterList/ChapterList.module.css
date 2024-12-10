@@ -12,15 +12,15 @@
 .chapterList {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	column-gap: 10px;
-	row-gap: 10px;
+	gap: 15px;
 	color: white;
 }
 
 .chapterContainer {
+	position: relative;
 	background: var(--medium-navy);
 	padding: 10px;
-	border-radius: 15px;
+	border-radius: 12px;
 	border: 2px solid var(--medium-navy);
 	box-sizing: border-box;
 	transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -36,6 +36,20 @@
 	border: 2px solid var(--very-light-blue);
 	box-shadow: 5px 5px 5px var(--darker-navy);
 }
+
+/* .readLabel::after {
+	content: 'Read';
+	position: absolute;
+	right: 0;
+	top: 0;
+	transform: translate(30%, -50%);
+	color: black;
+	background: var(--red);
+	border-radius: 15px;
+	padding: 0 5px;
+	font-size: 0.8rem;
+	font-weight: bold;
+} */
 
 .paginationContainer {
 	position: relative;
