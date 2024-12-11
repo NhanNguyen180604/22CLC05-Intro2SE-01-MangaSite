@@ -5,15 +5,16 @@ import { getMangaByID, updateMangaInfo, getCovers, getDefaultCover, deleteCover 
 import { getMe } from "../../service/userService.js"
 import { getAllAuthors } from "../../service/authorService.js";
 import { getAllCategories } from "../../service/categoryService.js";
-import Select from "react-select";
 import DesktopLogo from "../../components/main/DesktopLogo.jsx";
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
 import MainLayout from "../../components/main/MainLayout.jsx";
 import TabComponents from "../../components/Tab"
 const { Tab, TabPanel } = TabComponents;
 import { FaPlus } from "react-icons/fa6";
-import CoverDeletePopup from "./CoverDeletePopup.jsx";
+import CoverDeletePopup from "../../components/CoverDeletePopup";
 import NotiPopup from "../../components/NotiPopup";
+import CoverUploadPopup from "../../components/CoverUploadPopup";
+import MySelect from "../../components/MySelect";
 
 const MangaEditPage = () => {
     const { id } = useParams();
@@ -66,19 +67,21 @@ const MangaEditPage = () => {
 
     const [covers, setCovers] = useState([]);
     const defaultCoverRef = useRef(null);
+    const [showCoverUploadPopup, setShowCoverUploadPopup] = useState(false);
     const [showCoverDelPopup, setShowCoverDelPopup] = useState(false);
     const [delCoverNum, setDelCoverNum] = useState(-1);
-    const [delPopupLoading, setDelPopupLoading] = useState(false);
+    const [popupLoading, setPopupLoading] = useState(false);
+
     useEffect(() => {
         if (delCoverNum !== -1) {
             setShowCoverDelPopup(true);
         }
         else setShowCoverDelPopup(false);
     }, [delCoverNum]);
+
     const deleteCoverImg = async (e) => {
-        setDelPopupLoading(true);
+        setPopupLoading(true);
         e.preventDefault();
-        console.log(delCoverNum);
 
         const response = await deleteCover(id, delCoverNum);
         if (response.status === 200) {
@@ -107,10 +110,11 @@ const MangaEditPage = () => {
         }
 
         setDelCoverNum(-1);
-        setDelPopupLoading(false);
+        setPopupLoading(false);
         setShowNoti(true);
     };
 
+    // reset all changes
     const reset = (e) => {
         e.preventDefault();
         setUpdatedManga(mangaRef.current);
@@ -128,7 +132,15 @@ const MangaEditPage = () => {
         if (mangaResponse.status === 200) {
             const me = await getMe();
             if (!me || (me.accountType !== 'admin' && (me && mangaResponse.manga.uploader._id !== me._id))) {
-                navigate('/');
+                setNotiDetails({
+                    success: false,
+                    message: 'You are not authorized',
+                    details: 'Only the uploader or admin can edit this, returning to home in 5 seconds',
+                });
+                setShowNoti(true);
+                setLoading(false);
+                setTimeout(() => navigate('/'), 5000);
+                return;
             }
 
             mangaRef.current = mangaResponse.manga;
@@ -262,8 +274,8 @@ const MangaEditPage = () => {
                                     <input type='checkbox' name='canComment' checked={updatedManga.canComment} onChange={handleCheckboxChange} />
                                     Allow Comments
                                 </label>
-
                             </TabPanel>
+
                             <TabPanel title="Art">
                                 <div className={styles.coverListContainer}>
                                     {covers.map(cover => (
@@ -286,7 +298,10 @@ const MangaEditPage = () => {
                                             </div>
                                         </div>
                                     ))}
-                                    <div className={styles.coverPlaceholder}>
+                                    <div
+                                        className={styles.coverPlaceholder}
+                                        onClick={() => setShowCoverUploadPopup(true)}
+                                    >
                                         <FaPlus />
                                     </div>
                                 </div>
@@ -301,7 +316,19 @@ const MangaEditPage = () => {
                         onClose={() => setDelCoverNum(-1)}
                         message='You are about to delete this cover image. This action cannot be undone.'
                         callback={deleteCoverImg}
-                        loading={delPopupLoading}
+                        loading={popupLoading}
+                    />
+
+                    <CoverUploadPopup
+                        open={showCoverUploadPopup}
+                        setShowThis={setShowCoverUploadPopup}
+                        loading={popupLoading}
+                        setLoading={setPopupLoading}
+                        mangaID={id}
+                        covers={covers}
+                        setCovers={setCovers}
+                        setNotiDetails={setNotiDetails}
+                        setShowNoti={setShowNoti}
                     />
 
                     <NotiPopup
@@ -317,7 +344,7 @@ const MangaEditPage = () => {
         </MainLayout>
     )
 }
-export default MangaEditPage
+export default MangaEditPage;
 
 const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay' }) => {
     return (
@@ -335,65 +362,5 @@ const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay' }) => {
                 Delete this manga
             </button>
         </div>
-    );
-};
-
-const MySelect = ({ options, isLoading, value, onChange }) => {
-    const myStyles = {
-        control: (styles, state) => ({
-            ...styles,
-            backgroundColor: "var(--darker-navy)",
-            border: 'none',
-            boxShadow: "none",
-            '&:hover': {
-                border: 'none',
-                outline: '1px solid white',
-            },
-            outline: state.isFocused ? '1px solid white' : 'none',
-            padding: '1rem',
-        }),
-        input: (styles, state) => ({
-            ...styles,
-            color: 'white',
-        }),
-        menu: (styles, state) => ({
-            ...styles,
-            color: 'white',
-            backgroundColor: 'var(--darker-navy)',
-        }),
-        option: (styles, state) => ({
-            ...styles,
-            backgroundColor: state.isFocused ? 'var(--medium-navy)' : 'none'
-        }),
-        multiValue: (styles, state) => ({
-            ...styles,
-            backgroundColor: 'var(--very-light-blue)',
-            borderRadius: '6px',
-            gap: '5px'
-        }),
-        multiValueLabel: (styles, state) => ({
-            ...styles,
-            color: 'black',
-            fontWeight: '600',
-        }),
-        multiValueRemove: (styles, state) => ({
-            ...styles,
-            color: 'black',
-            ':hover': {
-                color: 'var(--red)',
-            }
-        })
-    };
-
-    return (
-        <Select
-            options={options}
-            isMulti
-            isLoading={isLoading}
-            closeMenuOnSelect={false}
-            value={value}
-            onChange={onChange}
-            styles={myStyles}
-        />
     );
 };

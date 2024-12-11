@@ -154,6 +154,28 @@ export const getDefaultCover = async () => {
     }
 };
 
+export const uploadCover = async (mangaID, formData) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.post(API + mangaID + '/covers', formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+            }
+        });
+        return { status: response.status, cover: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
 export const deleteCover = async (mangaID, coverNumber) => {
     const token = localStorage.getItem('token');
     if (!token)

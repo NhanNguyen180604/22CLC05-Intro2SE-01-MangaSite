@@ -20,7 +20,9 @@ const getCovers = asyncHandler(async (req, res) => {
         throw new Error("Manga not found");
     }
 
-    const covers = await Cover.find({ manga: manga.id }).select('-manga -imagePublicID');
+    const covers = await Cover.find({ manga: manga.id })
+        .sort({ number: 1 })
+        .select('-manga -imagePublicID');
     res.status(200).json(covers);
 });
 

@@ -9,8 +9,8 @@ const CoverDeletePopup = ({ open, onClose, callback, loading }) => {
 			onClose={onClose}
 			modal
 			lockScroll
-			closeOnDocumentClick
-			closeOnEscapse
+			closeOnDocumentClick={!loading}
+			closeOnEscapse={!loading}
 			className='cover-delete-popup'
 		>
 			{loading ? <div className={styles.loadingMsg}>Deleting cover image</div> : (

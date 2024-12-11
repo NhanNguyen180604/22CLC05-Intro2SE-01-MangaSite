@@ -121,6 +121,10 @@
   field-sizing: content;
 }
 
+.mangaEditContainer textarea:hover{
+  outline: 1px solid white;
+}
+
 .flexItemContainer {
   background: var(--darker-navy);
   display: flex;

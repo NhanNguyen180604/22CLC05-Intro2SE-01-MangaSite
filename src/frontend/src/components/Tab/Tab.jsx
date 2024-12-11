@@ -53,11 +53,14 @@ export default TabComponents
 
 Tab.propTypes = {
     children: PropTypes.oneOfType([
-        PropTypes.element.isRequired,
-        PropTypes.arrayOf(PropTypes.element).isRequired,
-    ]),
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element),
+    ]).isRequired,
 }
 
 TabPanel.propTypes = {
-    children: PropTypes.element.isRequired,
+    children: PropTypes.oneOfType([
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element),
+    ]).isRequired,
 }
