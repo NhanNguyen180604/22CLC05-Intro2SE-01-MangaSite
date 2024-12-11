@@ -112,17 +112,66 @@
   margin-bottom: 5px;
 }
 
-.mangaEditContainer textarea {
+.mangaEditContainer textarea,
+.mangaEditContainer input[type="text"] {
   color: white;
   background: var(--darker-navy);
   padding: 1rem 2rem;
-  width: 100%;
   border-radius: 5px;
+}
+
+.mangaEditContainer textarea {
+  width: 100%;
   field-sizing: content;
 }
 
-.mangaEditContainer textarea:hover{
+.mangaEditContainer textarea:hover,
+.newAuthorInput input[type="text"]:hover {
   outline: 1px solid white;
+}
+
+.newAuthorInput {
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.newAuthorInput input[type="text"] {
+  width: 75%;
+}
+
+.newAuthorInput button {
+  width: 15%;
+  margin: 0 5%;
+  padding: 5px 0;
+  background: var(--sky-blue);
+  color: black;
+  font-weight: bold;
+  border-radius: 10px;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.newAuthorInput button:disabled{
+  opacity: 0.5;
+}
+
+.newAuthorInput button:not(:disabled):hover{
+  background: var(--blue);
+  color: white;
+}
+
+.newAuthorInput button:not(:disabled):active{
+  background: var(--very-light-blue);
+  color: black;
+}
+
+.failMsg{
+  color: var(--red);
+  font-weight: bold;
+}
+
+.successMsg{
+  color: var(--light-green);
+  font-weight: bold;
 }
 
 .flexItemContainer {
@@ -183,7 +232,7 @@
   cursor: pointer;
 }
 
-.coverBTNs div:hover{
+.coverBTNs div:hover {
   background: rgba(255, 255, 255, 0.25);
 }
 

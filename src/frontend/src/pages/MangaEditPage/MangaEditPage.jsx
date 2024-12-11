@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getMangaByID, updateMangaInfo, getCovers, getDefaultCover, deleteCover } from "../../service/mangaService";
 import { getMe } from "../../service/userService.js"
-import { getAllAuthors } from "../../service/authorService.js";
+import { getAllAuthors, postNewAuthor } from "../../service/authorService.js";
 import { getAllCategories } from "../../service/categoryService.js";
 import DesktopLogo from "../../components/main/DesktopLogo.jsx";
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
@@ -122,6 +122,50 @@ const MangaEditPage = () => {
 
     const authorsRef = useRef([]);
     const categoriesRef = useRef([]);
+    const [newAuthor, setNewAuthor] = useState('');  // for posting new author
+
+    const handleTextInput = (e) => {
+        const { value } = e.target;
+        setNewAuthor(value);
+        if (authorPostingResult.length)
+            setAuthorPostingResult('');
+    };
+
+    const [authorPostingResult, setAuthorPostingResult] = useState('');
+    const [addAuthorSuccess, setAddAuthorSuccess] = useState(false);
+    const submitNewAuthor = async (e) => {
+        e.preventDefault();
+        const response = await postNewAuthor(newAuthor);
+        if (response.status === 200) {
+            setAuthorPostingResult(`Author ${newAuthor} added`);
+            setNewAuthor('');
+
+            // add to author option
+            authorsRef.current = [
+                ...authorsRef.current,
+                { label: response.author.name, value: response.author._id }
+            ];
+            setAddAuthorSuccess(true);
+        }
+        else {
+            setAuthorPostingResult(`Failed to post new author. ${response.message}`);
+            if (response.message === 'That author already exists.') {
+                const authorResponse = await getAllAuthors();
+                if (authorResponse?.status === 200) {
+                    authorsRef.current = authorResponse.authors.map(author => {
+                        return {
+                            value: author._id,
+                            label: author.name,
+                        };
+                    });
+                }
+                else {
+                    console.log("Reload the page you noob");
+                }
+            }
+            setAddAuthorSuccess(false);
+        }
+    };
 
     const navigate = useNavigate();
 
@@ -220,7 +264,10 @@ const MangaEditPage = () => {
             </header>
 
             {loading ? <div>Loading</div> :
-                <form className={styles.mangaEditContainer}>
+                <form
+                    className={styles.mangaEditContainer}
+                    onSubmit={submit}
+                >
                     <div className={styles.leftColumnContainer}>
                         <img src={updatedManga.cover} className={styles.coverImg} />
 
@@ -248,6 +295,30 @@ const MangaEditPage = () => {
                                             };
                                         })}
                                     />
+
+                                </section>
+
+                                <section>
+                                    <h1>Not finding your author? Post a new one</h1>
+                                    <div className={styles.newAuthorInput}>
+                                        <input
+                                            type='text'
+                                            onChange={handleTextInput}
+                                        />
+                                        <button
+                                            onClick={submitNewAuthor}
+                                            disabled={!newAuthor.length}
+                                        >
+                                            Post
+                                        </button>
+                                    </div>
+                                    {authorPostingResult.length > 0 &&
+                                        <div
+                                            className={addAuthorSuccess ? styles.successMsg : styles.failMsg}
+                                        >
+                                            {authorPostingResult}
+                                        </div>
+                                    }
                                 </section>
 
                                 <section>

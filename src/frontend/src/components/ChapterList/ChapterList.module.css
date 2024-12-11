@@ -37,19 +37,19 @@
 	box-shadow: 5px 5px 5px var(--darker-navy);
 }
 
-/* .readLabel::after {
+.readLabel::after {
 	content: 'Read';
 	position: absolute;
 	right: 0;
 	top: 0;
 	transform: translate(30%, -50%);
 	color: black;
-	background: var(--red);
+	background: var(--sky-blue);
 	border-radius: 15px;
 	padding: 0 5px;
 	font-size: 0.8rem;
 	font-weight: bold;
-} */
+}
 
 .paginationContainer {
 	position: relative;

@@ -183,11 +183,12 @@ const Details = ({ manga, mobile = false }) => {
 		<div className={mobile ? styles.mobileDisplay : styles.desktopDisplay}>
 			<div className={styles.details}>
 				<h1 className={styles.mangaTitle}>{manga.name}</h1>
-				<div className={`${styles.authorName} ${styles.hoverableName}`}>
+				<div className={`${styles.authorName}`}>
 					{manga.authors &&
 						manga.authors.map((author, index) => (
 							// onclick filter search by this author
 							<Link
+								className={styles.hoverableName}
 								key={author._id}
 								to={`/search?includeAuthors=${author._id}`}
 							>
