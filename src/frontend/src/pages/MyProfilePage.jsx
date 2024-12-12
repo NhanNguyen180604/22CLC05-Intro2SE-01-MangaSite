@@ -33,6 +33,7 @@ const MyProfilePage = () => {
     const fetchProfile = async () => {
         try {
             setLoading(true);
+            setPreviewAvatar();
             const response = await getMe();
             if (!response) {
                 noData.current = true;
@@ -188,7 +189,7 @@ const MyProfilePage = () => {
 
 			<form className="mt-6 mx-auto w-full px-4" onSubmit={handleSave}>
                 <div 
-                    className="mt-4 mx-auto mb-3 relative w-52 h-52 rounded-full overflow-hidden group" 
+                    className="mx-auto my-6 relative w-52 h-52 rounded-full overflow-hidden group" 
                     onClick={handleImageClick}
                 >
                     <img
@@ -202,6 +203,7 @@ const MyProfilePage = () => {
                     <input
                         type="file"
                         accept="image/*"
+                        name="avatar"
                         ref={fileInputRef}
                         onChange={handleUploadImage}
                         className="hidden"
@@ -265,7 +267,7 @@ const MyProfilePage = () => {
                             }))}
                         />
 
-                        <div className="block text-xl mb-2 font-bold">Blocked Categories</div>
+                        <div className="block text-xl font-bold">Blocked Categories</div>
                         <MySelect 
                             options={categoriesRef.current} 
                             isLoading={categoryLoading} 

@@ -324,7 +324,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     if (user.avatar && user.avatar.publicID) {
         await cloudinaryWrapper.deleteResources(user.avatar.publicID);
     }
-    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(avatar.data, `${req.user.id}`);
+    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(avatar.data, `avatar/${req.user.id}`);
     if(!publicID || !url){
         res.status(402);
         throw new Error("Failed to upload image to cloudinary");

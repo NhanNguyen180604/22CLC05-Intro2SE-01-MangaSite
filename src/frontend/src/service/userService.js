@@ -102,7 +102,6 @@ export const getBlacklist = async () => {
 }
 
 export const putBlacklist = async (blacklist) => {
-    console.log(blacklist);
     const token = localStorage.getItem('token');
     if (!token)
         return null;
