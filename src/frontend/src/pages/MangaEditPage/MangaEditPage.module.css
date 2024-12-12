@@ -1,20 +1,3 @@
-.mangaEditContainer {
-  display: grid;
-  grid-template-columns: 3fr 7fr;
-  gap: 2rem;
-  margin-top: 4rem;
-}
-
-.mangaEditContainer svg {
-  display: inline;
-}
-
-.leftColumnContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .coverImg {
   margin-bottom: 1.5rem;
 }
@@ -103,29 +86,29 @@
   transform: scale(1);
 }
 
-.rightColumnContainer section {
+.mySection {
   margin-bottom: 15px;
 }
 
-.mangaEditContainer h1 {
+.mySection h1 {
   font-size: 1rem;
   margin-bottom: 5px;
 }
 
-.mangaEditContainer textarea,
-.mangaEditContainer input[type="text"] {
+.mySection textarea,
+.mySection input[type="text"] {
   color: white;
   background: var(--darker-navy);
   padding: 1rem 2rem;
   border-radius: 5px;
 }
 
-.mangaEditContainer textarea {
+.mySection textarea {
   width: 100%;
   field-sizing: content;
 }
 
-.mangaEditContainer textarea:hover,
+.mySection textarea:hover,
 .newAuthorInput input[type="text"]:hover {
   outline: 1px solid white;
 }
@@ -248,7 +231,7 @@
 }
 
 .coverPlaceholder {
-  min-height: 300px;
+  min-height: 200px;
   background: var(--medium-navy);
   display: flex;
   justify-content: center;
@@ -266,37 +249,7 @@
   display: none;
 }
 
-@media only screen and (max-width: 1600px) {
-  .mangaEditContainer {
-    grid-template-columns: 35fr 65fr;
-  }
-}
-
-@media only screen and (max-width: 1200px) {
-  .mangaEditContainer {
-    grid-template-columns: 40fr 60fr;
-  }
-}
-
-@media only screen and (max-width: 1024px) {
-  .mangaEditContainer {
-    grid-template-columns: 40fr 60fr;
-    margin-bottom: 70px;
-  }
-}
-
-@media only screen and (max-width: 900px) {
-  .mangaEditContainer {
-    grid-template-columns: 45fr 55fr;
-  }
-}
-
 @media only screen and (max-width: 700px) {
-  .mangaEditContainer {
-    display: flex;
-    flex-direction: column;
-  }
-
   .mobileDisplay {
     margin-top: 2rem;
     display: flex;

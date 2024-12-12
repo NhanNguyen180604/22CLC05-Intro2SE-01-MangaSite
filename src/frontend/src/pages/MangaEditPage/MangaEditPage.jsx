@@ -8,6 +8,8 @@ import { getAllCategories } from "../../service/categoryService.js";
 import DesktopLogo from "../../components/main/DesktopLogo.jsx";
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
 import MainLayout from "../../components/main/MainLayout.jsx";
+import MangaPageLayoutComponents from "../../components/MangaPageLayout";
+const { MangaPageLayout, LeftColumnContainer, RightColumnContainer } = MangaPageLayoutComponents;
 import TabComponents from "../../components/Tab"
 const { Tab, TabPanel } = TabComponents;
 import { FaPlus } from "react-icons/fa";
@@ -300,11 +302,8 @@ const MangaEditPage = () => {
             </header>
 
             {loading ? <div>Loading</div> :
-                <form
-                    className={styles.mangaEditContainer}
-                    onSubmit={submit}
-                >
-                    <div className={styles.leftColumnContainer}>
+                <MangaPageLayout tag='form'>
+                    <LeftColumnContainer>
                         <img src={updatedManga.cover} className={styles.coverImg} />
 
                         <ActionBTNs
@@ -314,12 +313,11 @@ const MangaEditPage = () => {
                             navigate={navigate}
                             canSave={canSave}
                         />
-                    </div>
-
-                    <div className={styles.rightColumnContainer}>
+                    </LeftColumnContainer>
+                    <RightColumnContainer>
                         <Tab>
                             <TabPanel title="General">
-                                <section>
+                                <section className={styles.mySection}>
                                     <h1>Title</h1>
                                     <textarea
                                         value={updatedManga.name}
@@ -329,7 +327,7 @@ const MangaEditPage = () => {
                                     {showNameWarning && <div className={styles.failMsg}>Manga's title cannot be empty</div>}
                                 </section>
 
-                                <section>
+                                <section className={styles.mySection}>
                                     <h1>Authors</h1>
                                     <MySelect
                                         options={authorsRef.current}
@@ -345,7 +343,7 @@ const MangaEditPage = () => {
                                     {showAuthorWarning && <div className={styles.failMsg}>Must select at least 1 author</div>}
                                 </section>
 
-                                <section>
+                                <section className={styles.mySection}>
                                     <h1>Not finding your author? Post a new one</h1>
                                     <div className={styles.newAuthorInput}>
                                         <input
@@ -368,12 +366,12 @@ const MangaEditPage = () => {
                                     }
                                 </section>
 
-                                <section>
+                                <section className={styles.mySection}>
                                     <h1>Synopsis</h1>
                                     <textarea value={updatedManga.description} onChange={(e) => handleTextareaChange(e, 'description')}></textarea>
                                 </section>
 
-                                <section>
+                                <section className={styles.mySection}>
                                     <h1>Tags</h1>
                                     <MySelect
                                         onChange={(values) => handleSelectChange(values, 'categories')}
@@ -436,7 +434,7 @@ const MangaEditPage = () => {
                             navigate={navigate}
                             canSave={canSave}
                         />
-                    </div>
+                    </RightColumnContainer>
 
                     <CoverDeletePopup
                         open={showCoverDelPopup}
@@ -465,7 +463,7 @@ const MangaEditPage = () => {
                         details={notiDetails.details}
                         success={notiDetails.success}
                     />
-                </form>
+                </MangaPageLayout>
             }
 
         </MainLayout>

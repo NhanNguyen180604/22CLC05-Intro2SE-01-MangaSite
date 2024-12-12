@@ -13,6 +13,8 @@ import CoverGallery from "../../components/CoverGallery"
 import DesktopLogo from "../../components/main/DesktopLogo.jsx"
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx"
 import MainLayout from "../../components/main/MainLayout.jsx"
+import MangaPageLayoutComponents from "../../components/MangaPageLayout"
+const { MangaPageLayout, LeftColumnContainer, RightColumnContainer } = MangaPageLayoutComponents;
 import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx"
 import SearchBox from "../../components/search/SearchBox.jsx"
 import RatingPopup from "../../components/RatingPopup"
@@ -85,8 +87,8 @@ const MangaPage = () => {
 			</header>
 
 			{loading ? <MangaPageLoading /> : (
-				<div className={styles.mainContainer}>
-					<div className={styles.leftColumnContainer}>
+				<MangaPageLayout>
+					<LeftColumnContainer>
 						<img src={manga.cover} className={styles.coverImg} />
 
 						<Details manga={manga} mobile={true} />
@@ -141,8 +143,9 @@ const MangaPage = () => {
 						>
 							Start Reading
 						</button>
-					</div>
-					<div className={styles.rightColumnContainer}>
+					</LeftColumnContainer>
+
+					<RightColumnContainer>
 						<div className={styles.detailsContainer}>
 							<Details manga={manga} />
 
@@ -165,11 +168,9 @@ const MangaPage = () => {
 								<CoverGallery id={id} />
 							</TabPanel>
 						</Tab>
-
-					</div>
-				</div>
-			)
-			}
+					</RightColumnContainer>
+				</MangaPageLayout>
+			)}
 
 			<footer>
 				<MobileNavigationBar />

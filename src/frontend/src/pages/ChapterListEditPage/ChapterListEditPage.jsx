@@ -82,7 +82,7 @@ const ChapterListEditPage = () => {
                 <div className={styles.chapterListEditContainer}>
                     <div className={styles.actionBTNs}>
                         <button
-                            onClick={() => navigate(`/mangas/${id}/chapters/new`)}
+                            onClick={() => navigate(`/mangas/${id}/edit`)}
                             className={styles.returnBTN}
                         >
                             Go Back to Manga Edit

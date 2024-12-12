@@ -1,0 +1,51 @@
+.mangaPageContainer {
+	display: grid;
+	grid-template-columns: 25fr 75fr;
+	width: 100%;
+	margin-top: 2rem;
+    column-gap: 1.5em;
+}
+
+.mangaPageContainer svg{
+	display: inline;
+}
+
+.leftColumnContainer,
+.rightColumnContainer {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+@media only screen and (max-width: 1600px) {
+	.mangaPageContainer {
+		grid-template-columns: 35fr 65fr;
+	}
+}
+
+@media only screen and (max-width: 1200px) {
+	.mangaPageContainer {
+		grid-template-columns: 40fr 60fr;
+	}
+}
+
+@media only screen and (max-width: 1024px) {
+	.mangaPageContainer {
+		grid-template-columns: 40fr 60fr;
+		margin-bottom: 70px;
+	}
+}
+
+@media only screen and (max-width: 900px) {
+	.mangaPageContainer {
+		grid-template-columns: 45fr 55fr;
+	}
+}
+
+@media only screen and (max-width: 700px) {
+    .mangaPageContainer{
+        display: flex;
+        flex-direction: column;
+    }
+}

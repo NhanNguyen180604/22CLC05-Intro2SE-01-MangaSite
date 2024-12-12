@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../../components/main/MainLayout.jsx';
+import MangaPageLayoutComponents from "../../components/MangaPageLayout";
+const { MangaPageLayout, LeftColumnContainer, RightColumnContainer } = MangaPageLayoutComponents;
 import DesktopLogo from '../../components/main/DesktopLogo.jsx';
 import DesktopNavigationBar from '../../components/main/DesktopNavigationBar.jsx';
 import styles from './AddChapterPage.module.css';
@@ -220,18 +222,18 @@ const AddChapterPage = () => {
             </header>
 
             {loading ? <div className={styles.loadingContainer}>{loadingMessage}</div> : (
-                <div className={styles.addChapterContainer}>
+                <>
                     <div className={styles.returnBTNContainer}>
                         <button
-                            onClick={() => navigate(`/mangas/${id}/chapters/new`)}
+                            onClick={() => navigate(`/mangas/${id}/chapters/edit`)}
                             className={styles.returnBTN}
                         >
                             Go Back to All Chapters
                         </button>
                     </div>
 
-                    <div className={styles.formContainer}>
-                        <div className={styles.leftColumnContainer}>
+                    <MangaPageLayout tag='form'>
+                        <LeftColumnContainer>
                             <img src={mangaCover} className={styles.coverImg} />
 
                             <ActionBTNs
@@ -239,10 +241,9 @@ const AddChapterPage = () => {
                                 canPost={canPost}
                                 reset={reset}
                             />
-                        </div>
-
-                        <div className={styles.rightColumnContainer}>
-                            <section>
+                        </LeftColumnContainer>
+                        <RightColumnContainer>
+                            <section className={`${styles.mySection}`}>
                                 <label htmlFor='titleInput'>Chapter Title</label>
                                 <input
                                     value={chapter.title}
@@ -254,7 +255,7 @@ const AddChapterPage = () => {
                                 {showTitleMessage && <div className={styles.warningMsg}>{titleMessage}</div>}
                             </section>
 
-                            <section>
+                            <section className={`${styles.mySection}`}>
                                 <label htmlFor='numberInput'>Chapter Number</label>
                                 <input
                                     value={chapter.number}
@@ -268,7 +269,7 @@ const AddChapterPage = () => {
                                 {showNumberMessage && <div className={styles.warningMsg}>{numberMessage}</div>}
                             </section>
 
-                            <section className={styles.pageSection}>
+                            <section className={`${styles.mySection} ${styles.pageSection}`}>
                                 <h1>Pages</h1>
                                 <div className={styles.pageListContainer}>
                                     <DndContext
@@ -313,17 +314,17 @@ const AddChapterPage = () => {
                                 reset={reset}
                                 myClassName='mobileDisplay'
                             />
-                        </div>
-                    </div>
+                        </RightColumnContainer>
 
-                    <NotiPopup
-                        open={showNoti}
-                        onClose={() => setShowNoti(false)}
-                        message={notiDetails.message}
-                        details={notiDetails.details}
-                        success={notiDetails.success}
-                    />
-                </div>
+                        <NotiPopup
+                            open={showNoti}
+                            onClose={() => setShowNoti(false)}
+                            message={notiDetails.message}
+                            details={notiDetails.details}
+                            success={notiDetails.success}
+                        />
+                    </MangaPageLayout>
+                </>
             )}
         </MainLayout>
     )

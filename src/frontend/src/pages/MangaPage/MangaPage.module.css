@@ -1,25 +1,14 @@
 .mobileDisplay{
 	display: none;
+	width: 100%;
 }
 
-.mainContainer {
-	display: grid;
-	grid-template-columns: 25fr 75fr;
+.desktopDisplay{
 	width: 100%;
-	margin-top: 4rem;
-}
-
-.leftColumnContainer {
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-items: center;
-	color: black;
 }
 
 .flex-margin-bot-20 {
-	width: 90%;
+	width: 100%;
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 20px;
@@ -32,9 +21,8 @@
 
 .coverImg {
 	object-fit: contain;
-	max-width: 90%;
-	max-height: 90%;
-	margin-top: 10px;
+	max-width: 100%;
+	max-height: 100%;
 	border-radius: 5px;
 	margin-bottom: 15px;
 }
@@ -48,6 +36,7 @@
 
 .actionBTNsContainer > span.disabledBTN{
 	opacity: 0.5;
+	padding: 10px;
 }
 
 .actionBTNsContainer > .editBTN{
@@ -64,22 +53,24 @@
 	background: var(--medium-navy);
 }
 
-.leftColumnContainer button {
+.genreList button,
+.startReadingBTN {
 	font-weight: 600;
 	font-size: 1.1rem;
 	border-radius: 15px;
 	border: none;
 	padding: 5px 10px;
 	background: var(--very-light-blue);
+	color: black;
 	transition: opacity 0.2s ease-in-out;
 }
 
-.leftColumnContainer button:disabled{
-	opacity: 0.5;
+.startReadingBTN:disabled{
+	opacity: 0.4;
 }
 
-.leftColumnContainer .startReadingBTN {
-	width: 90%;
+.startReadingBTN {
+	width: 100%;
 	font-size: 1.3rem;
 	padding: 10px 0;
 	display: block;
@@ -87,7 +78,8 @@
 	margin-bottom: 40px;
 }
 
-.leftColumnContainer button:not(:disabled):hover {
+.startReadingBTN:not(:disabled):hover,
+.genreList button:hover {
 	opacity: 0.6;
 	cursor: pointer;
 }
@@ -169,31 +161,6 @@
 	z-index: 100;
 }
 
-@media only screen and (max-width: 1600px) {
-	.mainContainer {
-		grid-template-columns: 35fr 65fr;
-	}
-}
-
-@media only screen and (max-width: 1200px) {
-	.mainContainer {
-		grid-template-columns: 40fr 60fr;
-	}
-}
-
-@media only screen and (max-width: 1024px) {
-	.mainContainer {
-		grid-template-columns: 40fr 60fr;
-		margin-bottom: 70px;
-	}
-}
-
-@media only screen and (max-width: 900px) {
-	.mainContainer {
-		grid-template-columns: 45fr 55fr;
-	}
-}
-
 @media only screen and (max-width: 700px) {
 	.mobileDisplay{
 		display: block;
@@ -202,22 +169,6 @@
 
 	.desktopDisplay{
 		display: none;
-	}
-
-	.mainContainer {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.coverImg {
-		max-width: 80%;
-		max-height: 80%;
-	}
-
-	.leftColumnContainer > div,
-	.rightColumnContainer > div,
-	.leftColumnContainer .startReadingBTN {
-		width: 80%;
 	}
 
 	.synopsis {
