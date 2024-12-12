@@ -18,7 +18,15 @@ const chapterSchema = new mongoose.Schema({
     },
     images: [
         {
-            type: String,
+            publicID: {
+                type: String,
+                required: true,
+            },
+            url: {
+                type: String, 
+                required: true,
+            },
+            _id: false,
         }
     ],
 });

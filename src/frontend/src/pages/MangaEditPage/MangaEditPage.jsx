@@ -203,24 +203,7 @@ const MangaEditPage = () => {
         setLoading(true);
 
         const mangaResponse = await getMangaByID(id);
-        if (mangaResponse.status === 200) {
-            const me = await getMe();
-            if (!me || (me.accountType !== 'admin' && (me && mangaResponse.manga.uploader._id !== me._id))) {
-                setNotiDetails({
-                    success: false,
-                    message: 'You are not authorized',
-                    details: 'Only the uploader or admin can edit this, returning to home in 5 seconds',
-                });
-                setShowNoti(true);
-                setLoading(false);
-                setTimeout(() => navigate('/'), 5000);
-                return;
-            }
-
-            mangaRef.current = mangaResponse.manga;
-            setUpdatedManga(mangaResponse.manga);
-        }
-        else {
+        if (mangaResponse.status !== 200) {
             // display error
             setNotiDetails({
                 success: false,
@@ -231,6 +214,22 @@ const MangaEditPage = () => {
             setLoading(false);
             return;
         }
+
+        const me = await getMe();
+        if (!me || (me.accountType !== 'admin' && (me && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== me._id))) {
+            setNotiDetails({
+                success: false,
+                message: 'You are not authorized',
+                details: 'Only the uploader or admin can edit this, returning to home in 5 seconds',
+            });
+            setShowNoti(true);
+            setLoading(false);
+            setTimeout(() => navigate('/'), 5000);
+            return;
+        }
+
+        mangaRef.current = mangaResponse.manga;
+        setUpdatedManga(mangaResponse.manga);
 
         const coverResponse = await getCovers(id);
         if (coverResponse.status === 200) {

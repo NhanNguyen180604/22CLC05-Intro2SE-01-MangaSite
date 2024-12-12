@@ -97,7 +97,7 @@ const ChapterListEditPage = () => {
                     <div className={styles.chapterBTNsContainer}>
                         {chapters.map(chapter => (
                             <div
-                                onClick={() => navigate(`/mangas/${id}/${chapter.number}/edit`)}
+                                onClick={() => navigate(`/mangas/${id}/chapters/${chapter.number}/edit`)}
                                 key={chapter._id}
                                 className={styles.chapterBTN}
                             >

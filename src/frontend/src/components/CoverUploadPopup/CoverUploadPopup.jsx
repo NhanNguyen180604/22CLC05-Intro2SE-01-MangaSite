@@ -113,7 +113,7 @@ const CoverUploadPopup = ({ open, setShowThis, loading, setLoading, mangaID, cov
                         <input
                             className={styles.hidden}
                             type='file'
-                            accept=".png, .jpeg, .jpg"
+                            accept='.png, .jpeg, .jpg, .webp'
                             onChange={handleUpload}
                             name="image"
                             id="singleCoverUpload"

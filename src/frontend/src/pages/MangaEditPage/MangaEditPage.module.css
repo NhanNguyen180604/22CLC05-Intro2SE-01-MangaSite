@@ -231,7 +231,6 @@
 }
 
 .coverPlaceholder {
-  min-height: 200px;
   background: var(--medium-navy);
   display: flex;
   justify-content: center;

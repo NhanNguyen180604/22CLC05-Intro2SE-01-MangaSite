@@ -9,7 +9,7 @@ const uploadImages = asyncHandler(async function cloudinaryUploadWrapper(images,
         api_secret: process.env.CLOUDINARY_SECRET
     });
 
-    const urls = await Promise.all(images.map(async (image) => {
+    const imageResult = await Promise.all(images.map(async (image) => {
         try {
             const buffer = Buffer.from(image);
 
@@ -30,7 +30,10 @@ const uploadImages = asyncHandler(async function cloudinaryUploadWrapper(images,
             });
 
             // Return the secure URL
-            return uploadResult.secure_url;
+            return {
+                publicID: uploadResult.public_id,
+                url: uploadResult.secure_url
+            };
         }
         catch (error) {
             for (const [key, value] of Object.entries(error)) {
@@ -40,7 +43,7 @@ const uploadImages = asyncHandler(async function cloudinaryUploadWrapper(images,
         }
     }));
 
-    return urls;
+    return imageResult;
 });
 
 // delete all resources by prefix on the cloud

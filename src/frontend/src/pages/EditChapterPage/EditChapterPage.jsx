@@ -5,8 +5,8 @@ import MangaPageLayoutComponents from "../../components/MangaPageLayout";
 const { MangaPageLayout, LeftColumnContainer, RightColumnContainer } = MangaPageLayoutComponents;
 import DesktopLogo from '../../components/main/DesktopLogo.jsx';
 import DesktopNavigationBar from '../../components/main/DesktopNavigationBar.jsx';
-import styles from './AddChapterPage.module.css';
-import { getMangaByID, getChapterNumbers, uploadChapter } from '../../service/mangaService.js';
+import styles from './EditChapterPage.module.css';
+import { getMangaByID, getChapter, getChapterNumbers, updateChapter } from '../../service/mangaService.js';
 import { getMe } from '../../service/userService.js';
 import NotiPopup from '../../components/NotiPopup';
 import { FaPlus } from 'react-icons/fa';
@@ -15,8 +15,8 @@ import { closestCorners, DndContext } from '@dnd-kit/core';
 import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const AddChapterPage = () => {
-    const { id } = useParams();
+const EditChapterPage = () => {
+    const { id, chapterNumber } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState('Loading');
@@ -29,12 +29,35 @@ const AddChapterPage = () => {
 
     const [mangaCover, setMangaCover] = useState('');
 
-    const chapterNumbersRef = useRef(null);
-    const [chapter, setChapter] = useState({
+    const chapterNumbersRef = useRef(null);  // used to check for duplicate numbers
+    const chapterRef = useRef(null);   // used to reset
+    const [chapter, setChapter] = useState({  // we dont use chapter images in here
         title: 'Your chapter title',
         number: 0,
     });
 
+    const [deletedImages, setDeletedImages] = useState([]);  // store publicID of images to be deleted
+    // for images displaying and uploading
+    const [images, setImages] = useState([]);
+    const imageIDRef = useRef(0);
+    const handleUploadPages = (e) => {
+        const newPages = Array.from(e.target.files);
+        const newObjectURLs = newPages.map(page => URL.createObjectURL(page));
+        const newImages = newPages.map((page, index) => {
+            return {
+                file: page,
+                objectURL: newObjectURLs[index],
+                id: `new-page-${imageIDRef.current++}`,
+            };
+        });
+
+        setImages([
+            ...images,
+            ...newImages,
+        ]);
+    };
+
+    // for warning
     const [showNumberMessage, setShowNumberMessage] = useState(false);
     const [numberMessage, setNumberMessage] = useState('');
     const [showTitleMessage, setShowTitleMessage] = useState(false);
@@ -73,35 +96,30 @@ const AddChapterPage = () => {
         });
     };
 
-    // for images upload
-    const [images, setImages] = useState([]);
-    const imageIDRef = useRef(0);
-    const handleUploadPages = (e) => {
-        const newPages = Array.from(e.target.files);
-        const newObjectURLs = newPages.map(page => URL.createObjectURL(page));
-        const newImages = newPages.map((page, index) => {
-            return {
-                file: page,
-                objectURL: newObjectURLs[index],
-                id: `new-page-${imageIDRef.current++}`,
-            };
-        });
-
-        setImages([
-            ...images,
-            ...newImages,
-        ]);
-    };
     const getImageIndex = (id) => {
         return images.findIndex(image => image.id === id);
     };
     const removeImage = (id) => {
         const foundImage = images[getImageIndex(id)];
-        URL.revokeObjectURL(foundImage.objectURL);
+        // only newly uploaded images have field objectURL
+        if (foundImage.objectURL) {
+            URL.revokeObjectURL(foundImage.objectURL);
+        }
+        // since this is not newly uploaded, it is an old image from our database
+        // store the publicID to delete in the server
+        else {
+            setDeletedImages([
+                ...deletedImages,
+                foundImage.publicID,
+            ]);
+        }
         setImages(images.filter(image => image.id !== id));
     };
     const freeImage = () => {
-        images.forEach(image => URL.revokeObjectURL(image.objectURL));
+        images.forEach(image => {
+            if (image.objectURL)
+                URL.revokeObjectURL(image.objectURL)
+        });
     }
     const handleDragEnd = (e) => {
         const { active, over } = e;
@@ -133,7 +151,7 @@ const AddChapterPage = () => {
         }
 
         const me = await getMe();
-        if (!me || (me && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== me._id)) {
+        if (!me || (me.accountType !== 'admin' && (me && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== me._id))) {
             setNotiDetails({
                 success: false,
                 message: 'You are not authorized',
@@ -147,15 +165,36 @@ const AddChapterPage = () => {
 
         setMangaCover(mangaResponse.manga.cover);
 
-        const chapterNumbersResponse = await getChapterNumbers(id);
-        if (chapterNumbersResponse.status === 200) {
-            const latestChapterNum = chapterNumbersResponse.numbers[chapterNumbersResponse.numbers.length - 1];
-            chapterNumbersRef.current = chapterNumbersResponse.numbers;
-            setChapter({
-                ...chapter,
-                number: latestChapterNum + 1,
+        const chapterResponse = await getChapter(id, chapterNumber);
+        if (chapterResponse.status !== 200) {
+            setNotiDetails({
+                success: false,
+                message: 'Failed to fetch chapter, please try again',
+                details: chapterResponse.message,
             });
+            setShowNoti(true);
+            return;
         }
+
+        const chapterNumbersResponse = await getChapterNumbers(id);
+        if (chapterNumbersResponse.status !== 200) {
+            setNotiDetails({
+                success: false,
+                message: 'Failed to fetch chapter numbers, please try again',
+                details: chapterNumbersResponse.message,
+            });
+            setShowNoti(true);
+            return;
+        }
+
+        chapterRef.current = chapterResponse.chapter;
+        chapterRef.current.images = chapterRef.current.images.map(image => ({
+            ...image,
+            id: `image-page-${imageIDRef.current++}`,
+        }));
+        setChapter(chapterResponse.chapter);
+        chapterNumbersRef.current = chapterNumbersResponse.numbers.filter(number => number !== chapterRef.current.number);
+        setImages(chapterRef.current.images);
 
         setLoading(false);
     };
@@ -167,43 +206,59 @@ const AddChapterPage = () => {
     const reset = async (e) => {
         e.preventDefault();
 
-        setChapter({
-            title: 'Your chapter title',
-            number: chapterNumbersRef.current[chapterNumbersRef.current.length - 1] + 1,
-        });
+        setChapter(chapterRef.current);
 
         freeImage();
-        setImages([]);
+        setImages(chapterRef.current.images);
     };
 
     const submit = async (e) => {
         e.preventDefault();
-        setLoadingMessage('Posting chapter');
+        setLoadingMessage('Updating chapter');
         setLoading(true);
 
         const formData = new FormData();
-        formData.append('title', chapter.title);
-        formData.append('number', chapter.number);
-        images.forEach(image => formData.append('images', image.file));
+        if (chapterRef.current.title !== chapter.title)
+            formData.append('title', chapter.title);
+        if (chapterRef.current.number !== chapter.number)
+            formData.append('number', chapter.number);
 
-        const response = await uploadChapter(id, formData);
-        if (response.status === 200) {
-            navigate(`/mangas/${id}/chapters/${chapter.number}`);
-        }
-        else {
+        const submittingImages = images.map((image, index) => ({
+            ...image,
+            index: index,
+        }));
+
+        submittingImages.forEach(image => {
+            // if this is newly uploaded image
+            if (image.objectURL) {
+                formData.append('newImages', image.file);
+                formData.append('newIndex', image.index);
+            }
+            // this is old image from our base
+            else {
+                formData.append('oldImages', JSON.stringify(image));
+            }
+        });
+
+        deletedImages.forEach(image => formData.append('deleting', image));
+
+        const response = await updateChapter(id, chapterNumber, formData);
+        if (response.status !== 200) {
             setNotiDetails({
                 success: false,
-                message: 'Failed to upload chapter',
+                message: 'Failed to update chapter',
                 details: response.message,
             });
             setShowNoti(true);
+            setLoading(false);
+            return;
         }
 
-        freeImage();
         setLoading(false);
+        navigate(`/mangas/${id}/chapters/${chapterNumber}`);
     };
 
-    const canPost = () => {
+    const canSubmit = () => {
         return chapter.title.length
             && !chapterNumbersRef.current?.find(element => element === chapter.number)
             && !isNaN(chapter.number)
@@ -236,7 +291,7 @@ const AddChapterPage = () => {
 
                             <ActionBTNs
                                 submit={submit}
-                                canPost={canPost}
+                                canSubmit={canSubmit}
                                 reset={reset}
                             />
                         </LeftColumnContainer>
@@ -309,7 +364,7 @@ const AddChapterPage = () => {
 
                             <ActionBTNs
                                 submit={submit}
-                                canPost={canPost}
+                                canSubmit={canSubmit}
                                 reset={reset}
                                 myClassName='mobileDisplay'
                             />
@@ -328,17 +383,17 @@ const AddChapterPage = () => {
         </MainLayout>
     )
 }
-export default AddChapterPage;
+export default EditChapterPage;
 
-const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', canPost }) => {
+const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', canSubmit }) => {
     return (
         <div className={`${styles.actionBTNs} ${styles[myClassName]}`}>
             <button
                 className={styles.blueBTN}
                 onClick={submit}
-                disabled={!canPost()}
+                disabled={!canSubmit()}
             >
-                Post new chapter
+                Update Chapter
             </button>
 
             <button className={styles.discardBTN} onClick={reset}>
@@ -364,7 +419,7 @@ const SortableItem = ({ image, removeImage }) => {
                 {...listeners}
                 style={style}
             >
-                <img src={image.objectURL} />
+                <img src={image.url ? image.url : image.objectURL} />
 
             </div>
             <button

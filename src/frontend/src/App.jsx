@@ -4,6 +4,7 @@ import MangaPage from "./pages/MangaPage";
 import MangaEditPage from "./pages/MangaEditPage";
 import ChapterListEditPage from "./pages/ChapterListEditPage";
 import AddChapterPage from "./pages/AddChapterPage";
+import EditChapterPage from "./pages/EditChapterPage";
 import ChapterPage from "./pages/ChapterPage";
 import SearchPage from "./pages/SearchPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -19,8 +20,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/mangas/:id">
           <Route index element={<MangaPage />} />
-          <Route path="chapters/:chapterNumber" element={<ChapterPage />} />
           <Route path="edit" element={<MangaEditPage />} />
+          <Route path="chapters/:chapterNumber" element={<ChapterPage />} />
+          <Route path="chapters/:chapterNumber/edit" element={<EditChapterPage />} />
           <Route path="chapters/edit" element={<ChapterListEditPage />} />
           <Route path="chapters/new" element={<AddChapterPage />} />
         </Route>
