@@ -45,7 +45,7 @@ export default function DesktopNavigationBar() {
         className={`relative size-14 overflow-clip rounded-full ${expanded ? "z-[60]" : ""}`}
       >
         <img
-          src={me.avatar.url}
+          src={me.avatar?.url}
           alt="Your Profile Image"
         />
       </a>

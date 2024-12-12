@@ -223,7 +223,7 @@ const CommentPopup = ({ loggedIn }) => {
                                 <button onClick={(e) => { e.preventDefault(); resetReplying(); }}><FaXmark /></button>
                             </div>
                             <div className={styles.commentInput}>
-                                <img src={me.avatar.url} className={styles.userAvatar} />
+                                <img src={me.avatar?.url} className={styles.userAvatar} />
                                 <input
                                     type='text'
                                     placeholder="Comment..."
@@ -265,7 +265,7 @@ const CommentContainer = ({ commentObj, setReplying, isReply = false }) => {
         <div className={styles.commentWrapper}>
             <div className={`${styles.commentContainer} ${isReply && styles.replyContainer}`}>
                 <div className={styles.userInfo}>
-                    <img src={commentObj.user.avatar.url} className={styles.userAvatar} />
+                    <img src={commentObj.user.avatar?.url} className={styles.userAvatar} />
                     <span>{commentObj.user.name}</span>
                 </div>
                 <div>{commentObj.content}</div>

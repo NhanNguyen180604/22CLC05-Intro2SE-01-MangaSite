@@ -38,7 +38,7 @@ export default function MobileNavigationBar() {
           className="relative -top-4 mx-4 flex shrink-0 scale-[2.0] items-center justify-center rounded-full bg-darker-navy p-2 duration-200 hover:-translate-y-2"
         >
           <img
-            src={me.avatar.url}
+            src={me.avatar?.url}
             alt="Your profile picture"
             className="size-8 rounded-full object-fill"
           />
