@@ -38,7 +38,7 @@ const LoginPage = ({setToken}) => {
       <div className="w-full max-w-lg p-8 rounded-lg shadow-lg bg-blue">
         <div className="text-center mb-8">
           <img
-            src="assets/book_open_yoko.png"
+            src="../assets/book_open_yoko.png"
             alt="Openbook Logo"
             className="mx-auto w-12 h-12"
           />
@@ -108,7 +108,7 @@ const LoginPage = ({setToken}) => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-300">
             New User?{" "}
-            <a href="/register" className="hover:underline">
+            <a href="/user/register" className="hover:underline">
               Register now!
             </a>
           </p>

@@ -12,7 +12,7 @@ router.route('/library/:tab/:id').delete(authorize, userController.deleteFromLib
 router.route('/blacklist').get(authorize, userController.getBlacklist).put(authorize, userController.updateBlacklist);
 
 router.route('/').get(authorize, userController.getUsers);
-router.route('/me').get(authorize, userController.getMe);
+router.route('/me').get(authorize, userController.getMe).put(authorize, userController.updateUserById);
 router.route('/notifications').post(authorize, userController.notifyUser).get(authorize, userController.getUserNoti);
 router.route('/ban').post(authorize, userController.banUser).delete(authorize, userController.unbanUser);
 router.route('/:id').get(authorize, userController.getUserById).put(authorize, userController.changeUserRole);

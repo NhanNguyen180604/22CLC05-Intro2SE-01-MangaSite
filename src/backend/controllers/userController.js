@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const cloudinaryWrapper = require('../others/cloudinaryWrapper');
 
 const getMe = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id).select('name email accountType avatar.url blacklist');
+    const user = await User.findById(req.user.id).select('name email accountType avatar.url');
     if (!user) {
         res.status(401);
         throw new Error('You are not logged in');
@@ -38,6 +38,24 @@ const getUserById = asyncHandler(async (req, res) => {
         throw new Error('Wrong user id');
     }
     res.json(user);
+});
+
+const updateUserById = asyncHandler(async (req, res) => {
+    const {_id} = await User.findById(req.user.id);
+    if(!_id){
+        res.status(400);
+        throw new Error('You are not logged in');
+    }
+    if(!req.body.email && !req.body.name){
+      res.status(401);
+      throw new Error('No email or name');  
+    }
+    const userUpdate = await User.findByIdAndUpdate(req.user.id, req.body, { new: true });
+    if(!userUpdate){
+        res.status(402);
+        throw new Error('Cannot update user');
+    }
+    res.json(userUpdate);
 });
 
 const changeUserRole = asyncHandler(async (req, res) => {
@@ -206,7 +224,10 @@ const getBlacklist = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error("You are not logged in");
     }
-    res.json(blacklist);
+    const realblacklist = await blacklist.populate([{path: 'authors', model: 'Author'}
+                                                   ,{path: 'categories', model: 'Category'}]);
+                                
+    res.json(realblacklist);
 });
 
 const updateBlacklist = asyncHandler(async (req, res) => {
@@ -303,7 +324,11 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     if (user.avatar && user.avatar.publicID) {
         await cloudinaryWrapper.deleteResources(user.avatar.publicID);
     }
-    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(avatar.data, `${req.user.id}`);
+    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(avatar.data, `avatar/${req.user.id}`);
+    if(!publicID || !url){
+        res.status(402);
+        throw new Error("Failed to upload image to cloudinary");
+    }
     const newAvatar = {
         avatar: { url, publicID }
     };
@@ -356,6 +381,7 @@ module.exports = {
     notifyUser,
     getUserNoti,
     updateUserAvatar,
-    deleteUserAvatar
+    deleteUserAvatar,
+    updateUserById
 };
 

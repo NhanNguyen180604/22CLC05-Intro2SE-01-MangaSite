@@ -10,6 +10,7 @@ import SearchPage from "./pages/SearchPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import useToken from "./service/useToken.js";
+import MyProfilePage from "./pages/MyProfilePage.jsx";
 
 function App() {
   const { token, setToken } = useToken();
@@ -26,9 +27,12 @@ function App() {
           <Route path="chapters/edit" element={<ChapterListEditPage />} />
           <Route path="chapters/new" element={<AddChapterPage />} />
         </Route>
+        <Route path="/user">
+          <Route path="login" element={<LoginPage setToken={setToken} />} />
+          <Route path='register' element={<RegisterPage />} />
+          <Route path="me" element={<MyProfilePage/>} />
+        </Route>
         <Route path="/search" element={<SearchPage />} />
-        <Route path="/login" element={<LoginPage setToken={setToken} />} />
-        <Route path='/register' element={<RegisterPage />} />
       </Routes>
     </>
   );
