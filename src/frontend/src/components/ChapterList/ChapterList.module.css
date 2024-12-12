@@ -30,6 +30,7 @@
 
 .chapterContainer div:not(:first-of-type) {
 	font-size: 1.2rem;
+	font-weight: 300;
 }
 
 .chapterContainer:hover {

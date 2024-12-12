@@ -68,11 +68,41 @@ export const getChapterList = async (mangaID, page = 1, per_page = 20, all = fal
     }
 };
 
+export const getChapterNumbers = async (mangaID) => {
+    try {
+        const response = await axios.get(API + mangaID + '/chapters/numbers');
+        return { status: response.status, numbers: response.data };
+    } catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
 export const getChapter = async (mangaID, chapterNumber) => {
     try {
         const response = await axios.get(API + mangaID + "/chapters/" + chapterNumber);
         return { status: response.status, chapter: response.data };
     } catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const uploadChapter = async (mangaID, formData) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.post(API + mangaID + "/chapters", formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return { status: response.status, chapter: response.data };
+    }
+    catch (error) {
         return getErrorMessage(error);
     }
 };

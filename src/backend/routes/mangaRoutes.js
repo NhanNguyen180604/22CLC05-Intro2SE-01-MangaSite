@@ -43,6 +43,10 @@ router.route('/:id/covers/:coverNumber')
     .delete(authorize, coverController.deleteCover);
 
 // chapter routes
+// /api/mangas/:id/numbers
+router.route('/:id/chapters/numbers')
+    .get(chapterController.getAllChapterNumbers);
+
 // /api/mangas/:id/chapters/:chapterNumber
 router.route('/:id/chapters/:chapterNumber')
     .get(chapterController.getChapter)

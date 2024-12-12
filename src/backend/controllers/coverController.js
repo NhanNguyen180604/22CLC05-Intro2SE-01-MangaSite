@@ -26,6 +26,9 @@ const getCovers = asyncHandler(async (req, res) => {
     res.status(200).json(covers);
 });
 
+// @description get default cover of all mangas
+// @route GET /api/mangas/:id/covers/default
+// @access public
 const getDefaultCover = asyncHandler(async (req, res) => {
     res.status(200).json(process.env.DEFAULT_COVER);
 });

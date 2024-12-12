@@ -13,6 +13,7 @@ const MySelect = ({ options, isLoading, value, onChange }) => {
             },
             outline: state.isFocused ? '1px solid white' : 'none',
             padding: '1rem',
+            marginBottom: '5px',
         }),
         input: (styles, state) => ({
             ...styles,

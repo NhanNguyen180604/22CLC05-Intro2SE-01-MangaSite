@@ -10,7 +10,7 @@ import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx
 import MainLayout from "../../components/main/MainLayout.jsx";
 import TabComponents from "../../components/Tab"
 const { Tab, TabPanel } = TabComponents;
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa";
 import CoverDeletePopup from "../../components/CoverDeletePopup";
 import NotiPopup from "../../components/NotiPopup";
 import CoverUploadPopup from "../../components/CoverUploadPopup";
@@ -26,10 +26,10 @@ const MangaEditPage = () => {
         details: '',
     });
 
-    const mangaRef = useRef(null);
+    const mangaRef = useRef(null);  // use this to reset changes
     const [updatedManga, setUpdatedManga] = useState({
         _id: '',
-        title: '',
+        name: '',
         authors: [],
         categories: [],
         canComment: false,
@@ -44,7 +44,14 @@ const MangaEditPage = () => {
         setUpdatedManga({
             ...updatedManga,
             [field]: value,
-        })
+        });
+
+        if (field === 'name' && !value.length) {
+            setShowNameWarning(true);
+        }
+        else {
+            showNameWarning && setShowNameWarning(false);
+        }
     };
     const handleCheckboxChange = (e) => {
         const { name, checked } = e.target;
@@ -62,9 +69,37 @@ const MangaEditPage = () => {
                     name: value.label,
                 };
             })
-        })
-    };
+        });
 
+        if (field === 'authors') {
+            if (!values.length) {
+                setShowAuthorWarning(true);
+            }
+            else {
+                showAuthorWarning && setShowAuthorWarning(false);
+            }
+        }
+        else if (field === 'categories') {
+            if (!values.length) {
+                setShowCateWarning(true);
+            }
+            else {
+                showCateWarning && setShowCateWarning(false);
+            }
+        }
+    };
+    // reset all changes
+    const reset = (e) => {
+        e.preventDefault();
+        setUpdatedManga(mangaRef.current);
+    }
+
+    // warning messages for invalid input cases
+    const [showNameWarning, setShowNameWarning] = useState(false);
+    const [showAuthorWarning, setShowAuthorWarning] = useState(false);
+    const [showCateWarning, setShowCateWarning] = useState(false);
+
+    // for updating cover images
     const [covers, setCovers] = useState([]);
     const defaultCoverRef = useRef(null);
     const [showCoverUploadPopup, setShowCoverUploadPopup] = useState(false);
@@ -72,7 +107,7 @@ const MangaEditPage = () => {
     const [delCoverNum, setDelCoverNum] = useState(-1);
     const [popupLoading, setPopupLoading] = useState(false);
 
-    useEffect(() => {
+    useEffect(() => {  // this might be stupid, idk, i'm noob at React
         if (delCoverNum !== -1) {
             setShowCoverDelPopup(true);
         }
@@ -114,16 +149,9 @@ const MangaEditPage = () => {
         setShowNoti(true);
     };
 
-    // reset all changes
-    const reset = (e) => {
-        e.preventDefault();
-        setUpdatedManga(mangaRef.current);
-    }
-
     const authorsRef = useRef([]);
     const categoriesRef = useRef([]);
-    const [newAuthor, setNewAuthor] = useState('');  // for posting new author
-
+    const [newAuthor, setNewAuthor] = useState('');  // for posting new autho
     const handleTextInput = (e) => {
         const { value } = e.target;
         setNewAuthor(value);
@@ -249,9 +277,17 @@ const MangaEditPage = () => {
             navigate(`/mangas/${id}`);
         }
         else {
-            // create popup here, I'm lazy af
-            console.log(response);
+            setNotiDetails({
+                success: false,
+                message: 'Failed to update the manga',
+                details: response.message,
+            });
+            setShowNoti(true);
         }
+    };
+
+    const canSave = () => {
+        return updatedManga.name.length && updatedManga.authors.length && updatedManga.categories.length;
     };
 
     return (
@@ -271,7 +307,13 @@ const MangaEditPage = () => {
                     <div className={styles.leftColumnContainer}>
                         <img src={updatedManga.cover} className={styles.coverImg} />
 
-                        <ActionBTNs reset={reset} submit={submit} />
+                        <ActionBTNs
+                            reset={reset}
+                            submit={submit}
+                            mangaID={id}
+                            navigate={navigate}
+                            canSave={canSave}
+                        />
                     </div>
 
                     <div className={styles.rightColumnContainer}>
@@ -279,7 +321,12 @@ const MangaEditPage = () => {
                             <TabPanel title="General">
                                 <section>
                                     <h1>Title</h1>
-                                    <textarea value={updatedManga.name} onChange={(e) => handleTextareaChange(e, 'name')}></textarea>
+                                    <textarea
+                                        value={updatedManga.name}
+                                        onChange={(e) => handleTextareaChange(e, 'name')}
+                                        onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                                    ></textarea>
+                                    {showNameWarning && <div className={styles.failMsg}>Manga's title cannot be empty</div>}
                                 </section>
 
                                 <section>
@@ -295,7 +342,7 @@ const MangaEditPage = () => {
                                             };
                                         })}
                                     />
-
+                                    {showAuthorWarning && <div className={styles.failMsg}>Must select at least 1 author</div>}
                                 </section>
 
                                 <section>
@@ -339,6 +386,7 @@ const MangaEditPage = () => {
                                         })}
                                         isLoading={loading}
                                     />
+                                    {showCateWarning && <div className={styles.failMsg}>Must select at least 1 tag</div>}
                                 </section>
 
                                 <label className={styles.formControl}>
@@ -352,6 +400,7 @@ const MangaEditPage = () => {
                                     {covers.map(cover => (
                                         <div key={cover._id} className={styles.coverContainer}>
                                             <img src={cover.imageURL} className={styles.smolCover} />
+                                            <div>#{cover.number}</div>
                                             <div className={styles.coverBTNs}>
                                                 <div
                                                     onClick={() => setUpdatedManga({
@@ -379,7 +428,14 @@ const MangaEditPage = () => {
                             </TabPanel>
                         </Tab>
 
-                        <ActionBTNs reset={reset} submit={submit} myClassName="mobileDisplay" />
+                        <ActionBTNs
+                            reset={reset}
+                            submit={submit}
+                            myClassName="mobileDisplay"
+                            mangaID={id}
+                            navigate={navigate}
+                            canSave={canSave}
+                        />
                     </div>
 
                     <CoverDeletePopup
@@ -417,18 +473,31 @@ const MangaEditPage = () => {
 }
 export default MangaEditPage;
 
-const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay' }) => {
+const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', navigate, mangaID, canSave }) => {
     return (
         <div className={`${styles.actionBTNs} ${styles[myClassName]}`}>
-            <button className={styles.blueBTN} onClick={(e) => submit(e)}>
+            <button
+                className={styles.blueBTN}
+                onClick={(e) => submit(e)}
+                disabled={!canSave()}
+            >
                 Save changes
             </button>
-            <button className={styles.blueBTN}>
+
+            <button
+                className={styles.blueBTN}
+                onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/mangas/${mangaID}/chapters/edit`)
+                }}
+            >
                 Go to Chapters
             </button>
+
             <button className={styles.discardBTN} onClick={reset}>
                 Discard changes
             </button>
+
             <button className={styles.deleteBTN}>
                 Delete this manga
             </button>

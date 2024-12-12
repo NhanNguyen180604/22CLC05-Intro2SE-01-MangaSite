@@ -16,7 +16,7 @@
 }
 
 .coverImg {
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .actionBTNs {
@@ -211,6 +211,10 @@
 
 .coverContainer {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
 }
 
 .coverBTNs {
