@@ -25,6 +25,7 @@ export default function AdminPage() {
     );
   }
 
+  // Clearance level 3 is Senior Researcher, i meant Administrator.
   if (clearance < 3) {
     redirect("/401");
     return;

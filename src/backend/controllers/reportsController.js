@@ -3,13 +3,15 @@ const Report = require("../models/reportModel");
 const Manga = require("../models/mangaModel");
 const Chapter = require("../models/chapterModel");
 const Comment = require("../models/commentModel");
+const { z } = require("zod");
 
 /**
  * GET /api/reports: Retrieve all reports
  *
  * - Clearance Level: 4 (Admins)
- * - Special Containment Procedures: Requires query { page: number, per_page: number }.
- * - Containment Class: Safe (because we're fucking good at containing this)
+ * - Special Containment Procedures:
+ *   + Accepts query: { page: number, per_page: number, show_processed: boolean }
+ * - Object Class: Safe (No mutations are done)
  * - Status: 200/success, 401/unauthorized.
  * - Returns: { reports: { _id, informant, description, manga, chapter, comment, processed }[], page, per_page, total_pages, total }
  */
@@ -20,35 +22,33 @@ const getReports = expressAsyncHandler(async (req, res) => {
     throw new Error("Unauthorized.");
   }
 
-  const page = req.query.page ? parseInt(req.query.page) : 1;
-  const per_page = req.query.per_page ? parseInt(req.query.per_page) : 20;
+  const schema = z.object({
+    page: z.coerce.number().positive().safe().default(1),
+    per_page: z.coerce.number().positive().safe().default(20),
+    show_processed: z.coerce.boolean().default(false),
+  });
+  const query = schema.safeParse(req.query);
 
-  // Validation.
-  if (Number.isNaN(page) || !Number.isSafeInteger(page) || page <= 0) {
-    res.status(400);
-    throw new Error("Bad Request: Invalid query page.");
+  if (query.error) {
+    res
+      .status(400)
+      .json({ message: `Bad request: ${query.error.issues[0].message}` });
+    return;
   }
 
-  if (
-    Number.isNaN(per_page) ||
-    !Number.isSafeInteger(per_page) ||
-    per_page <= 0
-  ) {
-    res.status(400);
-    throw new Error("Bad Request: Invalid query per_page.");
-  }
-
+  const { page, per_page, show_processed } = query.data;
   const total = await Report.countDocuments({});
   const total_pages = Math.ceil(total / per_page);
 
   if (page > total_pages) {
-    res.status(400);
-    throw new Error("Bad Request: Query page too large.");
+    res.status(400).json({ message: "Bad request: query page too large." });
+    return;
   }
 
   // Finally, some action.
   const reports = await Report.find({})
     .sort({ processed: -1 })
+    .match(show_processed ? {} : { processed: false })
     .skip((page - 1) * per_page)
     .limit(per_page);
   return res.status(200).json({ reports, page, per_page, total_pages, total });
