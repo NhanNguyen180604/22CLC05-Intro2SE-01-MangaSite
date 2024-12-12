@@ -17,13 +17,6 @@ const authorRoutes = require("./routes/authorRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const userRoutes = require("./routes/userRoutes");
 const searchRoutes = require("./routes/searchRoutes");
-const userModel = require("./models/userModel");
-const { hashSync } = require("bcryptjs");
-const authorModel = require("./models/authorModel");
-const categoryModel = require("./models/categoryModel");
-const mangaModel = require("./models/mangaModel");
-const reportModel = require("./models/reportModel");
-const commentModel = require("./models/commentModel");
 
 // initialize app
 const app = express();
@@ -37,7 +30,7 @@ app.use(
     limits: {
       fileSize: 30 * 1024 * 1024, // 30 MiB
     },
-  })
+  }),
 );
 
 // routing, order matters
@@ -48,67 +41,71 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/search", searchRoutes);
 
-// app.get("/fake", async (req, res) => {
-//   await Promise.all([
-//     userModel.deleteMany(),
-//     mangaModel.deleteMany(),
-//     authorModel.deleteMany(),
-//     reportModel.deleteMany(),
-//     categoryModel.deleteMany(),
-//     commentModel.deleteMany(),
-//   ]);
-
-//   const users = require("./data/fake_users.json");
-//   const createdUsers = await userModel.insertMany(users.map((it) => ({ ...it, password: hashSync(it.password) })));
-
-//   const authors = require("./data/fake_authors.json");
-//   await authorModel.insertMany(authors);
-
-//   const categories = require("./data/fake_categories.json");
-//   await categoryModel.insertMany(categories);
-
-//   async function getUser(name) {
-//     return await userModel.findOne({ name });
-//   }
-
-//   async function mapAuthorsToId(...names) {
-//     return (await authorModel.find({ name: { $in: names } }).select("_id")).map((node) => node._id);
-//   }
-
-//   async function mapCategoriesToId(...names) {
-//     return (await categoryModel.find({ name: { $in: names } }).select("_id")).map((node) => node._id);
-//   }
-
-//   const mangas = require("./data/fake_mangas.json");
-//   const parsedMangas = await Promise.all(
-//     mangas.map(async (manga) => {
-//       const a = {
-//         ...manga,
-//         authors: await mapAuthorsToId(...manga.authors),
-//         categories: await mapCategoriesToId(...manga.categories),
-//         uploader: (await getUser(manga.uploader[0]))._id,
-//       };
-//       return a;
-//     })
-//   );
-//   const createdMangas = await mangaModel.insertMany(parsedMangas);
-
-//   const reports = [
-//     {
-//       informant: createdUsers[0]._id,
-//       description: "Art is too cute",
-//       manga: await mangaModel.findOne({ name: "Shattered" }),
-//     },
-//     {
-//       informant: createdUsers[1]._id,
-//       description: "Bro this isn't Yoshi this is tax evasion guide",
-//       manga: await mangaModel.findOne({ name: "Yoshi Yoshi Yoshi YOSH!" }),
-//     },
-//   ];
-//   await reportModel.insertMany(reports);
-
-//   res.status(200).json({});
-// });
+app.get("/fake", async (req, res) => {
+  // const userModel = require("./models/userModel");
+  // const { hashSync } = require("bcryptjs");
+  // const authorModel = require("./models/authorModel");
+  // const categoryModel = require("./models/categoryModel");
+  // const mangaModel = require("./models/mangaModel");
+  // const reportModel = require("./models/reportModel");
+  // const commentModel = require("./models/commentModel");
+  // await Promise.all([
+  //   userModel.deleteMany(),
+  //   mangaModel.deleteMany(),
+  //   authorModel.deleteMany(),
+  //   reportModel.deleteMany(),
+  //   categoryModel.deleteMany(),
+  //   commentModel.deleteMany(),
+  // ]);
+  // const users = require("./data/fake_users.json");
+  // const createdUsers = await userModel.insertMany(
+  //   users.map((it) => ({ ...it, password: hashSync(it.password) })),
+  // );
+  // const authors = require("./data/fake_authors.json");
+  // await authorModel.insertMany(authors);
+  // const categories = require("./data/fake_categories.json");
+  // await categoryModel.insertMany(categories);
+  // async function getUser(name) {
+  //   return await userModel.findOne({ name });
+  // }
+  // async function mapAuthorsToId(...names) {
+  //   return (await authorModel.find({ name: { $in: names } }).select("_id")).map(
+  //     (node) => node._id,
+  //   );
+  // }
+  // async function mapCategoriesToId(...names) {
+  //   return (
+  //     await categoryModel.find({ name: { $in: names } }).select("_id")
+  //   ).map((node) => node._id);
+  // }
+  // const mangas = require("./data/fake_mangas.json");
+  // const parsedMangas = await Promise.all(
+  //   mangas.map(async (manga) => {
+  //     const a = {
+  //       ...manga,
+  //       authors: await mapAuthorsToId(...manga.authors),
+  //       categories: await mapCategoriesToId(...manga.categories),
+  //       uploader: (await getUser(manga.uploader[0]))._id,
+  //     };
+  //     return a;
+  //   }),
+  // );
+  // const createdMangas = await mangaModel.insertMany(parsedMangas);
+  // const reports = [
+  //   {
+  //     informant: createdUsers[0]._id,
+  //     description: "Art is too cute",
+  //     manga: await mangaModel.findOne({ name: "Shattered" }),
+  //   },
+  //   {
+  //     informant: createdUsers[1]._id,
+  //     description: "Bro this isn't Yoshi this is tax evasion guide",
+  //     manga: await mangaModel.findOne({ name: "Yoshi Yoshi Yoshi YOSH!" }),
+  //   },
+  // ];
+  // await reportModel.insertMany(reports);
+  // res.status(200).json({});
+});
 
 // handle error
 app.use(errorHandler);

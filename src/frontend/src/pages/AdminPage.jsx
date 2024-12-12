@@ -1,13 +1,14 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
+import { redirect } from "react-router-dom";
+import MobileAdminTools from "../components/admin/MobileAdminTools.jsx";
 import DesktopLogo from "../components/main/DesktopLogo.jsx";
 import DesktopNavigationBar from "../components/main/DesktopNavigationBar.jsx";
 import MainLayout from "../components/main/MainLayout.jsx";
 import MobileNavigationBar from "../components/main/MobileNavigationBar.jsx";
-import { redirect } from "../service/service.js";
 import { $token, checkClearance } from "../stores/auth.js";
 
-export default function ReportManagementPage() {
+export default function AdminPage() {
   const token = useStore($token);
   const [clearance, setClearance] = useState(-1);
 
@@ -29,10 +30,6 @@ export default function ReportManagementPage() {
     return;
   }
 
-  function fake() {
-    fetch("http://localhost:3000/fake/users");
-  }
-
   return (
     <MainLayout>
       <header className="flex w-full flex-row items-center justify-between">
@@ -40,11 +37,7 @@ export default function ReportManagementPage() {
         <DesktopNavigationBar />
       </header>
 
-      <section className="flex flex-col">
-        <h1 className="text-2xl font-bold">Reports Management</h1>
-
-        <button onClick={fake}>Fake data</button>
-      </section>
+      <MobileAdminTools />
 
       <footer>
         <MobileNavigationBar />

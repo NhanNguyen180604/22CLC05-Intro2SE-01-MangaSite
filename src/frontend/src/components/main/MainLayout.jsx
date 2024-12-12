@@ -13,7 +13,7 @@ function MainLayout({ children }) {
 }
 
 MainLayout.propTypes = {
-  children: propTypes.arrayOf(propTypes.element),
+  children: propTypes.any,
 };
 
 export default MainLayout;

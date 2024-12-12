@@ -29,7 +29,11 @@ const getReports = expressAsyncHandler(async (req, res) => {
     throw new Error("Bad Request: Invalid query page.");
   }
 
-  if (Number.isNaN(per_page) || !Number.isSafeInteger(per_page) || per_page <= 0) {
+  if (
+    Number.isNaN(per_page) ||
+    !Number.isSafeInteger(per_page) ||
+    per_page <= 0
+  ) {
     res.status(400);
     throw new Error("Bad Request: Invalid query per_page.");
   }
@@ -66,10 +70,14 @@ const sendReport = expressAsyncHandler(async (req, res) => {
   }
 
   // Check query.
-  const sum = [!!req.body.manga, !!req.body.chapter, !!req.body.comment].reduce((a, v) => a + v);
+  const sum = [!!req.body.manga, !!req.body.chapter, !!req.body.comment].reduce(
+    (a, v) => a + v,
+  );
   if (sum != 1) {
     res.status(400);
-    throw new Error("Bad Request: only one field among manga, chapter and comment may be set.");
+    throw new Error(
+      "Bad Request: only one field among manga, chapter and comment may be set.",
+    );
   }
 
   // Check existence.
@@ -83,7 +91,9 @@ const sendReport = expressAsyncHandler(async (req, res) => {
   }
   if (req.body.comment && !(await Comment.exists({ _id: req.body.comment }))) {
     res.status(404);
-    throw new Error("Not Found: that comment doesn't exist. stop hallucinating.");
+    throw new Error(
+      "Not Found: that comment doesn't exist. stop hallucinating.",
+    );
   }
 
   // Create the report.
@@ -138,7 +148,11 @@ const updateReportState = expressAsyncHandler(async (req, res) => {
     throw new Error("Not Found: that report doesn't exist.");
   }
 
-  const q = await Report.findOneAndUpdate({ _id: req.params.id }, { processed: !report.processed }, { returnDocument: "after" });
+  const q = await Report.findOneAndUpdate(
+    { _id: req.params.id },
+    { processed: !report.processed },
+    { returnDocument: "after" },
+  );
   return res.status(200).json(q);
 });
 

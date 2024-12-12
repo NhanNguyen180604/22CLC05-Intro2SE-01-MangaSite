@@ -4,6 +4,7 @@
  * @returns the me object, or null if there's an error or not logged in.
  */
 import axios from "axios";
+import { $token } from "../stores/auth.js";
 import { API_URL } from "./service.js";
 const API = API_URL + '/users/';
 
@@ -36,7 +37,7 @@ export const postRegister = async (email, username, password) => {
 };
 
 export async function getMe() {
-    const token = localStorage.getItem('token');
+  const token = $token.get();
     if (!token)
         return null;
 
