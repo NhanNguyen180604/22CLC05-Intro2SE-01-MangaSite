@@ -15,7 +15,7 @@ export default function ReportsPanel() {
   return (
     <section className="flex flex-col gap-6 p-6">
       <button
-        className="flex flex-row items-center gap-2 font-semibold underline-offset-4 duration-200 hover:gap-4 hover:underline"
+        className="flex flex-row items-center gap-2 font-semibold underline-offset-4 duration-200 hover:gap-4 hover:underline lg:hidden"
         onClick={() => $adminPanel.set(null)}
       >
         <MdChevronLeft color="white" className="size-6" />

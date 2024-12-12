@@ -1,11 +1,12 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
-import { redirect } from "react-router-dom";
+import DesktopAdminTools from "../components/admin/DesktopAdminTools.jsx";
 import MobileAdminTools from "../components/admin/MobileAdminTools.jsx";
 import DesktopLogo from "../components/main/DesktopLogo.jsx";
 import DesktopNavigationBar from "../components/main/DesktopNavigationBar.jsx";
 import MainLayout from "../components/main/MainLayout.jsx";
 import MobileNavigationBar from "../components/main/MobileNavigationBar.jsx";
+import { redirect } from "../service/service.js";
 import { $token, checkClearance } from "../stores/auth.js";
 
 export default function AdminPage() {
@@ -39,6 +40,7 @@ export default function AdminPage() {
       </header>
 
       <MobileAdminTools />
+      <DesktopAdminTools />
 
       <footer>
         <MobileNavigationBar />

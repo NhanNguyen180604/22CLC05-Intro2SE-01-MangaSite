@@ -33,7 +33,7 @@ export const sendReport = async (reportField, reportedId, description) => {
 /**
  * Retrieves a list of reports.
  * @param {{ page: number, showProcessed: boolean }} data
- * @returns {Promise<{ reports: any[], more: boolean }>} Results can be null if unauthorized, or an object containing data.
+ * @returns {Promise<{ reports: any[], more: boolean } | null>} Results can be null if unauthorized, or an object containing data.
  */
 export async function getReports({ page = 1, showProcessed = false }) {
   const token = $token.get();
@@ -44,6 +44,7 @@ export async function getReports({ page = 1, showProcessed = false }) {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      mode: "cors",
     },
   );
 

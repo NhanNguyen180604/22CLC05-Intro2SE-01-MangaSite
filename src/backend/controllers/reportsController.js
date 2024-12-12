@@ -4,6 +4,7 @@ const Manga = require("../models/mangaModel");
 const Chapter = require("../models/chapterModel");
 const Comment = require("../models/commentModel");
 const { z } = require("zod");
+const reportModel = require("../models/reportModel");
 
 /**
  * GET /api/reports: Retrieve all reports
@@ -37,21 +38,79 @@ const getReports = expressAsyncHandler(async (req, res) => {
   }
 
   const { page, per_page, show_processed } = query.data;
-  const total = await Report.countDocuments({});
-  const total_pages = Math.ceil(total / per_page);
-
-  if (page > total_pages) {
-    res.status(400).json({ message: "Bad request: query page too large." });
-    return;
-  }
 
   // Finally, some action.
-  const reports = await Report.find({})
-    .sort({ processed: -1 })
+  const reports = await reportModel
+    .aggregate()
     .match(show_processed ? {} : { processed: false })
-    .skip((page - 1) * per_page)
-    .limit(per_page);
-  return res.status(200).json({ reports, page, per_page, total_pages, total });
+    .sort({ processed: -1 })
+    .lookup({
+      from: "users",
+      localField: "informant",
+      foreignField: "_id",
+      as: "informant",
+    })
+    .unwind("$informant")
+    .lookup({
+      from: "mangas",
+      localField: "manga",
+      foreignField: "_id",
+      as: "manga",
+    })
+    .unwind({ path: "$manga", preserveNullAndEmptyArrays: true })
+    .lookup({
+      from: "authors",
+      localField: "manga.authors",
+      foreignField: "_id",
+      as: "manga.authors",
+    })
+    .lookup({
+      from: "chapters",
+      localField: "chapter",
+      foreignField: "_id",
+      as: "chapter",
+    })
+    .unwind({ path: "$chapter", preserveNullAndEmptyArrays: true })
+    .lookup({
+      from: "mangas",
+      localField: "chapter.manga",
+      foreignField: "_id",
+      as: "chapter.manga",
+    })
+    .unwind({ path: "$chapter.manga", preserveNullAndEmptyArrays: true })
+    .lookup({
+      from: "comments",
+      localField: "comment",
+      foreignField: "_id",
+      as: "comment",
+    })
+    .unwind({ path: "$comment", preserveNullAndEmptyArrays: true })
+    .lookup({
+      from: "users",
+      localField: "comment.user",
+      foreignField: "_id",
+      as: "comment.user",
+    })
+    .unwind({ path: "$comment.user", preserveNullAndEmptyArrays: true })
+    .facet({
+      total: [{ $count: "count" }],
+      pagination: [
+        {
+          $skip: (page - 1) * page,
+        },
+        {
+          $limit: per_page,
+        },
+      ],
+    });
+
+  return res.status(200).json({
+    reports: reports[0].pagination,
+    page,
+    per_page,
+    total_pages: Math.ceil(reports[0].total[0].count / per_page),
+    total: reports[0].total[0].count,
+  });
 });
 
 /**
