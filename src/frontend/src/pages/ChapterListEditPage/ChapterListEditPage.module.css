@@ -1,0 +1,91 @@
+.chapterListEditContainer {
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.loadingContainer{
+    width: 100%;
+    height: 100%;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.chapterListEditContainer svg {
+  display: inline;
+}
+
+.actionBTNs {
+  margin-bottom: 2rem;
+}
+
+.returnBTN {
+  background: var(--sky-blue);
+  color: black;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  font-weight: bold;
+}
+
+.returnBTN:hover{
+  background: var(--very-light-blue);
+}
+
+.title {
+  font-size: 1.2rem;
+  font-size: bold;
+  margin-bottom: 1rem;
+}
+
+.chapterBTNsContainer {
+  display: grid;
+  grid-template-columns: 1;
+  grid-auto-rows: 1fr;
+  gap: 10px;
+}
+
+.chapterBTN,
+.addNewBTN {
+  display: block;
+  background: var(--medium-navy);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid var(--medium-navy);
+  transition: border 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.chapterBTN:hover,
+.addNewBTN:hover {
+  border: 2px solid var(--very-light-blue);
+}
+
+.addNewBTN{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 500;
+    font-size: 1.2rem;
+}
+
+.chapterNum {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.chapterTitle {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 300;
+}
+
+.chapterPageCount {
+  font-size: 1rem;
+}
+
+@media only screen and (max-width: 700px) {
+  .actionBTNs {
+    text-align: center;
+  }
+}

@@ -27,7 +27,7 @@ export default function DesktopNavigationBar() {
   if (loading) return <DesktopNavLoading />;
   
   // It's null, loading failed. Returns a login button, this is only available on the desktop bar.
-  if (me == null) return <a href="/login" className="font-semibold text-xl hidden h-14 px-4 items-center justify-center lg:flex bg-sky-blue text-black rounded-2xl">Login</a>;
+  if (me == null) return <a href="/user/login" className="font-semibold text-xl hidden h-14 px-4 items-center justify-center lg:flex bg-sky-blue text-black rounded-2xl">Login</a>;
 
   return (
     <div
@@ -40,12 +40,12 @@ export default function DesktopNavigationBar() {
       onBlur={() => setExpanded(false)}
     >
       <a
-        href="/users/me"
+        href="/user/me"
         aria-label="Profile"
         className={`relative size-14 overflow-clip rounded-full ${expanded ? "z-[60]" : ""}`}
       >
         <img
-          src={me.avatar.url}
+          src={me.avatar?.url}
           alt="Your Profile Image"
         />
       </a>

@@ -1,0 +1,24 @@
+.cover-upload-popup-content {
+    margin: auto;
+    border: none;
+    width: 50%;
+    height: 85%;
+    background: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  @media only screen and (max-width: 1000px) {
+    .cover-upload-popup-content {
+      width: 80%;
+    }
+  }
+  
+  @media only screen and (max-width: 800px) {
+    .cover-upload-popup-content {
+      width: 90%;
+    }
+  }
+  

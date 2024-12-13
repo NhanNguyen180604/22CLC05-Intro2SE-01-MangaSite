@@ -147,7 +147,7 @@ const ChapterPage = () => {
             <div className={styles.budgetLayout}>
                 <div className={styles.imgContainer}>
                     {chapter.images.length && chapter.images.map((image, index) => (
-                        <img src={image} key={`chapter-${chapter._id}-image-${index + 1}`} loading="lazy" />
+                        <img src={image.url} key={`chapter-${chapter._id}-image-${index + 1}`}/>
                     ))}
                 </div>
             </div>

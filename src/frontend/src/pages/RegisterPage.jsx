@@ -14,7 +14,7 @@ const RegisterPage = () => {
       setError(response.message);
       return;
     }
-    navigate('/login');
+    navigate('/user/login');
   }
 
   const deleteErrorState = () => {
@@ -25,7 +25,7 @@ const RegisterPage = () => {
       <div className="w-full max-w-lg p-8 rounded-lg shadow-lg bg-blue">
         <div className="text-center mb-8">
           <img
-            src="assets/book_open_yoko.png"
+            src="../assets/book_open_yoko.png"
             alt="Openbook Logo"
             className="mx-auto w-12 h-12"
           />
@@ -101,7 +101,7 @@ const RegisterPage = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-300">
             Already have an account?{" "}
-            <a href="/login" className="hover:underline">
+            <a href="/user/login" className="hover:underline">
               Login now!
             </a>
           </p>

@@ -40,8 +40,7 @@ export async function getMe() {
   const token = $token.get();
     if (!token)
         return null;
-
-    const res = await fetch(API + "/me", {
+    const res = await fetch(API + "me", {
         method: "GET",
         headers: {
             Authorization: `Bearer ${token}`
@@ -50,6 +49,73 @@ export async function getMe() {
 
     if (res.status == 401) return null;
     return await res.json();
+}
+
+export async function putMe(email, name){
+    const token = localStorage.getItem('token');
+    if (!token)
+        return null;
+    const res = await axios.put(API + "me", 
+        {
+            email,
+            name
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+
+    if (res.status == 401) return null;
+    return await res.data;
+}
+
+export const changeAvatar = async (avatar) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return null;
+    const res = await axios.put(API + "avatar", 
+        avatar,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+    if (res.status == 401) return null;
+    return await res.data;
+}
+
+export const getBlacklist = async () => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return null;
+    const res = await axios.get(API + "blacklist", 
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+    if (res.status !== 200) return null;
+    return await res.data;
+}
+
+export const putBlacklist = async (blacklist) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return null;
+    const res = await axios.put(API + "blacklist",
+        {blacklist}, 
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+    if (res.status !== 200) return null;
+    return await res.data;
 }
 
 export const getLibrary = async () => {

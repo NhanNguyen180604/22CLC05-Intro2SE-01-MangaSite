@@ -13,6 +13,8 @@ import CoverGallery from "../../components/CoverGallery"
 import DesktopLogo from "../../components/main/DesktopLogo.jsx"
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx"
 import MainLayout from "../../components/main/MainLayout.jsx"
+import MangaPageLayoutComponents from "../../components/MangaPageLayout"
+const { MangaPageLayout, LeftColumnContainer, RightColumnContainer } = MangaPageLayoutComponents;
 import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx"
 import SearchBox from "../../components/search/SearchBox.jsx"
 import RatingPopup from "../../components/RatingPopup"
@@ -85,19 +87,30 @@ const MangaPage = () => {
 			</header>
 
 			{loading ? <MangaPageLoading /> : (
-				<div className={styles.mainContainer}>
-					<div className={styles.leftColumnContainer}>
-						<img src={manga.cover} />
+				<MangaPageLayout>
+					<LeftColumnContainer>
+						<img src={manga.cover} className={styles.coverImg} />
 
-						<div className={styles.actionBTNsContainer}>
-							<span><LibraryPopup title={manga.title} loggedIn={me.loggedIn} /></span>
+						<Details manga={manga} mobile={true} />
+
+						<div className={styles.mobileDisplay}>
+							<RatingPopup mangaID={id} loggedIn={me.loggedIn} />
+						</div>
+
+						<div className={`${styles.synopsis} ${styles.mobileDisplay}`}>
+							{manga.description.split('\n').map((paragraph, index) => (
+								<div key={index}>{paragraph}</div>
+							))}
+						</div>
+
+						<div className={`${styles.actionBTNsContainer} ${styles['flex-margin-bot-20']}`}>
+							<span><LibraryPopup title={manga.name} loggedIn={me.loggedIn} /></span>
+							<span><ReportPopup reportField='manga' reportedId={id} loggedIn={me.loggedIn} /></span>
 							{manga.canComment ? (
 								<span><CommentPopup loggedIn={me.loggedIn} /></span>
 							) : (
 								<span className={styles.disabledBTN}><FaCommentSlash /></span>
 							)}
-
-							<span><ReportPopup reportField='manga' reportedId={id} loggedIn={me.loggedIn} /></span>
 							{manga.uploader?._id === me?._id &&
 								<span
 									className={styles.editBTN}
@@ -108,7 +121,7 @@ const MangaPage = () => {
 							}
 						</div>
 
-						<div>
+						<div className={`${styles['flex-margin-bot-20']} ${styles.genreList}`}>
 							{manga.categories && manga.categories.length > 0 && (
 								manga.categories.map(category => (
 									// onclick filter search by this category
@@ -130,41 +143,20 @@ const MangaPage = () => {
 						>
 							Start Reading
 						</button>
-					</div>
-					<div className={styles.rightColumnContainer}>
-						<div className={styles.details}>
-							<div>
-								<h1>{manga.name}</h1>
-								<div className={`${styles.authorName} ${styles.hoverableName}`}>
-									{manga.authors &&
-										manga.authors.map((author, index) => (
-											// onclick filter search by this author
-											<Link
-												key={author._id}
-												to={`/search?includeAuthors=${author._id}`}
-											>
-												{author.name}
-												{index < manga.authors.length - 1 && ',\u00A0'}
-											</Link>
-										))
-									}
-								</div>
-								<div>Status: {manga.status}</div>
-								<div>Upload by: {'\u00A0'}
-									<Link to={`/user/${manga.uploader?._id}`}
-										className={styles.hoverableName}
-									>
-										{manga.uploader?.name}
-									</Link>
-								</div>
-							</div>
+					</LeftColumnContainer>
 
-							<div>
+					<RightColumnContainer>
+						<div className={styles.detailsContainer}>
+							<Details manga={manga} />
+
+							<div className={styles.desktopDisplay}>
 								<RatingPopup mangaID={id} loggedIn={me.loggedIn} />
 							</div>
 
-							<div className={`${styles.synopsis}`}>
-								{manga.description}
+							<div className={`${styles.synopsis} ${styles.desktopDisplay}`}>
+								{manga.description.split('\n').map((paragraph, index) => (
+									<div key={index}>{paragraph}</div>
+								))}
 							</div>
 						</div>
 
@@ -176,17 +168,48 @@ const MangaPage = () => {
 								<CoverGallery id={id} />
 							</TabPanel>
 						</Tab>
-
-					</div>
-				</div>
-			)
-			}
+					</RightColumnContainer>
+				</MangaPageLayout>
+			)}
 
 			<footer>
 				<MobileNavigationBar />
 			</footer>
 		</MainLayout >
 	)
+}
+
+const Details = ({ manga, mobile = false }) => {
+	return (
+		<div className={mobile ? styles.mobileDisplay : styles.desktopDisplay}>
+			<div className={styles.details}>
+				<h1 className={styles.mangaTitle}>{manga.name}</h1>
+				<div className={`${styles.authorName}`}>
+					{manga.authors &&
+						manga.authors.map((author, index) => (
+							// onclick filter search by this author
+							<Link
+								className={styles.hoverableName}
+								key={author._id}
+								to={`/search?includeAuthors=${author._id}`}
+							>
+								{author.name}
+								{index < manga.authors.length - 1 && ',\u00A0'}
+							</Link>
+						))
+					}
+				</div>
+				<div>Status: {manga.status}</div>
+				<div>Upload by: {'\u00A0'}
+					<Link to={`/user/${manga.uploader?._id}`}
+						className={styles.hoverableName}
+					>
+						{manga.uploader?.name}
+					</Link>
+				</div>
+			</div>
+		</div>
+	);
 }
 
 const MangaPageLoading = () => {

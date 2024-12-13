@@ -20,8 +20,17 @@ const getCovers = asyncHandler(async (req, res) => {
         throw new Error("Manga not found");
     }
 
-    const covers = await Cover.find({ manga: manga.id }).select('-manga -imagePublicID');
+    const covers = await Cover.find({ manga: manga.id })
+        .sort({ number: 1 })
+        .select('-manga -imagePublicID');
     res.status(200).json(covers);
+});
+
+// @description get default cover of all mangas
+// @route GET /api/mangas/:id/covers/default
+// @access public
+const getDefaultCover = asyncHandler(async (req, res) => {
+    res.status(200).json(process.env.DEFAULT_COVER);
 });
 
 // @description upload a cover to the cover gallery of a manga
@@ -52,10 +61,12 @@ const uploadCover = asyncHandler(async (req, res) => {
         throw new Error("Need a number for cover");
     }
 
-    if (!req.body.image) {
+    if (!req.files || !req.files.image) {
         res.status(400);
         throw new Error("No cover image to upload");
     }
+
+    let uploadedFile = req.files.image;
 
     // check if cover exists
     let cover = await Cover.findOne({ manga: manga.id, number: req.body.number });
@@ -64,7 +75,7 @@ const uploadCover = asyncHandler(async (req, res) => {
         throw new Error("Cover already exists");
     }
 
-    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(req.body.image, `${manga.id}/cover`);
+    const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(uploadedFile.data, `${manga.id}/cover`);
     cover = await Cover.create({
         manga: manga.id,
         number: req.body.number,
@@ -152,6 +163,7 @@ const deleteCover = asyncHandler(async (req, res) => {
 
 module.exports = {
     getCovers,
+    getDefaultCover,
     uploadCover,
     changeCover,
     deleteCover

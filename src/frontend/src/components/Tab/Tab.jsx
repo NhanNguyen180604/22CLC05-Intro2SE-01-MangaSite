@@ -15,13 +15,13 @@ const Tab = ({ children }) => {
             {/* tab switching buttons */}
             <div className={styles.tabHeaders}>
                 {childrenArray.map((child, index) => (
-                    <button
+                    <div
                         key={`tab-header-${index + 1}`}
                         onClick={() => changeTab(index)}
                         className={activeTab === index ? styles.activeHeader : ""}
                     >
                         {child.props.title}
-                    </button>
+                    </div>
                 ))}
             </div>
 
@@ -52,9 +52,15 @@ const TabComponents = {
 export default TabComponents
 
 Tab.propTypes = {
-    children: PropTypes.arrayOf(PropTypes.element).isRequired,
+    children: PropTypes.oneOfType([
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element),
+    ]).isRequired,
 }
 
 TabPanel.propTypes = {
-    children: PropTypes.element.isRequired,
+    children: PropTypes.oneOfType([
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element),
+    ]).isRequired,
 }

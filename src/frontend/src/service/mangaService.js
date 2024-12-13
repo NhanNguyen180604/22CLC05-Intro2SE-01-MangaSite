@@ -27,6 +27,33 @@ export const getMangaByID = async (id) => {
     }
 };
 
+export const updateMangaInfo = async (id, updatedManga) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const data = {
+            ...updatedManga,
+            authors: updatedManga.authors.map(author => author._id),
+            categories: updatedManga.categories.map(category => category._id),
+        };
+
+        const response = await axios.put(API + id, data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return { status: response.status, data: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
 export const getChapterList = async (mangaID, page = 1, per_page = 20, all = false) => {
     try {
         let route = '';
@@ -41,11 +68,62 @@ export const getChapterList = async (mangaID, page = 1, per_page = 20, all = fal
     }
 };
 
+export const getChapterNumbers = async (mangaID) => {
+    try {
+        const response = await axios.get(API + mangaID + '/chapters/numbers');
+        return { status: response.status, numbers: response.data };
+    } catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
 export const getChapter = async (mangaID, chapterNumber) => {
     try {
         const response = await axios.get(API + mangaID + "/chapters/" + chapterNumber);
         return { status: response.status, chapter: response.data };
     } catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const uploadChapter = async (mangaID, formData) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.post(API + mangaID + "/chapters", formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return { status: response.status, chapter: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const updateChapter = async (mangaID, chapterNumber, formData) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.put(API + mangaID + "/chapters/" + chapterNumber, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return { status: response.status, chapter: response.data };
+    }
+    catch (error) {
         return getErrorMessage(error);
     }
 };
@@ -117,6 +195,58 @@ export const getCovers = async (mangaID) => {
     }
 };
 
+export const getDefaultCover = async () => {
+    try {
+        const response = await axios.get(API + '/covers/default');
+        return { status: response.status, cover: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const uploadCover = async (mangaID, formData) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.post(API + mangaID + '/covers', formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+            }
+        });
+        return { status: response.status, cover: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const deleteCover = async (mangaID, coverNumber) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.delete(API + mangaID + '/covers/' + coverNumber, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return { status: response.status, result: response.data };
+    } catch (error) {
+        return getErrorMessage(error);
+    }
+}
+
 // get a manga's comments
 export const getMangaComments = async (mangaID, page = 1, per_page = 20) => {
     try {
@@ -160,6 +290,27 @@ export const postComment = async (content, mangaID, chapterNumber = null, replyI
         });
         return { status: response.status, comment: response.data };
     } catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const getReadingHistory = async (mangaID) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.get(API + mangaID + '/readingHistory', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return { status: response.status, history: response.data };
+    }
+    catch (error) {
         return getErrorMessage(error);
     }
 };

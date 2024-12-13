@@ -1,0 +1,261 @@
+.coverImg {
+  margin-bottom: 1.5rem;
+}
+
+.actionBTNs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.actionBTNs button {
+  padding: 5px 0;
+  border-radius: 100px;
+  color: black;
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: inherit;
+  transition: all 0.1s ease-in-out;
+}
+
+.actionBTNs button:disabled {
+  opacity: 0.5;
+}
+
+.blueBTN {
+  background: var(--sky-blue);
+}
+
+.blueBTN:not(:disabled):hover {
+  background: var(--blue);
+}
+
+.discardBTN {
+  background: var(--light-red);
+}
+
+.discardBTN:not(:disabled):hover {
+  background: var(--red);
+}
+
+.deleteBTN {
+  background: var(--red);
+}
+
+.deleteBTN:not(:disabled):hover {
+  background: var(--darker-navy);
+  color: white;
+}
+
+.formControl {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1rem auto;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+}
+
+.formControl [type="checkbox"] {
+  appearance: none;
+  margin: 0;
+  font: inherit;
+  box-sizing: border-box;
+  width: 1rem;
+  height: 1rem;
+  border: 0.15em solid white;
+  border-radius: 0.15em;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+}
+
+.formControl input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1rem 1rem white;
+  transform-origin: bottom left;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.formControl input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.mySection {
+  margin-bottom: 15px;
+}
+
+.mySection h1 {
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.mySection textarea,
+.mySection input[type="text"] {
+  color: white;
+  background: var(--darker-navy);
+  padding: 1rem 2rem;
+  border-radius: 5px;
+}
+
+.mySection textarea {
+  width: 100%;
+  field-sizing: content;
+}
+
+.mySection textarea:hover,
+.newAuthorInput input[type="text"]:hover {
+  outline: 1px solid white;
+}
+
+.newAuthorInput {
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.newAuthorInput input[type="text"] {
+  width: 75%;
+}
+
+.newAuthorInput button {
+  width: 15%;
+  margin: 0 5%;
+  padding: 5px 0;
+  background: var(--sky-blue);
+  color: black;
+  font-weight: bold;
+  border-radius: 10px;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.newAuthorInput button:disabled{
+  opacity: 0.5;
+}
+
+.newAuthorInput button:not(:disabled):hover{
+  background: var(--blue);
+  color: white;
+}
+
+.newAuthorInput button:not(:disabled):active{
+  background: var(--very-light-blue);
+  color: black;
+}
+
+.failMsg{
+  color: var(--red);
+  font-weight: bold;
+}
+
+.successMsg{
+  color: var(--light-green);
+  font-weight: bold;
+}
+
+.flexItemContainer {
+  background: var(--darker-navy);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 1rem 2rem;
+}
+
+.flexItem,
+.addBTN {
+  font-size: 1rem;
+  font-weight: 400;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
+}
+
+.addBTN {
+  background: var(--medium-navy);
+}
+
+.flexItem {
+  background: var(--very-light-blue);
+  color: black;
+}
+
+.coverListContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 10px;
+}
+
+.coverContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.coverBTNs {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  gap: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.coverBTNs div {
+  border: 2px solid white;
+  border-radius: 12px;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.coverBTNs div:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.coverContainer:hover .coverBTNs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.coverPlaceholder {
+  background: var(--medium-navy);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background 0.1s ease-in-out;
+}
+
+.coverPlaceholder:hover {
+  background: var(--sky-blue);
+}
+
+.mobileDisplay {
+  display: none;
+}
+
+@media only screen and (max-width: 700px) {
+  .mobileDisplay {
+    margin-top: 2rem;
+    display: flex;
+    width: 100%;
+  }
+
+  .desktopDisplay {
+    display: none;
+  }
+}

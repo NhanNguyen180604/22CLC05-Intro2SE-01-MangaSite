@@ -1,7 +1,7 @@
 import styles from "./ChapterList.module.css";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from 'react';
-import { getChapterList } from "../../service/mangaService.js"
+import { getChapterList, getReadingHistory } from "../../service/mangaService.js"
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa'
 
 const ChapterList = ({ mangaID }) => {
@@ -10,6 +10,11 @@ const ChapterList = ({ mangaID }) => {
     const [totalPages, setTotalPages] = useState(0);
     const [totalChapters, setTotalChapters] = useState(0);
     const perPage = 4;
+    const [history, setHistory] = useState({
+        _id: '',
+        user: '',
+        chapters: [],
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -22,6 +27,16 @@ const ChapterList = ({ mangaID }) => {
             }
             else {
                 console.log("Couldn't get chapter list");
+                console.log(response);
+            }
+
+            const historyResponse = await getReadingHistory(mangaID);
+            if (historyResponse.status === 200) {
+                setHistory(historyResponse.history);
+            }
+            else {
+                // console.log("Couldn't fetch reading history");
+                // console.log(historyResponse);
             }
         };
 
@@ -39,7 +54,7 @@ const ChapterList = ({ mangaID }) => {
                                 chapters.map(chapter => (
                                     <Link
                                         key={chapter._id}
-                                        className={styles.chapterContainer}
+                                        className={`${styles.chapterContainer} ${!history.chapters.includes(chapter._id) ? '' : styles.readLabel}`}
                                         to={`/mangas/${mangaID}/chapters/${chapter.number}`}
                                     >
                                         <div><b>{`Chapter #${chapter.number}`}</b></div>

@@ -12,7 +12,8 @@
     border-radius: 5px;
 }
 
-.tabContainer .tabHeaders button{
+.tabContainer .tabHeaders div{
+    cursor: pointer;
     padding: 5px 10px;
     font-size: 1.1rem;
     transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
@@ -20,7 +21,7 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
-.tabContainer .tabHeaders button:hover,
+.tabContainer .tabHeaders div:hover,
 .tabContainer .tabHeaders .activeHeader{
     background: var(--darker-navy);
     color: white;

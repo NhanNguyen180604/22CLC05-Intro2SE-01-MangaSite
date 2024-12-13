@@ -38,8 +38,7 @@ const getChapterList = asyncHandler(async (req, res) => {
 
     if (req.query.all === 'true') {
         const chapters = await Chapter.find({ manga: manga.id })
-            .sort({ number: 1 })
-            .select('_id title number');
+            .sort({ number: 1 });
 
         return res.status(200).json({
             chapters: chapters,
@@ -73,8 +72,7 @@ const getChapterList = asyncHandler(async (req, res) => {
     const chapters = await Chapter.find({ manga: manga.id })
         .sort({ number: 1 })
         .skip(skip)
-        .limit(per_page)
-        .select('_id title number');
+        .limit(per_page);
 
     res.status(200).json({
         chapters: chapters,
@@ -83,6 +81,14 @@ const getChapterList = asyncHandler(async (req, res) => {
         total_pages: total_pages,
         total: count,
     });
+});
+
+// @description get chapter number list
+// @route GET /api/mangas/:id/chapters/numbers
+// @access public
+const getAllChapterNumbers = asyncHandler(async (req, res) => {
+    let chapters = await Chapter.find();
+    res.status(200).json(chapters.map(chapter => chapter.number).sort((a, b) => a - b));
 });
 
 // @description get chapter's list
@@ -109,7 +115,8 @@ const uploadChapter = asyncHandler(async (req, res) => {
     }
 
     // check body
-    if (!req.body.number || req.body.number < 0) {
+    const number = parseFloat(req.body.number);
+    if (isNaN(number) || number < 0) {
         res.status(400);
         throw new Error("Invalid chapter number");
     }
@@ -123,37 +130,31 @@ const uploadChapter = asyncHandler(async (req, res) => {
     if (!Array.isArray(uploadedFiles))
         uploadedFiles = [uploadedFiles];
 
-    // res.status(200).json('ok');
     let chapter = await Chapter.findOne({ manga: manga.id, number: req.body.number });
-    // if chapter exists, append the images
+    // if chapter exists
     if (chapter) {
         // upload images to cloud
-        const urls = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${req.body.number}`);
-        chapter.images = [...chapter.images, ...urls];
+        res.status(400);
+        throw new Error("Chapter already exists");
     }
-    // if chapter doesn't exist, create one
-    else {
-        chapter = await Chapter.create({
-            manga: manga.id,
-            number: req.body.number,
-            title: req.body.title ? req.body.title : 'No title'
-        });
-        // upload images to cloud
-        const urls = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${req.body.number}`);
-        chapter.images = urls;
-    }
+
+    chapter = await Chapter.create({
+        manga: manga.id,
+        number: req.body.number,
+        title: req.body.title ? req.body.title : 'No title'
+    });
+    // upload images to cloud
+    chapter.images = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${req.body.number}`);
+
 
     chapter.updatedAt = new Date();
     await chapter.save();
 
-    // create notification when finish uploading (upload may be called more than once)
-    if (req.body.finish) {
-        const mangaNoti = await MangaNoti.create({
-            manga: chapter.manga,
-            message: `${updatedManga.name}, chapter ${chapter.number} just got uploaded`,
-            createdAt: new Date(),
-        });
-    }
+    const mangaNoti = await MangaNoti.create({
+        manga: chapter.manga,
+        message: `${manga.name}, chapter ${chapter.number} just got uploaded`,
+        createdAt: new Date(),
+    });
 
     res.status(200).json(chapter);
 });
@@ -195,15 +196,57 @@ const updateChapter = asyncHandler(async (req, res) => {
         chapter.title = req.body.title;
     }
 
-    if (req.files && req.files.images) {
-        updated = true;
-        let uploadedFiles = req.files.images;
+    // delete images
+    if (req.body.deleting)
+        cloudinaryWrapper.deleteResources(req.body.deleting);
+
+    // upload new images
+    let newImages = null;
+    if (req.files && req.files.newImages) {
+        let uploadedFiles = req.files.newImages;
         if (!Array.isArray(uploadedFiles))
             uploadedFiles = [uploadedFiles];
-
-        await cloudinaryWrapper.deleteByPrefix(`${manga.id}/${chapter.number}`);
-        chapter.images = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${chapter.number}`);
+        newImages = await cloudinaryWrapper.uploadImages(uploadedFiles.map(file => file.data), `${manga.id}/${chapter.number}`);
+        newImages = newImages.map((image, index) => {
+            return {
+                ...image,
+                index: req.body.newIndex[index],
+            }
+        });
+        console.log(newImages);
     }
+    let oldImages = req.body.oldImages;
+    if (oldImages) {
+        oldImages = oldImages?.map(image => (JSON.parse(image)));
+    }
+
+    let length = 0;
+    if (newImages?.length)
+        length += newImages.length;
+    if (oldImages?.length)
+        length += oldImages.length
+
+    const finalImages = new Array(length);
+
+    if (length) {
+        updated = true;
+        oldImages?.forEach(image => {
+            finalImages[image.index] = {
+                publicID: image.publicID,
+                url: image.url,
+            };
+        });
+
+        newImages?.forEach(image => {
+            finalImages[image.index] = {
+                publicID: image.publicID,
+                url: image.url,
+            };
+        });
+
+        chapter.set('images', finalImages);
+    }
+
 
     if (updated) {
         manga.updatedAt = new Date();
@@ -266,6 +309,7 @@ const deleteChapter = asyncHandler(async (req, res) => {
 module.exports = {
     getChapter,
     getChapterList,
+    getAllChapterNumbers,
     uploadChapter,
     updateChapter,
     deleteChapter,
