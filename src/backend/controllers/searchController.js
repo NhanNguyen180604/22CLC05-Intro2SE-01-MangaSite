@@ -60,11 +60,6 @@ const searchHandler = expressAsyncHandler(async (req, res) => {
       .default(20),
   });
   const parsed = schema.safeParse(req.query);
-  if (parsed.error) {
-    console.log(req.query);
-    console.log(parsed.error.issues);
-  }
-
   if (!parsed.success) {
     res.status(400);
     throw new Error(
