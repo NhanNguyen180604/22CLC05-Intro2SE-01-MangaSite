@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import AddChapterPage from "./pages/AddChapterPage";
+import AdminPage from "./pages/AdminPage.jsx";
 import ChapterListEditPage from "./pages/ChapterListEditPage";
 import ChapterPage from "./pages/ChapterPage";
 import EditChapterPage from "./pages/EditChapterPage";
@@ -38,6 +39,7 @@ function App() {
         </Route>
         <Route path="/search" element={<SearchPage />} />
         <Route path="/401" element={<Page401 />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </>
   );
