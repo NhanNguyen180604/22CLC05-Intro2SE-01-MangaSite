@@ -6,8 +6,16 @@ import { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FaCommentSlash } from "react-icons/fa";
 import CommentPopup from '../../components/CommentPopup';
+import NotiPopup from '../../components/NotiPopup';
 
 const ChapterPage = () => {
+    const [showNoti, setShowNoti] = useState(false);
+    const [notiDetails, setNotiDetails] = useState({
+        success: false,
+        message: '',
+        details: '',
+    });
+
     const [showHeader, setShowHeader] = useState(true);
     const [showFooter, setShowFooter] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -98,8 +106,17 @@ const ChapterPage = () => {
                 console.err(chapterListResponse.message);
             }
         }
+        else if (response.status === 404) {
+            navigate('/notfound');
+        }
         else {
-            console.log('Server is dead, and we dont know why');
+            setNotiDetails({
+                success: false,
+                message: 'Failed to delete chapter',
+                details: response.message,
+            });
+            setShowNoti(true);
+            return;
         }
     };
 
@@ -147,7 +164,7 @@ const ChapterPage = () => {
             <div className={styles.budgetLayout}>
                 <div className={styles.imgContainer}>
                     {chapter.images.length && chapter.images.map((image, index) => (
-                        <img src={image.url} key={`chapter-${chapter._id}-image-${index + 1}`}/>
+                        <img src={image.url} key={`chapter-${chapter._id}-image-${index + 1}`} />
                     ))}
                 </div>
             </div>
@@ -178,6 +195,14 @@ const ChapterPage = () => {
                     <div><FaChevronRight /></div>
                 </button>
             </div>
+
+            <NotiPopup
+                open={showNoti}
+                onClose={() => setShowNoti(false)}
+                message={notiDetails.message}
+                details={notiDetails.details}
+                success={notiDetails.success}
+            />
         </>
     )
 }

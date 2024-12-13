@@ -128,6 +128,27 @@ export const updateChapter = async (mangaID, chapterNumber, formData) => {
     }
 };
 
+export const deleteChapter = async (mangaID, chapterNumber) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.delete(API + mangaID + "/chapters/" + chapterNumber, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return { status: response.status, deletedChapter: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
 export const getRatings = async (mangaID) => {
     try {
         const response = await axios.get(API + mangaID + `/ratings`);

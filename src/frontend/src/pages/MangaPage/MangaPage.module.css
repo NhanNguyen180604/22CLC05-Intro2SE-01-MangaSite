@@ -41,6 +41,9 @@
 
 .actionBTNsContainer > .editBTN{
 	padding: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .actionBTNsContainer > span:not(.disabledBTN) {

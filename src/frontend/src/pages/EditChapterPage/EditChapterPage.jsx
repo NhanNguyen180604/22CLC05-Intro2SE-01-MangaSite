@@ -6,13 +6,13 @@ const { MangaPageLayout, LeftColumnContainer, RightColumnContainer } = MangaPage
 import DesktopLogo from '../../components/main/DesktopLogo.jsx';
 import DesktopNavigationBar from '../../components/main/DesktopNavigationBar.jsx';
 import styles from './EditChapterPage.module.css';
-import { getMangaByID, getChapter, getChapterNumbers, updateChapter } from '../../service/mangaService.js';
+import { getMangaByID, getChapter, getChapterNumbers, updateChapter, deleteChapter } from '../../service/mangaService.js';
 import { getMe } from '../../service/userService.js';
 import NotiPopup from '../../components/NotiPopup';
 import { FaPlus } from 'react-icons/fa';
 import { FaCircleXmark } from 'react-icons/fa6';
-import { closestCorners, DndContext } from '@dnd-kit/core';
-import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
+import { closestCorners, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 const EditChapterPage = () => {
@@ -26,6 +26,14 @@ const EditChapterPage = () => {
         message: '',
         details: '',
     });
+
+    const sensors = useSensors(
+        useSensor(TouchSensor),
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates
+        })
+    );
 
     const [mangaCover, setMangaCover] = useState('');
 
@@ -58,41 +66,23 @@ const EditChapterPage = () => {
     };
 
     // for warning
-    const [showNumberMessage, setShowNumberMessage] = useState(false);
-    const [numberMessage, setNumberMessage] = useState('');
     const [showTitleMessage, setShowTitleMessage] = useState(false);
     const [titleMessage, setTitleMessage] = useState('');
 
-    const handleInput = (e, field) => {
+    const handleInput = (e) => {
         let { value } = e.target;
 
-        if (field === 'number') {
-            value = parseFloat(value);
-
-            if (isNaN(value)) {
-                setNumberMessage(`Invalid chapter number!`);
-                setShowNumberMessage(true);
-            }
-            else if (chapterNumbersRef.current.find(element => element === value)) {
-                setNumberMessage(`Chapter #${value} already exists!`);
-                setShowNumberMessage(true);
-            }
-            else {
-                { showNumberMessage && setShowNumberMessage(false) }
-            }
+        if (value.length === 0) {
+            setTitleMessage('Title cannot be empty!');
+            setShowTitleMessage(true);
         }
         else {
-            if (value.length === 0) {
-                setTitleMessage('Title cannot be empty!');
-                setShowTitleMessage(true);
-            }
-            else {
-                { showTitleMessage && setShowTitleMessage(false) }
-            }
+            { showTitleMessage && setShowTitleMessage(false) }
         }
+
         setChapter({
             ...chapter,
-            [field]: value,
+            title: value,
         });
     };
 
@@ -166,13 +156,17 @@ const EditChapterPage = () => {
         setMangaCover(mangaResponse.manga.cover);
 
         const chapterResponse = await getChapter(id, chapterNumber);
-        if (chapterResponse.status !== 200) {
+        if (chapterResponse.status === 404) {
+            navigate('/notfound');
+        }
+        else if (chapterResponse.status !== 200) {
             setNotiDetails({
                 success: false,
                 message: 'Failed to fetch chapter, please try again',
                 details: chapterResponse.message,
             });
             setShowNoti(true);
+            setLoading(false);
             return;
         }
 
@@ -210,6 +204,26 @@ const EditChapterPage = () => {
 
         freeImage();
         setImages(chapterRef.current.images);
+    };
+
+    const removeChapter = async (e) => {
+        e.preventDefault();
+        setLoadingMessage('Deleting chapter');
+        setLoading(true);
+
+        const response = await deleteChapter(id, chapterNumber);
+        if (response.status !== 200) {
+            setNotiDetails({
+                success: false,
+                message: 'Failed to delete chapter',
+                details: response.message,
+            });
+            setShowNoti(true);
+            setLoading(false);
+            return;
+        }
+
+        navigate(`/mangas/${id}/chapters/edit`);
     };
 
     const submit = async (e) => {
@@ -255,7 +269,7 @@ const EditChapterPage = () => {
         }
 
         setLoading(false);
-        navigate(`/mangas/${id}/chapters/${chapterNumber}`);
+        navigate(`/mangas/${id}/chapters/edit`);
     };
 
     const canSubmit = () => {
@@ -293,6 +307,7 @@ const EditChapterPage = () => {
                                 submit={submit}
                                 canSubmit={canSubmit}
                                 reset={reset}
+                                removeChapter={removeChapter}
                             />
                         </LeftColumnContainer>
                         <RightColumnContainer>
@@ -300,7 +315,7 @@ const EditChapterPage = () => {
                                 <label htmlFor='titleInput'>Chapter Title</label>
                                 <input
                                     value={chapter.title}
-                                    onChange={(e) => handleInput(e, 'title')}
+                                    onChange={handleInput}
                                     type='text'
                                     id="titleInput"
                                     required
@@ -309,17 +324,12 @@ const EditChapterPage = () => {
                             </section>
 
                             <section className={`${styles.mySection}`}>
-                                <label htmlFor='numberInput'>Chapter Number</label>
+                                <label>Chapter Number</label>
                                 <input
                                     value={chapter.number}
-                                    onChange={(e) => handleInput(e, 'number')}
-                                    type='number'
-                                    step='any'
-                                    min={0}
-                                    id="numberInput"
+                                    readOnly
                                     required
                                 />
-                                {showNumberMessage && <div className={styles.warningMsg}>{numberMessage}</div>}
                             </section>
 
                             <section className={`${styles.mySection} ${styles.pageSection}`}>
@@ -328,6 +338,7 @@ const EditChapterPage = () => {
                                     <DndContext
                                         collisionDetection={closestCorners}
                                         onDragEnd={handleDragEnd}
+                                        sensors={sensors}
                                     >
                                         <SortableContext
                                             items={images}
@@ -366,6 +377,7 @@ const EditChapterPage = () => {
                                 submit={submit}
                                 canSubmit={canSubmit}
                                 reset={reset}
+                                removeChapter={removeChapter}
                                 myClassName='mobileDisplay'
                             />
                         </RightColumnContainer>
@@ -385,7 +397,7 @@ const EditChapterPage = () => {
 }
 export default EditChapterPage;
 
-const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', canSubmit }) => {
+const ActionBTNs = ({ reset, submit, removeChapter, myClassName = 'desktopDisplay', canSubmit }) => {
     return (
         <div className={`${styles.actionBTNs} ${styles[myClassName]}`}>
             <button
@@ -398,6 +410,10 @@ const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', canSubmit }
 
             <button className={styles.discardBTN} onClick={reset}>
                 Reset
+            </button>
+
+            <button className={styles.deleteBTN} onClick={removeChapter}>
+                Delete this Chapter
             </button>
         </div>
     );
@@ -418,6 +434,7 @@ const SortableItem = ({ image, removeImage }) => {
                 {...attributes}
                 {...listeners}
                 style={style}
+                className={styles.noTouchAction}
             >
                 <img src={image.url ? image.url : image.objectURL} />
 
@@ -425,7 +442,6 @@ const SortableItem = ({ image, removeImage }) => {
             <button
                 className={styles.removePageBTN}
                 onClick={(e) => {
-                    e.stopPropagation();
                     e.preventDefault();
                     removeImage(image.id);
                 }}

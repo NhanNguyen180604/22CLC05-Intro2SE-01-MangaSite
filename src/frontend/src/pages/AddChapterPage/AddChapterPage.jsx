@@ -363,6 +363,7 @@ const SortableItem = ({ image, removeImage }) => {
                 {...attributes}
                 {...listeners}
                 style={style}
+                className={styles.noTouchAction}
             >
                 <img src={image.objectURL} />
 
@@ -370,7 +371,6 @@ const SortableItem = ({ image, removeImage }) => {
             <button
                 className={styles.removePageBTN}
                 onClick={(e) => {
-                    e.stopPropagation();
                     e.preventDefault();
                     removeImage(image.id);
                 }}

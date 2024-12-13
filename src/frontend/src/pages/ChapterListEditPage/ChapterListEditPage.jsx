@@ -4,10 +4,10 @@ import DesktopLogo from '../../components/main/DesktopLogo.jsx';
 import DesktopNavigationBar from '../../components/main/DesktopNavigationBar.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getChapterList } from '../../service/mangaService.js';
+import { getChapterList, deleteChapter } from '../../service/mangaService.js';
 import { getMangaByID } from '../../service/mangaService.js';
 import { getMe } from '../../service/userService.js';
-import { FaPlus } from 'react-icons/fa6';
+import { FaPlus, FaXmark } from 'react-icons/fa6';
 import NotiPopup from '../../components/NotiPopup';
 
 const ChapterListEditPage = () => {
@@ -22,6 +22,35 @@ const ChapterListEditPage = () => {
     });
 
     const [chapters, setChapters] = useState([]);
+
+    const removeChapter = async (chapterNumber) => {
+        const response = await deleteChapter(id, chapterNumber);
+        if (response.status !== 200) {
+            setNotiDetails({
+                success: false,
+                message: 'Failed to delete chapter',
+                details: response.message,
+            });
+            setShowNoti(true);
+            return;
+        }
+
+        await fetchChapterList();
+    };
+
+    const fetchChapterList = async () => {
+        const response = await getChapterList(id, 1, 20, true);
+        if (response.status === 200) {
+            setChapters(response.chaptersInfo.chapters);
+        }
+        else {
+            setNotiDetails({
+                success: false,
+                message: 'Failed to fetch chapter list',
+                details: response.message,
+            });
+        }
+    }
 
     const initialize = async () => {
         setLoading(true);
@@ -54,13 +83,7 @@ const ChapterListEditPage = () => {
             return;
         }
 
-        const response = await getChapterList(id, 1, 20, true);
-        if (response.status === 200) {
-            setChapters(response.chaptersInfo.chapters);
-        }
-        else {
-            console.log("Couldn't fetch chapters");
-        }
+        await fetchChapterList();
 
         setLoading(false);
     };
@@ -97,15 +120,26 @@ const ChapterListEditPage = () => {
                     <div className={styles.chapterBTNsContainer}>
                         {chapters.map(chapter => (
                             <div
-                                onClick={() => navigate(`/mangas/${id}/chapters/${chapter.number}/edit`)}
                                 key={chapter._id}
                                 className={styles.chapterBTN}
                             >
-                                <div>
-                                    <div className={styles.chapterNum}>Chapter #{chapter.number}</div>
-                                    <div className={styles.chapterTitle}>{chapter.title}</div>
-                                    <div className={styles.chapterPageCount}>{chapter.images.length} page{chapter.images.length ? 's' : ''}</div>
+                                <div
+                                    className={styles.chapterBTNInner}
+                                    onClick={() => navigate(`/mangas/${id}/chapters/${chapter.number}/edit`)}
+                                >
+                                    <div>
+                                        <div className={styles.chapterNum}>Chapter #{chapter.number}</div>
+                                        <div className={styles.chapterTitle}>{chapter.title}</div>
+                                        <div className={styles.chapterPageCount}>{chapter.images.length} page{chapter.images.length ? 's' : ''}</div>
+                                    </div>
                                 </div>
+
+                                <button
+                                    onClick={() => removeChapter(chapter.number)}
+                                    className={styles.deleteChapterBTN}
+                                >
+                                    <FaXmark />
+                                </button>
                             </div>
                         ))}
 

@@ -63,6 +63,15 @@
     background: var(--red);
 }
 
+.deleteBTN {
+    background: var(--red);
+}
+
+.deleteBTN:not(:disabled):hover {
+    background: var(--darker-navy);
+    color: white;
+}
+
 .mySection {
     margin-bottom: 15px;
     width: 100%;
@@ -92,6 +101,10 @@
     width: 100%;
 }
 
+.mySection input:read-only {
+    pointer-events: none;
+}
+
 .mySection label+input {
     margin: 5px 0;
 }
@@ -104,12 +117,19 @@
 .pageListContainer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr;
     gap: 20px;
 }
 
 .pageContainer {
     position: relative;
+}
+
+.draggedOverlay {
+    opacity: 0.3;
+}
+
+.noTouchAction {
+    touch-action: none;
 }
 
 .removePageBTN {
@@ -167,5 +187,9 @@
 
     .desktopDisplay {
         display: none;
+    }
+
+    .pageListContainer {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

@@ -3,12 +3,12 @@
   padding: 1rem;
 }
 
-.loadingContainer{
-    width: 100%;
-    height: 100%;
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
+.loadingContainer {
+  width: 100%;
+  height: 100%;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
 }
 
 .chapterListEditContainer svg {
@@ -27,7 +27,7 @@
   font-weight: bold;
 }
 
-.returnBTN:hover{
+.returnBTN:hover {
   background: var(--very-light-blue);
 }
 
@@ -41,18 +41,22 @@
   display: grid;
   grid-template-columns: 1;
   grid-auto-rows: 1fr;
-  gap: 10px;
+  gap: 16px;
 }
 
 .chapterBTN,
 .addNewBTN {
+  position: relative;
   display: block;
   background: var(--medium-navy);
-  padding: 1rem;
   border-radius: 12px;
   border: 2px solid var(--medium-navy);
   transition: border 0.2s ease-in-out;
   cursor: pointer;
+}
+
+.chapterBTNInner {
+  padding: 1rem;
 }
 
 .chapterBTN:hover,
@@ -60,13 +64,32 @@
   border: 2px solid var(--very-light-blue);
 }
 
-.addNewBTN{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-weight: 500;
-    font-size: 1.2rem;
+.addNewBTN,
+.deleteChapterBTN {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addNewBTN {
+  gap: 10px;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.deleteChapterBTN {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  color: black;
+  background: var(--light-gray);
+  padding: 4px;
+  border-radius: 99px;
+}
+
+.deleteChapterBTN:hover{
+	background: rgba(255, 255, 255, 0.246);
 }
 
 .chapterNum {

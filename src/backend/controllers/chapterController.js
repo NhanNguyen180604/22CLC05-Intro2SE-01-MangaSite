@@ -16,6 +16,12 @@ const getChapter = asyncHandler(async (req, res) => {
 
     const chapter = await Chapter.findOne({ manga: req.params.id, number: req.params.chapterNumber })
         .populate({ path: 'manga', model: 'Manga', select: 'name canComment' });
+
+    if (!chapter){
+        res.status(404);
+        throw new Error("Chapter not found");
+    }
+    
     res.status(200).json(chapter);
 });
 
@@ -149,6 +155,8 @@ const uploadChapter = asyncHandler(async (req, res) => {
 
     chapter.updatedAt = new Date();
     await chapter.save();
+    manga.updatedAt = new Date();
+    await manga.save();
 
     const mangaNoti = await MangaNoti.create({
         manga: chapter.manga,
@@ -213,7 +221,6 @@ const updateChapter = asyncHandler(async (req, res) => {
                 index: req.body.newIndex[index],
             }
         });
-        console.log(newImages);
     }
     let oldImages = req.body.oldImages;
     if (oldImages) {
@@ -264,7 +271,7 @@ const updateChapter = asyncHandler(async (req, res) => {
     }
     else {
         res.status(400);
-        throw new Error("Didnt specify new title / new images");
+        throw new Error("No changes were made");
     }
 });
 
@@ -298,7 +305,7 @@ const deleteChapter = asyncHandler(async (req, res) => {
         throw new Error("Chapter not found");
     }
 
-    await cloudinaryWrapper.deleteImages(`${manga.id}/${chapter.number}`);
+    await cloudinaryWrapper.deleteByPrefix(`${manga.id}/${chapter.number}`);
 
     await chapter.deleteOne();
     manga.updatedAt = new Date();
