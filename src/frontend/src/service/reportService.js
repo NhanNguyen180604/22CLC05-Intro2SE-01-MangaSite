@@ -52,3 +52,39 @@ export async function getReports({ page = 1, showProcessed = false }) {
   const data = await res.json();
   return { reports: data.reports, more: data.page < data.total_pages };
 }
+
+/**
+ * Process a report, returns the new report.
+ * @param {{ _id: string }} data
+ */
+export async function processReport({ _id }) {
+  const token = $token.get();
+  const res = await fetch(`${API_URL}/reports/${_id}`, {
+    method: "PUT",
+    mode: "cors",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (res.status != 200) return null;
+  return await res.json();
+}
+
+/**
+ * Delete a report.
+ * @param {{ _id: string }} data
+ */
+export async function deleteReport({ _id }) {
+  const token = $token.get();
+  const res = await fetch(`${API_URL}/reports/${_id}`, {
+    method: "DELETE",
+    mode: "cors",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (res.status != 200) return false;
+  return true;
+}

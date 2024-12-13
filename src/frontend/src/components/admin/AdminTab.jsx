@@ -8,10 +8,10 @@ const AdminTab = function ({ checked, icon, label, onClick }) {
         {icon}
         <input
           type="radio"
-          name="users"
+          name="admin"
           className="m-0 size-0 appearance-none p-0"
           checked={checked}
-          onClick={onClick}
+          onChange={onClick}
         />
         {label}
       </div>

@@ -174,6 +174,7 @@ const sendReport = expressAsyncHandler(async (req, res) => {
  * - Returns: { _id: string }
  */
 const deleteReport = expressAsyncHandler(async (req, res) => {
+  console.log(`Want to delete ${req.params.id}`);
   if (req.user.accountType != "admin") {
     res.status(401);
     throw new Error("Unauthorized.");
@@ -196,6 +197,7 @@ const deleteReport = expressAsyncHandler(async (req, res) => {
  * - Returns: report
  */
 const updateReportState = expressAsyncHandler(async (req, res) => {
+  console.log(`Want to update ${req.params.id}`, req.params);
   if (req.user.accountType != "admin") {
     res.status(401);
     throw new Error("Unauthorized.");

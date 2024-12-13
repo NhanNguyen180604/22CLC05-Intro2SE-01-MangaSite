@@ -28,16 +28,55 @@ const ReportsList = function ({ search, showProcessed }) {
     });
   }, [page]);
 
+  // Function to update the report client-side, or should we refetch?
+  function updateProcessedData(_id, processed) {
+    setData(
+      data.map((node) => {
+        if (node._id != _id) return node;
+        return {
+          ...node,
+          processed: processed,
+        };
+      }),
+    );
+  }
+
+  // Function to pop out a node without having to refetch.
+  function deleteData(_id) {
+    setData(data.filter((node) => node._id != _id));
+  }
+
   return (
     <div className="flex w-full flex-col gap-6">
-      {data.map((report, idx) => (
-        <ReportedNode report={report} key={`report-node-${idx}`} />
-      ))}
+      {data
+        .filter((node) =>
+          node.informant.name.toLowerCase().includes(search.toLowerCase()),
+        )
+        .filter((node) => showProcessed || !node.processed)
+        .map((report, idx) => (
+          <ReportedNode
+            report={report}
+            key={`report-node-${idx}`}
+            updater={updateProcessedData}
+            deleter={deleteData}
+          />
+        ))}
 
       {loading && (
         <p className="my-4 animate-pulse text-center text-xl font-semibold">
           Loading...
         </p>
+      )}
+
+      {hasMore && !loading && (
+        <button
+          onClick={() => {
+            setPage(page + 1);
+          }}
+          className="h-12 rounded-full border-2 border-very-light-blue text-very-light-blue duration-200 hover:bg-very-light-blue hover:text-black"
+        >
+          Show More
+        </button>
       )}
     </div>
   );

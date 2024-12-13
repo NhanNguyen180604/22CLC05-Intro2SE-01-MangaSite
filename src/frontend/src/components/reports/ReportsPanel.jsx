@@ -52,7 +52,7 @@ export default function ReportsPanel() {
         Show processed reports
       </label>
 
-      <ReportsList />
+      <ReportsList search={search} showProcessed={showProcessed} />
     </section>
   );
 }
