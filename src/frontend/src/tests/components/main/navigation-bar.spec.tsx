@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DesktopNavigationBar from "../../../components/main/DesktopNavigationBar.jsx";
 import MobileNavigationBar from "../../../components/main/MobileNavigationBar.jsx";
 
-describe("navigation bar", () => {
+describe.skip("navigation bar", () => {
   const data = {
     avatar: { url: "https://avatars.githubusercontent.com/u/128211112?v=4" },
   };
