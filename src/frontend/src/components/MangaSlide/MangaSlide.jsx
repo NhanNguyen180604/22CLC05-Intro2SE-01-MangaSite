@@ -12,18 +12,18 @@ const MangaCarousel = (props) => {
 		<>
 			<div className={styles.mainContainer}>
 				<div className={styles.mangaListTitle}>{props.title}</div>
-				<ul className={styles.mangaListContainer}>
-					{props.mangas && props.mangas.length ? (
-						props.mangas.map(manga => (
-							<li key={manga._id} onClick={() => mangaClickHandler(manga._id)}>
-								<img src={manga.cover} />
-								<div>{manga.name}</div>
-							</li>
-						))
-					) : (
-						<div>Nothing here</div>
-					)}
-				</ul>
+				<div className={styles.mangaListContainer}>
+					{/* {props.mangas && props.mangas.length ? ( */}
+					{/* 	props.mangas.map(manga => ( */}
+					{/* 		<div className={styles.item} key={manga._id} onClick={() => mangaClickHandler(manga._id)}> */}
+					{/* 			<img src={manga.cover} /> */}
+					{/* 			<div>{manga.name}</div> */}
+					{/* 		</div> */}
+					{/* 	)) */}
+					{/* ) : ( */}
+					{/* 	<div>Nothing here</div> */}
+					{/* )} */}
+				</div>
 			</div>
 		</>
 	)
