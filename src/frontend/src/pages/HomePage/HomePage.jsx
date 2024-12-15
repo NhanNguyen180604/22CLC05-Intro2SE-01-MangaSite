@@ -3,6 +3,7 @@ import MangaSlide from "../../components/MangaSlide";
 import { getMangas } from "../../service/mangaService";
 import DesktopLogo from "../../components/main/DesktopLogo.jsx";
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
+import SearchBox from "../../components/search/SearchBox.jsx"
 import MainLayout from "../../components/main/MainLayout.jsx";
 import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx";
 import styles from "./HomePage.module.css";
@@ -26,13 +27,16 @@ const HomePage = () => {
       <MainLayout>
         <header className="flex w-full flex-row items-center justify-between">
           <DesktopLogo />
-          <DesktopNavigationBar />
+          <div className="flex w-full flex-row items-center gap-8 lg:w-fit">
+              <SearchBox />
+              <DesktopNavigationBar />
+          </div>
         </header>
 
         <div className={styles.container}>
           <div className={styles.content}>
             <MangaSlide title="Trending" mangas={mangas} />
-            {/* <MangaSlide title="Top rated" mangas={mangas} /> */}
+            <MangaSlide title="Top rated" mangas={mangas} />
           </div>
           <div className={styles.notification}>
             <h4 className={styles.notificationHeader}>Notifications</h4>
