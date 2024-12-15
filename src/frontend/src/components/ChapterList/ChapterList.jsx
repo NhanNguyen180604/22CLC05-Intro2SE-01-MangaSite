@@ -54,7 +54,7 @@ const ChapterList = ({ mangaID }) => {
                                 chapters.map(chapter => (
                                     <Link
                                         key={chapter._id}
-                                        className={`${styles.chapterContainer} ${!history.chapters.includes(chapter._id) ? '' : styles.readLabel}`}
+                                        className={`${styles.chapterContainer} ${!history.chapters?.includes(chapter._id) ? '' : styles.readLabel}`}
                                         to={`/mangas/${mangaID}/chapters/${chapter.number}`}
                                     >
                                         <div><b>{`Chapter #${chapter.number}`}</b></div>

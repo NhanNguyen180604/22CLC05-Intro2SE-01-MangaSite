@@ -1,30 +1,30 @@
 .library-popup-content {
-  margin: auto;
-  background: none;
-  border: none;
-  width: 40%;
-  height: 60%;
-  border-radius: 20px;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin: auto !important;
+  background: none !important;
+  border: none !important;
+  width: 40% !important;
+  height: 60% !important;
+  border-radius: 20px !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
-@media only screen and (max-width: 1024px){
-  .library-popup-content{
-    width: 50%;
+@media only screen and (max-width: 1024px) {
+  .library-popup-content {
+    width: 50% !important;
   }
 }
 
-@media only screen and (max-width: 800px){
-  .library-popup-content{
-    width: 60%;
+@media only screen and (max-width: 800px) {
+  .library-popup-content {
+    width: 60% !important;
   }
 }
 
-@media only screen and (max-width: 500px){
-  .library-popup-content{
-    width: 90%;
+@media only screen and (max-width: 500px) {
+  .library-popup-content {
+    width: 90% !important;
   }
 }

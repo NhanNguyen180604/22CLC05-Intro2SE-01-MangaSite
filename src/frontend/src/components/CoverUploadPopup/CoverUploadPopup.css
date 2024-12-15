@@ -1,24 +1,23 @@
 .cover-upload-popup-content {
-    margin: auto;
-    border: none;
-    width: 50%;
-    height: 85%;
-    background: none;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  margin: auto !important;
+  border: none !important;
+  width: 50% !important;
+  height: 85% !important;
+  background: none !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+@media only screen and (max-width: 1000px) {
+  .cover-upload-popup-content {
+    width: 80% !important;
   }
-  
-  @media only screen and (max-width: 1000px) {
-    .cover-upload-popup-content {
-      width: 80%;
-    }
+}
+
+@media only screen and (max-width: 800px) {
+  .cover-upload-popup-content {
+    width: 90% !important;
   }
-  
-  @media only screen and (max-width: 800px) {
-    .cover-upload-popup-content {
-      width: 90%;
-    }
-  }
-  
+}
