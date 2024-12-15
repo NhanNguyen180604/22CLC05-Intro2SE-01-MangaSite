@@ -8,7 +8,7 @@ const MangaCarousel = (props) => {
 			<div className={styles.mangaListTitle}>{props.title}</div>
 			<div className={styles.mangaListContainer}>
 				{props.mangas && props.mangas.length ? (
-					props.mangas.map(manga => (
+					props.mangas.slice(0, 4).map(manga => (
 						<MangaPost key={manga._id} manga={manga} />
 					))
 				) : (
