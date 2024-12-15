@@ -300,7 +300,7 @@ const MangaEditPage = () => {
                 </div>
             </header>
 
-            {loading ? <div>Loading</div> :
+            {loading ? <div className={styles.loadingContainer}>Loading</div> :
                 <MangaPageLayout tag='form'>
                     <LeftColumnContainer>
                         <img src={updatedManga.cover} className={styles.coverImg} />
@@ -384,6 +384,30 @@ const MangaEditPage = () => {
                                         isLoading={loading}
                                     />
                                     {showCateWarning && <div className={styles.failMsg}>Must select at least 1 tag</div>}
+                                </section>
+
+                                <section className={styles.mySection}>
+                                    <h1>Status</h1>
+                                    <MySelect
+                                        isMulti={false}
+                                        onChange={(value) => setUpdatedManga({
+                                            ...updatedManga,
+                                            status: value.value,
+                                        })}
+                                        options={[
+                                            {
+                                                label: 'Completed', value: 'Completed'
+                                            },
+                                            {
+                                                label: 'In progress', value: 'In progress'
+                                            },
+                                            {
+                                                label: 'Suspended', value: 'Suspended'
+                                            },
+                                        ]}
+                                        isLoading={loading}
+                                        value={{ label: updatedManga.status, value: updatedManga.status }}
+                                    />
                                 </section>
 
                                 <label className={styles.formControl}>

@@ -27,6 +27,16 @@ export const getMangaByID = async (id) => {
     }
 };
 
+export const getMangaByUploader = async (uploaderID, page = 1, per_page = 20) => {
+    try {
+        const response = await axios.get(API + `/uploader/${uploaderID}?page=${page}&per_page=${per_page}`);
+        return { status: response.status, mangas: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
 export const updateMangaInfo = async (id, updatedManga) => {
     const token = localStorage.getItem('token');
     if (!token)
@@ -48,6 +58,28 @@ export const updateMangaInfo = async (id, updatedManga) => {
             },
         });
         return { status: response.status, data: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const uploadManga = async (formData) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.post(API, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return { status: response.status, manga: response.data };
     }
     catch (error) {
         return getErrorMessage(error);
@@ -325,6 +357,27 @@ export const getReadingHistory = async (mangaID) => {
 
     try {
         const response = await axios.get(API + mangaID + '/readingHistory', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return { status: response.status, history: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const updateReadingHistory = async (mangaID, data) => {
+    const token = localStorage.getItem('token');
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.put(API + mangaID + '/readingHistory', data, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

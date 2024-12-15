@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const User = require('../models/userModel');
 const Manga = require('../models/mangaModel');
 const Chapter = require('../models/chapterModel');
 const Cover = require('../models/coverModel');
@@ -6,6 +7,7 @@ const ReadingHistory = require('../models/readingHistoryModel');
 const Comment = require('../models/commentModel');
 const MangaNoti = require('../models/mangaNotificationModel');
 const Report = require('../models/reportModel');
+const cloudinaryWrapper = require('../others/cloudinaryWrapper');
 const { deleteByPrefix, deleteFolder } = require('../others/cloudinaryWrapper');
 
 // @description get all mangas, filtered by user's blacklist
@@ -86,6 +88,8 @@ const getMangas = asyncHandler(async (req, res) => {
     }
     else {
         mangas = await Manga.find(filter)
+            .skip(skip)
+            .limit(per_page)
             .populate([
                 { path: 'authors', model: 'Author', select: 'name' },
                 { path: 'categories', model: 'Category', select: 'name' }
@@ -98,6 +102,55 @@ const getMangas = asyncHandler(async (req, res) => {
         total_pages: total_pages,
         total: count,
         mangas: mangas,
+    });
+});
+
+// @description get mangas by uploader
+// @route GET /api/mangas/uploader/:uploaderID
+// @access public
+const getMangasByUploader = asyncHandler(async (req, res) => {
+    // check valid id
+    if (!req.params.uploaderID.match(/^[0-9a-fA-F]{24}$/)) {
+        res.status(400);
+        throw new Error("Invalid ID");
+    }
+
+    const user = await User.findById(req.params.uploaderID);
+    if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+
+    let page = req.query.page ? parseInt(req.query.page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 20;
+
+    // Validation.
+    if (Number.isNaN(page) || !Number.isSafeInteger(page) || page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query page.");
+    }
+
+    if (Number.isNaN(per_page) || !Number.isSafeInteger(per_page) || per_page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query per_page.");
+    }
+
+    const count = await Manga.countDocuments({ uploader: user._id });
+    const total_pages = Math.ceil(count / per_page);
+    page = Math.min(page, total_pages);
+    page = Math.max(page, 1);
+    const skip = (page - 1) * per_page;
+
+    const mangas = await Manga.find({ uploader: user._id })
+        .skip(skip)
+        .limit(per_page);
+
+    res.status(200).json({
+        mangas: mangas,
+        page: page,
+        per_page: per_page,
+        total: count,
+        total_pages: total_pages,
     });
 });
 
@@ -178,10 +231,23 @@ const uploadManga = asyncHandler(async (req, res) => {
         cover: process.env.DEFAULT_COVER,
         description: req.body.description ? req.body.description : '',
         status: req.body.status,
-        canComment: true,
+        canComment: req.body.canComment ? req.body.canComment : true,
         uploader: req.user.id,
         overallRating: 0,
     });
+
+    if (req.files && req.files.cover) {
+        let uploadedFile = req.files.cover;
+        const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(uploadedFile.data, `${manga.id}/cover`);
+        const cover = await Cover.create({
+            manga: manga._id,
+            number: 1,
+            imageURL: url,
+            imagePublicID: publicID,
+        });
+        manga.cover = url;
+        await manga.save();
+    }
 
     res.status(200).json(manga);
 });
@@ -379,6 +445,7 @@ const deleteHistory = asyncHandler(async (req, res) => {
 module.exports = {
     getMangas,
     getMangaByID,
+    getMangasByUploader,
     uploadManga,
     updateManga,
     deleteManga,

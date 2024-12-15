@@ -29,7 +29,7 @@ const CommentPopup = ({ loggedIn }) => {
             setShowThis(false);
             setShowNoti(true);
         }
-        else{
+        else {
             setShowThis(true);
             await fetchData(perPage);
         }
@@ -51,7 +51,6 @@ const CommentPopup = ({ loggedIn }) => {
     const [totalPages, setTotalPages] = useState(1);
     const perPageInc = 10;
     const [perPage, setPerPage] = useState(perPageInc);
-    const [firstTime, setFirstTime] = useState(true);
 
     const [isInputFilled, setIsInputFilled] = useState(false);
     const [commentInput, setCommentInput] = useState('');
@@ -82,7 +81,7 @@ const CommentPopup = ({ loggedIn }) => {
     }
 
     // load the next comment page
-    const loadMore = async (event) => {
+    const loadMore = (event) => {
         event.preventDefault();
         setPage(prev => prev + 1);
         setPerPage(prev => prev + perPageInc);
@@ -92,10 +91,7 @@ const CommentPopup = ({ loggedIn }) => {
         const response = !chapterNumber ? await getMangaComments(id, 1, per_page) : await getChapterComments(id, chapterNumber, 1, per_page);
 
         if (response.status === 200) {
-            if (firstTime) {
-                setTotalPages(response.comments.total_pages);
-                setFirstTime(false);
-            }
+            setTotalPages(response.comments.total_pages);
 
             const fetchedComments = response.comments.comments;
             // group reply comments

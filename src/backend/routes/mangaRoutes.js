@@ -58,6 +58,9 @@ router.route('/:id/chapters')
     .get(chapterController.getChapterList)
     .post(authorize, chapterController.uploadChapter);
 
+router.route('/uploader/:uploaderID')
+    .get(mangaController.getMangasByUploader);
+
 // manga routes
 // /api/mangas/
 router.route('/')

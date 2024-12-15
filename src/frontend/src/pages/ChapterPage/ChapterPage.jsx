@@ -1,6 +1,7 @@
 import styles from './ChapterPage.module.css';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getChapter, getChapterList } from '../../service/mangaService.js';
+import { getChapter, getChapterList, updateReadingHistory } from '../../service/mangaService.js';
+import { checkClearance } from '../../stores/auth.js';
 import { getMe } from '../../service/userService.js';
 import { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -84,6 +85,12 @@ const ChapterPage = () => {
         const response = await getChapter(id, chapterNumber);
         if (response.status === 200) {
             setChapter(response.chapter);
+            if (await checkClearance()) {
+                const historyResponse = await updateReadingHistory(id, { newChapters: [response.chapter._id] });
+                if (historyResponse.status !== 200 && historyResponse) {
+                    console.log('Failed to update reading history');
+                }
+            }
 
             // reset
             setShowHeader(true);

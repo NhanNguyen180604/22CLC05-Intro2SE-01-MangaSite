@@ -34,7 +34,7 @@ const ReportedNode = function ({ report, updater, deleter }) {
           className="flex flex-row items-center gap-2 hover:underline"
         >
           <img
-            src={report.informant.avatar.url}
+            src={report.informant.avatar?.url}
             alt={`Avatar of ${report.informant.name}`}
             className="size-6 rounded-full object-cover"
           />

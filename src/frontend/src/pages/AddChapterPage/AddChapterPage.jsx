@@ -188,7 +188,8 @@ const AddChapterPage = () => {
 
         const response = await uploadChapter(id, formData);
         if (response.status === 200) {
-            navigate(`/mangas/${id}/chapters/${chapter.number}`);
+            freeImage();
+            navigate(`/mangas/${id}/chapters/edit`);
         }
         else {
             setNotiDetails({
