@@ -198,3 +198,18 @@ export const getErrorMessage = (error) => {
         message: "Something went wrong, and we have no idea"
     }
 }
+
+export async function getUserNotifications() {
+  const token = $token.get();
+    if (!token)
+        return null;
+    const res = await fetch(API + "notifications", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+    if (res.status == 401) return null;
+    return await res.json();
+}
