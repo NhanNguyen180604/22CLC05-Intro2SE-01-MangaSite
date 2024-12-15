@@ -12,7 +12,7 @@ const HomePage = () => {
   const [mangas, setMangas] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getMangas(1, 20);
+      const response = await getMangas(1, 3);
       if (response.status === 200) {
         setMangas(response.mangas.mangas);
       }
@@ -32,7 +32,7 @@ const HomePage = () => {
         <div className={styles.container}>
           <div className={styles.content}>
             <MangaSlide title="Trending" mangas={mangas} />
-            <MangaSlide title="Top rated" mangas={mangas} />
+            {/* <MangaSlide title="Top rated" mangas={mangas} /> */}
           </div>
           <div className={styles.notification}>
             <h4 className={styles.notificationHeader}>Notifications</h4>

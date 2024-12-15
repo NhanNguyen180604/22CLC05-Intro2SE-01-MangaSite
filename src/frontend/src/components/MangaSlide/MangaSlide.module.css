@@ -11,11 +11,11 @@
 }
 
 .mangaListContainer {
-	min-width: 300px;
 	margin-top: 16px;
 	display: flex;
 	list-style: none;
 	padding: 0;
+	width: 100%;
+	gap: 26px;
 	overflow-x: hidden;
-	width: 300px;
 }
