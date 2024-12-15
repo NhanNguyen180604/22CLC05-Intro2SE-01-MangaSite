@@ -36,7 +36,7 @@ const RatingPopup = ({ loggedIn, mangaID }) => {
             setShowThis(false);
             setShowNoti(true);
         }
-        else{
+        else {
             setShowThis(true);
             await fetchMyRating();
         }
@@ -62,7 +62,8 @@ const RatingPopup = ({ loggedIn, mangaID }) => {
         setLoading(true);
         setLoadingMessage('Loading');
         await fetchRatings();
-        await fetchMyRating();
+        if (loggedIn)
+            await fetchMyRating();
         setCurrentTerm(ratingTerms[currentRating - 1]);
         setLoading(false);
     }

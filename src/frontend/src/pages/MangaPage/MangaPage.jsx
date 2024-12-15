@@ -57,7 +57,13 @@ const MangaPage = () => {
 
 	const fetchData = async () => {
 		setLoading(true);
+
+		const getMeResponse = await getMe();
+		if (getMeResponse)
+			setMe(getMeResponse);
+
 		const response = await getMangaByID(id);
+
 		if (response.status === 200) {
 			setManga(response.manga);
 
@@ -67,24 +73,22 @@ const MangaPage = () => {
 				setFirstChapter(tempChapterList[0].number);
 			}
 
-			const historyResponse = await getReadingHistory(id);
-			if (historyResponse.status === 200 && historyResponse.history) {
-				const fetchedHistory = historyResponse.history;
-				setHistory(fetchedHistory);
-				if (fetchedHistory.chapters.length){
-					const tempChapter = tempChapterList.find(element => element._id === fetchedHistory.chapters[fetchedHistory.chapters.length - 1]);
-					if (tempChapter)
-						setFirstChapter(tempChapter.number);
+			if (getMeResponse) {
+				const historyResponse = await getReadingHistory(id);
+				if (historyResponse.status === 200 && historyResponse.history) {
+					const fetchedHistory = historyResponse.history;
+					setHistory(fetchedHistory);
+					if (fetchedHistory.chapters.length) {
+						const tempChapter = tempChapterList.find(element => element._id === fetchedHistory.chapters[fetchedHistory.chapters.length - 1]);
+						if (tempChapter)
+							setFirstChapter(tempChapter.number);
+					}
 				}
 			}
 		}
 		else {
 			console.log(response.message);
 		}
-
-		const getMeResponse = await getMe();
-		if (getMeResponse)
-			setMe(getMeResponse);
 
 		setLoading(false);
 	}

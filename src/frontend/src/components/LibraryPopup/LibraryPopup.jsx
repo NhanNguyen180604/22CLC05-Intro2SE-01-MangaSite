@@ -34,7 +34,7 @@ const LibraryPopup = ({ loggedIn, title }) => {
             setShowThis(false);
             setShowNoti(true);
         }
-        else{
+        else {
             setShowThis(true);
             await fetchMyLibrary();
         }
@@ -65,9 +65,11 @@ const LibraryPopup = ({ loggedIn, title }) => {
 
     useEffect(() => {
         const initialize = async () => {
-            setLoading(true);
-            await fetchMyLibrary();
-            setLoading(false);
+            if (loggedIn) {
+                setLoading(true);
+                await fetchMyLibrary();
+                setLoading(false);
+            }
         };
 
         initialize();

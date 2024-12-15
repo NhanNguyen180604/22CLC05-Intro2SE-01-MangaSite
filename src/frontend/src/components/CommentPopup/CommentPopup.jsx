@@ -119,7 +119,9 @@ const CommentPopup = ({ loggedIn }) => {
                 setMe(getMeResponse);
             }
         }
-        initialize();
+
+        if (loggedIn)
+            initialize();
     }, []);
 
     useEffect(() => {
