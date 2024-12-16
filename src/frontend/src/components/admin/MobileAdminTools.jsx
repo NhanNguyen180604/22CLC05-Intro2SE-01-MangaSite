@@ -1,5 +1,6 @@
 import { LuFolderCog } from "react-icons/lu";
 import {
+  MdChevronRight,
   MdOutlineCategory,
   MdOutlineFace,
   MdOutlineFlag,
@@ -8,7 +9,6 @@ import {
 import { $adminPanel } from "../../stores/admin-tools.js";
 import UserManagementPanel from "../UserManagementPanel";
 import ReportsPanel from "../reports/ReportsPanel.jsx";
-import AdminTab from "./AdminTab.jsx";
 import MobileAdminPanel from "./MobileAdminPanel.jsx";
 
 export default function MobileAdminTools() {
@@ -16,43 +16,82 @@ export default function MobileAdminTools() {
     <section className="flex w-full flex-col lg:hidden">
       <MobileAdminPanel />
 
-      <div className="-mx-6 -mt-10 bg-light-red py-4 text-center font-semibold text-black lg:m-0 lg:mt-8">
+      <div className="-mx-6 -mt-10 bg-light-red py-4 text-center font-semibold text-black">
         Administrative Tools
       </div>
 
-      <fieldset className="-mx-6 my-12 flex flex-col divide-y-2 divide-blue font-semibold">
-        <AdminTab
-          icon={<MdOutlineManageAccounts color="white" className="size-6" />}
-          label={"Manage Users"}
-          checked={true}
-          onClick={() => $adminPanel.set(<UserManagementPanel />)}
-        />
+      <div className="-mx-6 my-12 flex flex-col divide-y-2 divide-blue font-semibold">
+        <button
+          className="flex w-full cursor-pointer flex-row items-center justify-between px-6 py-5 duration-200 hover:bg-medium-navy"
+          onClick={() => {
+            $adminPanel.set(<UserManagementPanel />);
+          }}
+        >
+          <div className="flex flex-row items-center gap-2 font-semibold duration-200">
+            <MdOutlineManageAccounts color="white" className="size-6" />
+            Manage Users
+          </div>
+
+          <MdChevronRight color="white" className="size-6" />
+        </button>
+
         {/* React-icons doesn't have folder_managed symbol from Material Design */}
-        <AdminTab
-          icon={<LuFolderCog color="white" className="size-6" />}
-          label={"Manage Publications"}
-          checked={true}
-          onClick={() => { }}
-        />
-        <AdminTab
-          icon={<MdOutlineFlag color="white" className="size-6" />}
-          label={"Manage Reports"}
-          checked={true}
-          onClick={() => $adminPanel.set(<ReportsPanel />)}
-        />
-        <AdminTab
-          icon={<MdOutlineCategory color="white" className="size-6" />}
-          label={"Manage Categories"}
-          checked={true}
-          onClick={() => { }}
-        />
-        <AdminTab
-          icon={<MdOutlineFace color="white" className="size-6" />}
-          label={"Manage Authors"}
-          checked={true}
-          onClick={() => { }}
-        />
-      </fieldset>
+        <button
+          className="flex w-full cursor-pointer flex-row items-center justify-between px-6 py-5 duration-200 hover:bg-medium-navy"
+          onClick={() => {
+            $adminPanel.set(null);
+          }}
+        >
+          <div className="flex flex-row items-center gap-2 font-semibold duration-200">
+            <LuFolderCog color="white" className="size-6" />
+            Manage Publications
+          </div>
+
+          <MdChevronRight color="white" className="size-6" />
+        </button>
+
+        <button
+          className="flex w-full cursor-pointer flex-row items-center justify-between px-6 py-5 duration-200 hover:bg-medium-navy"
+          onClick={() => {
+            $adminPanel.set(<ReportsPanel />);
+          }}
+        >
+          <div className="flex flex-row items-center gap-2 font-semibold duration-200">
+            <MdOutlineFlag color="white" className="size-6" />
+            Manage Reports
+          </div>
+
+          <MdChevronRight color="white" className="size-6" />
+        </button>
+
+        <button
+          className="flex w-full cursor-pointer flex-row items-center justify-between px-6 py-5 duration-200 hover:bg-medium-navy"
+          onClick={() => {
+            $adminPanel.set(null);
+          }}
+        >
+          <div className="flex flex-row items-center gap-2 font-semibold duration-200">
+            <MdOutlineCategory color="white" className="size-6" />
+            Manage Categories
+          </div>
+
+          <MdChevronRight color="white" className="size-6" />
+        </button>
+
+        <button
+          className="flex w-full cursor-pointer flex-row items-center justify-between px-6 py-5 duration-200 hover:bg-medium-navy"
+          onClick={() => {
+            $adminPanel.set(null);
+          }}
+        >
+          <div className="flex flex-row items-center gap-2 font-semibold duration-200">
+            <MdOutlineFace color="white" className="size-6" />
+            Manage Authors
+          </div>
+
+          <MdChevronRight color="white" className="size-6" />
+        </button>
+      </div>
     </section>
   );
 }
