@@ -6,6 +6,7 @@ import {
   MdOutlineManageAccounts,
 } from "react-icons/md";
 import { $adminPanel } from "../../stores/admin-tools.js";
+import UserManagementPanel from "../UserManagementPanel";
 import ReportsPanel from "../reports/ReportsPanel.jsx";
 import AdminTab from "./AdminTab.jsx";
 import MobileAdminPanel from "./MobileAdminPanel.jsx";
@@ -24,14 +25,14 @@ export default function MobileAdminTools() {
           icon={<MdOutlineManageAccounts color="white" className="size-6" />}
           label={"Manage Users"}
           checked={true}
-          onClick={() => {}}
+          onClick={() => $adminPanel.set(<UserManagementPanel />)}
         />
         {/* React-icons doesn't have folder_managed symbol from Material Design */}
         <AdminTab
           icon={<LuFolderCog color="white" className="size-6" />}
           label={"Manage Publications"}
           checked={true}
-          onClick={() => {}}
+          onClick={() => { }}
         />
         <AdminTab
           icon={<MdOutlineFlag color="white" className="size-6" />}
@@ -43,13 +44,13 @@ export default function MobileAdminTools() {
           icon={<MdOutlineCategory color="white" className="size-6" />}
           label={"Manage Categories"}
           checked={true}
-          onClick={() => {}}
+          onClick={() => { }}
         />
         <AdminTab
           icon={<MdOutlineFace color="white" className="size-6" />}
           label={"Manage Authors"}
           checked={true}
-          onClick={() => {}}
+          onClick={() => { }}
         />
       </fieldset>
     </section>

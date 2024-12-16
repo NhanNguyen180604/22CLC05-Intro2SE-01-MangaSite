@@ -9,6 +9,7 @@ import {
 } from "react-icons/md";
 import { $adminPanel } from "../../stores/admin-tools.js";
 import ReportsPanel from "../reports/ReportsPanel.jsx";
+import UserManagementPanel from "../UserManagementPanel";
 import AdminTab from "./AdminTab.jsx";
 import EmptyAdminPanel from "./EmptyAdminPanel.jsx";
 
@@ -31,7 +32,7 @@ export default function DesktopAdminTools() {
             onClick={() => {
               setSelection(0);
               // Set $adminPanel to manage users panel.
-              $adminPanel.set(null);
+              $adminPanel.set(<UserManagementPanel />);
             }}
           />
           {/* React-icons doesn't have folder_managed symbol from Material Design */}

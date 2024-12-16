@@ -160,7 +160,7 @@ const getMangasByUploader = asyncHandler(async (req, res) => {
 const getMangaByID = asyncHandler(async (req, res) => {
     // check valid id
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-        res.status(400);
+        res.status(404);
         throw new Error("Invalid ID");
     }
 

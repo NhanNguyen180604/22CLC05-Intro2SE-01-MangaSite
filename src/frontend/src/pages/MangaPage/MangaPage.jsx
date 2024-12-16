@@ -21,10 +21,17 @@ import RatingPopup from "../../components/RatingPopup"
 import LibraryPopup from "../../components/LibraryPopup"
 import ReportPopup from "../../components/ReportPopup"
 import CommentPopup from "../../components/CommentPopup"
+import NotiPopup from "../../components/NotiPopup"
 
 const MangaPage = () => {
 	const { id } = useParams();
 	const [loading, setLoading] = useState(true);
+	const [showNoti, setShowNoti] = useState(false);
+	const [notiDetails, setNotiDetails] = useState({
+		success: false,
+		message: '',
+		details: '',
+	});
 
 	const [me, setMe] = useState({
 		avatar: '',
@@ -86,8 +93,16 @@ const MangaPage = () => {
 				}
 			}
 		}
+		else if (response.status === 404) {
+			navigate('/404');
+		}
 		else {
-			console.log(response.message);
+			setNotiDetails({
+				success: false,
+				message: "Something went wrong, please try again",
+				details: response.message,
+			});
+			setShowNoti(true);
 		}
 
 		setLoading(false);
@@ -132,7 +147,7 @@ const MangaPage = () => {
 							) : (
 								<span className={styles.disabledBTN}><FaCommentSlash /></span>
 							)}
-							{(manga.uploader?._id === me?._id && manga.userType !== 'admin') &&
+							{(manga.uploader?._id === me?._id || me.accountType === 'admin') &&
 								<span
 									className={styles.editBTN}
 									onClick={() => navigate(`/mangas/${id}/edit`)}
