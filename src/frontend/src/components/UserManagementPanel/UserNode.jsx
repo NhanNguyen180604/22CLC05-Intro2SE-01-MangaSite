@@ -1,9 +1,8 @@
 import { FaUser, FaUserSlash } from "react-icons/fa6";
 import { TbAwardFilled, TbAwardOff } from "react-icons/tb";
 import { useState, useRef, useEffect } from "react";
-import { banUser } from "../../service/userService.js";
 
-const UserNode = ({ user, index, changeUserRoleWrapper, banUserWrapper, unbanUserWrapper, isBanned }) => {
+const UserNode = ({ user, changeUserRoleWrapper, banUserWrapper, unbanUserWrapper, isBanned, approvalReq }) => {
     const [showReport, setShowReport] = useState(false);
     const reasonInputRef = useRef(null);
 
@@ -55,7 +54,11 @@ const UserNode = ({ user, index, changeUserRoleWrapper, banUserWrapper, unbanUse
                             Banned
                         </div>
                     )}
-
+                    {approvalReq && (
+                        <div className="text-light-green mt-2 text-[0.8rem]">
+                            Pending approval, reason: {approvalReq.reason}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="flex justify-end relative lg:absolute top-0 right-0">
@@ -65,14 +68,14 @@ const UserNode = ({ user, index, changeUserRoleWrapper, banUserWrapper, unbanUse
                             {user.accountType === 'approved' ? (
                                 <button
                                     className="hover:bg-white/10 duration-200 p-1 rounded-lg"
-                                    onClick={() => changeUserRoleWrapper(user._id, index, 'user')}
+                                    onClick={() => changeUserRoleWrapper(user._id, 'user')}
                                 >
                                     <TbAwardOff />
                                 </button>
                             ) : (
                                 <button
                                     className="hover:bg-white/10 duration-200 p-1 rounded-lg"
-                                    onClick={() => changeUserRoleWrapper(user._id, index, 'approved')}
+                                    onClick={() => changeUserRoleWrapper(user._id, 'approved')}
                                 >
                                     <TbAwardFilled />
                                 </button>

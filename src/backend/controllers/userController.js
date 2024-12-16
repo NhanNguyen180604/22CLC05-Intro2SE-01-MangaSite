@@ -76,6 +76,10 @@ const changeUserRole = asyncHandler(async (req, res) => {
     }
     const userUpdate = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('email name accountType');
 
+    if (req.body.accountType === 'approved') {
+        await Approval.deleteOne({ user: user._id });
+    }
+
     const userNoti = await UserNoti.create({
         user: user._id,
         message: req.body.accountType === 'approved' ? 'You have become an approved user' : 'You are no longer an approved user',
@@ -138,6 +142,18 @@ const requestApproval = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error('You are not logged in');
     }
+
+    if (req.user.accountType === 'approved') {
+        res.status(400);
+        throw new Error("You are already an approved user");
+    }
+
+    const approvalExist = await Approval.findOne({ user: _id });
+    if (approvalExist) {
+        res.status(400);
+        throw new Error("Your request form is waiting to be processed");
+    }
+
     const approval = await Approval.create({
         user: _id,
         reason: req.body.reason,

@@ -47,7 +47,7 @@ const UserContainer = ({ search }) => {
         setLoading(false);
     };
 
-    const changeUserRoleWrapper = async (userID, index, role) => {
+    const changeUserRoleWrapper = async (userID, role) => {
         const response = await changeUserRole(userID, role);
         if (response.status !== 200) {
             setNotiDetails({
@@ -59,11 +59,18 @@ const UserContainer = ({ search }) => {
         }
         else {
             const copyUsers = [...users];
-            copyUsers[index] = {
-                ...copyUsers[index],
-                accountType: response.data.accountType,
-            };
-            setUsers([...copyUsers]);
+            const index = users.map(user => user._id).indexOf(userID);
+            if (index > -1) {
+                copyUsers[index] = {
+                    ...copyUsers[index],
+                    accountType: role,
+                };
+                setUsers([...copyUsers]);
+            }
+
+            if (role === 'approved') {
+                setApprovalReq(approvalReq.filter(approval => approval.user !== userID));
+            }
         }
     };
 
@@ -122,18 +129,18 @@ const UserContainer = ({ search }) => {
                     Loading...
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-2 max-h-[50vh] overflow-y-auto">
                     {users
                         .filter(filterUser)
-                        .map((user, index) => (
+                        .map((user) => (
                             <UserNode
                                 key={user._id}
                                 user={user}
-                                index={index}
                                 changeUserRoleWrapper={changeUserRoleWrapper}
                                 banUserWrapper={banUserWrapper}
                                 unbanUserWrapper={unbanUserWrapper}
                                 isBanned={banned.find(bannedUser => bannedUser.user === user._id)}
+                                approvalReq={approvalReq.find(element => element.user === user._id)}
                             />
                         ))
                     }
