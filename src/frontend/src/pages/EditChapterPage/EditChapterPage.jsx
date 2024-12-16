@@ -16,9 +16,14 @@ import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordi
 import { CSS } from '@dnd-kit/utilities';
 
 const EditChapterPage = () => {
+    const [me, setMe] = useState({
+        name: '',
+        email: '',
+        accountType: '',
+    });
     const { id, chapterNumber } = useParams();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState('Loading');
     const [showNoti, setShowNoti] = useState(false);
     const [notiDetails, setNotiDetails] = useState({
@@ -128,6 +133,23 @@ const EditChapterPage = () => {
         setLoading(true);
 
         const mangaResponse = await getMangaByID(id);
+
+        const meResponse = await getMe();
+        if (meResponse) {
+            setMe(meResponse);
+        }
+
+        if (
+            !meResponse ||
+            (
+                meResponse.accountType !== 'admin'
+                && (meResponse && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== meResponse._id)
+            )
+        ) {
+            navigate('/401');
+            return;
+        }
+
         if (mangaResponse.status !== 200) {
             // display error
             setNotiDetails({
@@ -137,19 +159,6 @@ const EditChapterPage = () => {
             });
             setShowNoti(true);
             setLoading(false);
-            return;
-        }
-
-        const me = await getMe();
-        if (!me || (me.accountType !== 'admin' && (me && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== me._id))) {
-            setNotiDetails({
-                success: false,
-                message: 'You are not authorized',
-                details: 'Only the uploader or admin can edit this, returning to home in 5 seconds',
-            });
-            setShowNoti(true);
-            setLoading(false);
-            setTimeout(() => navigate('/'), 5000);
             return;
         }
 
@@ -304,6 +313,7 @@ const EditChapterPage = () => {
                             <img src={mangaCover} className={styles.coverImg} />
 
                             <ActionBTNs
+                                me={me}
                                 submit={submit}
                                 canSubmit={canSubmit}
                                 reset={reset}
@@ -319,6 +329,7 @@ const EditChapterPage = () => {
                                     type='text'
                                     id="titleInput"
                                     required
+                                    readOnly={me.accountType === 'admin'}
                                 />
                                 {showTitleMessage && <div className={styles.warningMsg}>{titleMessage}</div>}
                             </section>
@@ -338,7 +349,7 @@ const EditChapterPage = () => {
                                     <DndContext
                                         collisionDetection={closestCorners}
                                         onDragEnd={handleDragEnd}
-                                        sensors={sensors}
+                                        sensors={me.accountType !== 'admin' ? sensors : []}
                                     >
                                         <SortableContext
                                             items={images}
@@ -346,6 +357,7 @@ const EditChapterPage = () => {
                                         >
                                             {images.map(image => (
                                                 <SortableItem
+                                                    me={me}
                                                     image={image}
                                                     key={image.id}
                                                     removeImage={removeImage}
@@ -354,26 +366,31 @@ const EditChapterPage = () => {
                                         </SortableContext>
                                     </DndContext>
 
-                                    <label
-                                        className={styles.pagePlaceholder}
-                                        htmlFor="pageInput"
-                                    >
-                                        <FaPlus />
-                                    </label>
-                                    <input
-                                        className={styles.hidden}
-                                        id="pageInput"
-                                        type='file'
-                                        accept='.png, .jpeg, .jpg, .webp'
-                                        multiple
-                                        onChange={handleUploadPages}
-                                        onClick={(e) => { e.target.value = null; }}
-                                    />
+                                    {me.accountType !== 'admin' && (
+                                        <>
+                                            <label
+                                                className={styles.pagePlaceholder}
+                                                htmlFor="pageInput"
+                                            >
+                                                <FaPlus />
+                                            </label>
+                                            <input
+                                                className={styles.hidden}
+                                                id="pageInput"
+                                                type='file'
+                                                accept='.png, .jpeg, .jpg, .webp'
+                                                multiple
+                                                onChange={handleUploadPages}
+                                                onClick={(e) => { e.target.value = null; }}
+                                            />
+                                        </>
+                                    )}
                                 </div>
 
                             </section>
 
                             <ActionBTNs
+                                me={me}
                                 submit={submit}
                                 canSubmit={canSubmit}
                                 reset={reset}
@@ -397,20 +414,24 @@ const EditChapterPage = () => {
 }
 export default EditChapterPage;
 
-const ActionBTNs = ({ reset, submit, removeChapter, myClassName = 'desktopDisplay', canSubmit }) => {
+const ActionBTNs = ({ me, reset, submit, removeChapter, myClassName = 'desktopDisplay', canSubmit }) => {
     return (
         <div className={`${styles.actionBTNs} ${styles[myClassName]}`}>
-            <button
-                className={styles.blueBTN}
-                onClick={submit}
-                disabled={!canSubmit()}
-            >
-                Update Chapter
-            </button>
+            {me.accountType !== 'admin' && (
+                <>
+                    <button
+                        className={styles.blueBTN}
+                        onClick={submit}
+                        disabled={!canSubmit()}
+                    >
+                        Update Chapter
+                    </button>
 
-            <button className={styles.discardBTN} onClick={reset}>
-                Reset
-            </button>
+                    <button className={styles.discardBTN} onClick={reset}>
+                        Reset
+                    </button>
+                </>
+            )}
 
             <button className={styles.deleteBTN} onClick={removeChapter}>
                 Delete this Chapter
@@ -419,7 +440,7 @@ const ActionBTNs = ({ reset, submit, removeChapter, myClassName = 'desktopDispla
     );
 };
 
-const SortableItem = ({ image, removeImage }) => {
+const SortableItem = ({ me, image, removeImage }) => {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: image.id });
 
     const style = {
@@ -434,20 +455,22 @@ const SortableItem = ({ image, removeImage }) => {
                 {...attributes}
                 {...listeners}
                 style={style}
-                className={styles.noTouchAction}
+                className={`${styles.noTouchAction} ${me.accountType === 'admin' && styles.cursorNotAllowed}`}
             >
                 <img src={image.url ? image.url : image.objectURL} />
 
             </div>
-            <button
-                className={styles.removePageBTN}
-                onClick={(e) => {
-                    e.preventDefault();
-                    removeImage(image.id);
-                }}
-            >
-                <FaCircleXmark />
-            </button>
+            {me.accountType !== 'admin' && (
+                <button
+                    className={styles.removePageBTN}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        removeImage(image.id);
+                    }}
+                >
+                    <FaCircleXmark />
+                </button>
+            )}
         </div>
     );
 };

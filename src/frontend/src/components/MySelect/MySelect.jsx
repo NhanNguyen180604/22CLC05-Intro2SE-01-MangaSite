@@ -1,6 +1,6 @@
 import Select from 'react-select';
 
-const MySelect = ({ options, isLoading, value, onChange, isMulti = true }) => {
+const MySelect = ({ options, isLoading, value, onChange, isMulti = true, isDisabled = false }) => {
     const myStyles = {
         control: (styles, state) => ({
             ...styles,
@@ -60,6 +60,7 @@ const MySelect = ({ options, isLoading, value, onChange, isMulti = true }) => {
             closeMenuOnSelect={false}
             value={value}
             onChange={onChange}
+            isDisabled={isDisabled}
             styles={myStyles}
         />
     );

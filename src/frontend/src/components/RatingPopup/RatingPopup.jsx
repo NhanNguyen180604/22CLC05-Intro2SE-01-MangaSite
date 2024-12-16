@@ -16,7 +16,7 @@ const RatingPopup = ({ loggedIn, mangaID }) => {
     const [ratings, setRatings] = useState([]);
     const ratingTerms = ['Bad', 'Ok', 'Mid', 'Good', 'Peak'];
     const [currentTerm, setCurrentTerm] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState('');
     const [myRating, setMyRating] = useState(0);   // previous rating on this manga
 

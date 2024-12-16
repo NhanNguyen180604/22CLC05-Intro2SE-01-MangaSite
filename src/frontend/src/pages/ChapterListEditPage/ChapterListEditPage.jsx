@@ -11,9 +11,14 @@ import { FaPlus, FaXmark } from 'react-icons/fa6';
 import NotiPopup from '../../components/NotiPopup';
 
 const ChapterListEditPage = () => {
+    const [me, setMe] = useState({
+        name: '',
+        email: '',
+        accountType: '',
+    });
     const { id } = useParams();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [showNoti, setShowNoti] = useState(false);
     const [notiDetails, setNotiDetails] = useState({
         success: false,
@@ -35,7 +40,7 @@ const ChapterListEditPage = () => {
             return;
         }
 
-        await fetchChapterList();
+        setChapters(chapters.filter(chapter => chapter.number !== chapterNumber));
     };
 
     const fetchChapterList = async () => {
@@ -58,18 +63,12 @@ const ChapterListEditPage = () => {
         const mangaResponse = await getMangaByID(id);
 
         if (mangaResponse.status === 200) {
-            const me = await getMe();
-            if (!me || (me.accountType !== 'admin' && (me && mangaResponse.manga.uploader._id !== me._id))) {
-                setNotiDetails({
-                    success: false,
-                    message: 'You are not authorized',
-                    details: 'Only the uploader or admin can edit this, returning to home in 5 seconds',
-                });
-                setShowNoti(true);
-                setLoading(false);
-                setTimeout(() => navigate('/'), 5000);
+            const meResponse = await getMe();
+            if (!meResponse || (meResponse.accountType !== 'admin' && (meResponse && mangaResponse.manga.uploader._id !== meResponse._id))) {
+                navigate('/401');
                 return;
             }
+            setMe(meResponse);
         }
         else {
             // display error
@@ -118,37 +117,47 @@ const ChapterListEditPage = () => {
                     </div>
 
                     <div className={styles.chapterBTNsContainer}>
-                        {chapters.map(chapter => (
-                            <div
-                                key={chapter._id}
-                                className={styles.chapterBTN}
-                            >
-                                <div
-                                    className={styles.chapterBTNInner}
-                                    onClick={() => navigate(`/mangas/${id}/chapters/${chapter.number}/edit`)}
-                                >
-                                    <div>
-                                        <div className={styles.chapterNum}>Chapter #{chapter.number}</div>
-                                        <div className={styles.chapterTitle}>{chapter.title}</div>
-                                        <div className={styles.chapterPageCount}>{chapter.images.length} page{chapter.images.length ? 's' : ''}</div>
+                        {chapters.length ? (
+                            <>
+                                {chapters.map(chapter => (
+                                    <div
+                                        key={chapter._id}
+                                        className={styles.chapterBTN}
+                                    >
+                                        <div
+                                            className={styles.chapterBTNInner}
+                                            onClick={() => navigate(`/mangas/${id}/chapters/${chapter.number}/edit`)}
+                                        >
+                                            <div>
+                                                <div className={styles.chapterNum}>Chapter #{chapter.number}</div>
+                                                <div className={styles.chapterTitle}>{chapter.title}</div>
+                                                <div className={styles.chapterPageCount}>{chapter.images.length} page{chapter.images.length ? 's' : ''}</div>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => removeChapter(chapter.number)}
+                                            className={styles.deleteChapterBTN}
+                                        >
+                                            <FaXmark />
+                                        </button>
                                     </div>
-                                </div>
+                                ))
+                                }
+                            </>
+                        ) : (
+                            <div>No chapter</div>
+                        )}
 
-                                <button
-                                    onClick={() => removeChapter(chapter.number)}
-                                    className={styles.deleteChapterBTN}
-                                >
-                                    <FaXmark />
-                                </button>
+
+                        {me.accountType !== 'admin' && (
+                            <div
+                                className={styles.addNewBTN}
+                                onClick={() => navigate(`/mangas/${id}/chapters/new`)}
+                            >
+                                <FaPlus />Add a new chapter
                             </div>
-                        ))}
-
-                        <div
-                            className={styles.addNewBTN}
-                            onClick={() => navigate(`/mangas/${id}/chapters/new`)}
-                        >
-                            <FaPlus />Add a new chapter
-                        </div>
+                        )}
                     </div>
 
                     <NotiPopup

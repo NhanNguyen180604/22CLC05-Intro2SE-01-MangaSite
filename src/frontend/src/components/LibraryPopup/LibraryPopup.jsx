@@ -12,7 +12,7 @@ const LibraryPopup = ({ loggedIn, title }) => {
     const [showNoti, setShowNoti] = useState(false);
 
     const { id } = useParams();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [expanded, setExpanded] = useState(false);
     const [selected, setSelected] = useState('none'); // will add fetching library later

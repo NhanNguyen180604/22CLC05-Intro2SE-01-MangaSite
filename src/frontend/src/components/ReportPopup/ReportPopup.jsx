@@ -11,7 +11,7 @@ const ReportPopup = ({ loggedIn, reportField, reportedId }) => {
     const [showThis, setShowThis] = useState(false);
     const [showNoti, setShowNoti] = useState(false);
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [isInputFilled, setIsInputFilled] = useState(false);
     const [formValues, setFormValues] = useState({
         Plagiarism: false,

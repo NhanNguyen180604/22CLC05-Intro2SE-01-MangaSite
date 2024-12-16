@@ -15,6 +15,7 @@ import MySelect from "../../components/MySelect";
 
 const MangaEditPage = () => {
     const [loading, setLoading] = useState(true);
+    const [loadingMessage, setLoadingMessage] = useState('Loading');
     const [showNoti, setShowNoti] = useState(false);
     const [notiDetails, setNotiDetails] = useState({
         success: false,
@@ -244,7 +245,8 @@ const MangaEditPage = () => {
 
     const submit = async (e) => {
         e.preventDefault();
-        console.log(manga);
+        setLoadingMessage('Uploading manga');
+        setLoading(true);
         const formData = new FormData();
         if (manga.cover.file) {
             formData.append('cover', manga.cover.file);
@@ -261,9 +263,7 @@ const MangaEditPage = () => {
             }
         }
 
-        console.log(formData);
         const response = await uploadManga(formData);
-        console.log(response);
         if (response.status === 200) {
             navigate(`/mangas/${response.manga._id}`);
         }
@@ -274,6 +274,7 @@ const MangaEditPage = () => {
                 details: response.message,
             });
             setShowNoti(true);
+            setLoading(false);
         }
     };
 
@@ -290,7 +291,7 @@ const MangaEditPage = () => {
                 </div>
             </header>
 
-            {loading ? <div className={styles.loadingContainer}>Loading</div> :
+            {loading ? <div className={styles.loadingContainer}>{loadingMessage}</div> :
                 <MangaPageLayout tag='form'>
                     <LeftColumnContainer>
                         <div className={styles.coverImgContainer}>

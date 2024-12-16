@@ -33,7 +33,7 @@ export default function MobileNavigationBar() {
           <MdAddCircleOutline color="white" size={32} />
         </a>
         <a
-          href="/profile/me"
+          href="/user/me"
           aria-label="My Profile"
           className="relative -top-4 mx-4 flex shrink-0 scale-[2.0] items-center justify-center rounded-full bg-darker-navy p-2 duration-200 hover:-translate-y-2"
         >

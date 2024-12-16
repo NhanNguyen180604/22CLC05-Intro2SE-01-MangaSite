@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_URL, getErrorMessage } from "./service.js";
 const API = API_URL + '/mangas/';
+import { $token } from "../stores/auth.js";
 
 // get mangas
 export const getMangas = async (page = 1, per_page = 20) => {
@@ -38,7 +39,7 @@ export const getMangaByUploader = async (uploaderID, page = 1, per_page = 20) =>
 };
 
 export const updateMangaInfo = async (id, updatedManga) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -65,7 +66,7 @@ export const updateMangaInfo = async (id, updatedManga) => {
 };
 
 export const uploadManga = async (formData) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -80,6 +81,26 @@ export const uploadManga = async (formData) => {
         });
 
         return { status: response.status, manga: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+export const deleteManga = async (id) => {
+    const token = $token.get();
+    if (!token)
+        return {
+            status: 401,
+            message: 'You are not logged in',
+        };
+
+    try {
+        const response = await axios.delete(API + id, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return { status: response.status, data: response.data };
     }
     catch (error) {
         return getErrorMessage(error);
@@ -119,7 +140,7 @@ export const getChapter = async (mangaID, chapterNumber) => {
 };
 
 export const uploadChapter = async (mangaID, formData) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -140,7 +161,7 @@ export const uploadChapter = async (mangaID, formData) => {
 };
 
 export const updateChapter = async (mangaID, chapterNumber, formData) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -161,7 +182,7 @@ export const updateChapter = async (mangaID, chapterNumber, formData) => {
 };
 
 export const deleteChapter = async (mangaID, chapterNumber) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -191,7 +212,7 @@ export const getRatings = async (mangaID) => {
 };
 
 export const getOneRating = async (mangaID) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -213,7 +234,7 @@ export const getOneRating = async (mangaID) => {
 };
 
 export const sendRating = async (mangaID, ratingScore) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -259,7 +280,7 @@ export const getDefaultCover = async () => {
 };
 
 export const uploadCover = async (mangaID, formData) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -281,7 +302,7 @@ export const uploadCover = async (mangaID, formData) => {
 };
 
 export const deleteCover = async (mangaID, coverNumber) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -320,7 +341,7 @@ export const getChapterComments = async (mangaID, chapterNumber, page = 1, per_p
 };
 
 export const postComment = async (content, mangaID, chapterNumber = null, replyID = null) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -348,7 +369,7 @@ export const postComment = async (content, mangaID, chapterNumber = null, replyI
 };
 
 export const getReadingHistory = async (mangaID) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,
@@ -369,7 +390,7 @@ export const getReadingHistory = async (mangaID) => {
 };
 
 export const updateReadingHistory = async (mangaID, data) => {
-    const token = localStorage.getItem('token');
+    const token = $token.get();
     if (!token)
         return {
             status: 401,

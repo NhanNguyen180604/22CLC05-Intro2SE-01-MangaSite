@@ -6,7 +6,7 @@ import { redirect } from "../../service/service.js";
 import ReportedNode from "./ReportedNode.jsx";
 
 const ReportsList = function ({ search, showProcessed }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [data, setData] = useState([]);

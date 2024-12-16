@@ -15,7 +15,7 @@ const UserContainer = ({ search }) => {
         message: '',
         details: '',
     });
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const initialize = async () => {
         setLoading(true);

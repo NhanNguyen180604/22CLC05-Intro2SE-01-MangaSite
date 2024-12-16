@@ -235,8 +235,12 @@ const updateChapter = asyncHandler(async (req, res) => {
             }
         });
     }
+
     let oldImages = req.body.oldImages;
     if (oldImages) {
+        if (!Array.isArray(oldImages))
+            oldImages = [oldImages];
+
         oldImages = oldImages?.map(image => (JSON.parse(image)));
     }
 
