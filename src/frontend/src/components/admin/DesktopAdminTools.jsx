@@ -10,6 +10,7 @@ import {
 import { $adminPanel } from "../../stores/admin-tools.js";
 import ReportsPanel from "../reports/ReportsPanel.jsx";
 import UserManagementPanel from "../UserManagementPanel";
+import PublicationManagementPanel from "../PublicationManagementPanel";
 import EmptyAdminPanel from "./EmptyAdminPanel.jsx";
 
 export default function DesktopAdminTools() {
@@ -49,7 +50,7 @@ export default function DesktopAdminTools() {
               checked={selection == 1}
               onChange={() => {
                 setSelection(1);
-                $adminPanel.set(null);
+                $adminPanel.set(<PublicationManagementPanel />);
               }}
             />
             Manage Publications

@@ -49,10 +49,9 @@ const getMangas = asyncHandler(async (req, res) => {
 
     if (req.query.type === 'top-rating' || req.query.type === 'recently-updated') {
         const sortField = req.query.type === 'top-rating' ? 'overallRating' : 'updatedAt';
-        const sortOrder = req.query.type === 'top-rating' ? 1 : -1;
         mangas = await Manga.aggregate([
             { $match: filter },
-            { $sort: { [sortField]: sortOrder } },
+            { $sort: { [sortField]: -1 } },
             { $skip: skip },
             { $limit: per_page },
             {

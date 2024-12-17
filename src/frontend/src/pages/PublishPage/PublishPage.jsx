@@ -47,7 +47,7 @@ const PublishPage = () => {
             }
         }
 
-        if (await checkClearance() < 2) {
+        if (await checkClearance() !== 2) {
             navigate('/401');
         }
 
