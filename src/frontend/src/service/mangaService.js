@@ -3,12 +3,13 @@ import { API_URL, getErrorMessage } from "./service.js";
 const API = API_URL + '/mangas/';
 
 // get mangas
-export const getMangas = async (page = 1, per_page = 20) => {
+export const getMangas = async (page = 1, per_page = 20, type) => {
     try {
         const response = await axios.get(API, {
             params: {
                 page: page,
                 per_page: per_page,
+                type,
             },
         })
         return { status: response.status, mangas: response.data }

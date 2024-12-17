@@ -6,6 +6,7 @@
 import axios from "axios";
 import { $token } from "../stores/auth.js";
 import { API_URL } from "./service.js";
+import { waitFor } from "@testing-library/react";
 const API = API_URL + '/users/';
 
 // get mangas
@@ -210,6 +211,20 @@ export async function getUserNotifications() {
         }
     });
 
+    if (res.status == 401) return null;
+    return await res.json();
+}
+
+export async function readUserNoti(id) {
+    const token = $token.get()
+    if (!token)
+        return null
+    const res = await fetch(`${API}notifications/${id}/read`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
     if (res.status == 401) return null;
     return await res.json();
 }
