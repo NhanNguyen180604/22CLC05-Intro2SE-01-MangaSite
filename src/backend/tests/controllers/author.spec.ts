@@ -50,6 +50,12 @@ describe("author controller", () => {
     expect(res.body.total).toBe(6);
   });
 
+  it("returns 200 if get ALL", async () => {
+    const res = await supertest(app).get("/api/authors").query({ all: true }).send();
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveLength(6);
+  });
+
   it("returns 200 even with page too large", async () => {
     const res = await supertest(app).get("/api/authors").query({ page: 3 }).send();
     expect(res.statusCode).toBe(200);
