@@ -200,6 +200,20 @@ export async function getUserNotifications() {
     return await res.json();
 }
 
+export async function readUserNoti(id) {
+    const token = $token.get()
+    if (!token)
+        return null
+    const res = await fetch(`${API}notifications/${id}/read`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    if (res.status == 401) return null;
+    return await res.json();
+}
+
 export const getAllUsers = async () => {
     const token = $token.get();
     if (!token)
