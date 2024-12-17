@@ -17,11 +17,11 @@ const getChapter = asyncHandler(async (req, res) => {
     const chapter = await Chapter.findOne({ manga: req.params.id, number: req.params.chapterNumber })
         .populate({ path: 'manga', model: 'Manga', select: 'name canComment' });
 
-    if (!chapter){
+    if (!chapter) {
         res.status(404);
         throw new Error("Chapter not found");
     }
-    
+
     res.status(200).json(chapter);
 });
 
@@ -93,7 +93,20 @@ const getChapterList = asyncHandler(async (req, res) => {
 // @route GET /api/mangas/:id/chapters/numbers
 // @access public
 const getAllChapterNumbers = asyncHandler(async (req, res) => {
-    let chapters = await Chapter.find();
+    // check valid id
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+        res.status(400);
+        throw new Error("Invalid ID");
+    }
+
+    // check if manga exists
+    const manga = await Manga.findById(req.params.id);
+    if (!manga) {
+        res.status(404);
+        throw new Error("Manga not found");
+    }
+
+    let chapters = await Chapter.find({ manga: manga._id });
     res.status(200).json(chapters.map(chapter => chapter.number).sort((a, b) => a - b));
 });
 
@@ -222,8 +235,12 @@ const updateChapter = asyncHandler(async (req, res) => {
             }
         });
     }
+
     let oldImages = req.body.oldImages;
     if (oldImages) {
+        if (!Array.isArray(oldImages))
+            oldImages = [oldImages];
+
         oldImages = oldImages?.map(image => (JSON.parse(image)));
     }
 

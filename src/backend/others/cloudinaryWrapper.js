@@ -125,7 +125,8 @@ const deleteFolder = asyncHandler(async function cloudinaryDeleteFolderWrapper(f
         await cloudinary.v2.api.delete_folder(folder);
     }
     catch (error) {
-        throw new Error(error.error);
+        if (error.error.http_code !== 404)
+            throw new Error(error.error);
     }
 });
 

@@ -25,7 +25,7 @@ export default function DesktopNavigationBar() {
 
   // Loading state
   if (loading) return <DesktopNavLoading />;
-  
+
   // It's null, loading failed. Returns a login button, this is only available on the desktop bar.
   if (me == null) return <a href="/user/login" className="font-semibold text-xl hidden h-14 px-4 items-center justify-center lg:flex bg-sky-blue text-black rounded-2xl">Login</a>;
 
@@ -45,7 +45,7 @@ export default function DesktopNavigationBar() {
         className={`relative size-14 overflow-clip rounded-full ${expanded ? "z-[60]" : ""}`}
       >
         <img
-          src={me.avatar?.url}
+          src={me.avatar?.url || 'https://placehold.co/100x100?text=User+Avatar'}
           alt="Your Profile Image"
         />
       </a>

@@ -130,6 +130,11 @@
 
 .noTouchAction {
     touch-action: none;
+    cursor: grab;
+}
+
+.cursorNotAllowed{
+    cursor: not-allowed;
 }
 
 .removePageBTN {

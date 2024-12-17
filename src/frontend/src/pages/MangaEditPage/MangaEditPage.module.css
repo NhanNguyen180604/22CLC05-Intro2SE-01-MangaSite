@@ -1,3 +1,10 @@
+.loadingContainer{
+	font-size: 2rem;
+	font-weight: bold;
+	margin-top: 3rem;
+	text-align: center;
+}
+
 .coverImg {
   margin-bottom: 1.5rem;
 }
@@ -108,8 +115,8 @@
   field-sizing: content;
 }
 
-.mySection textarea:hover,
-.newAuthorInput input[type="text"]:hover {
+.mySection textarea:not(:disabled):hover,
+.newAuthorInput input[type="text"]:not(:disabled):hover {
   outline: 1px solid white;
 }
 
@@ -133,26 +140,26 @@
   transition: opacity 0.2s ease-in-out;
 }
 
-.newAuthorInput button:disabled{
+.newAuthorInput button:disabled {
   opacity: 0.5;
 }
 
-.newAuthorInput button:not(:disabled):hover{
+.newAuthorInput button:not(:disabled):hover {
   background: var(--blue);
   color: white;
 }
 
-.newAuthorInput button:not(:disabled):active{
+.newAuthorInput button:not(:disabled):active {
   background: var(--very-light-blue);
   color: black;
 }
 
-.failMsg{
+.failMsg {
   color: var(--red);
   font-weight: bold;
 }
 
-.successMsg{
+.successMsg {
   color: var(--light-green);
   font-weight: bold;
 }
@@ -246,6 +253,15 @@
 
 .mobileDisplay {
   display: none;
+}
+
+@media only screen and ((pointer: coarse) or (pointer: none)) {
+  .coverBTNs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 @media only screen and (max-width: 700px) {

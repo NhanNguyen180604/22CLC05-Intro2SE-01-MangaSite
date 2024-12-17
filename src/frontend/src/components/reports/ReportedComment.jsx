@@ -8,7 +8,7 @@ const ReportedComment = function ({ comment, processed }) {
       <div className="flex flex-row items-center gap-4">
         <div className="flex flex-row items-center gap-2">
           <img
-            src={comment.user.avatar.url}
+            src={comment.user.avatar?.url || 'https://placehold.co/30x30?text=User+Avatar'}
             alt={`Avatar of ${comment.user.name}`}
             className="size-5 rounded-full"
           />

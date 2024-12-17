@@ -1,6 +1,6 @@
 import Select from 'react-select';
 
-const MySelect = ({ options, isLoading, value, onChange }) => {
+const MySelect = ({ options, isLoading, value, onChange, isMulti = true, isDisabled = false }) => {
     const myStyles = {
         control: (styles, state) => ({
             ...styles,
@@ -45,17 +45,22 @@ const MySelect = ({ options, isLoading, value, onChange }) => {
             ':hover': {
                 color: 'var(--red)',
             }
+        }),
+        singleValue: (styles, state) => ({
+            ...styles,
+            color: 'white',
         })
     };
 
     return (
         <Select
             options={options}
-            isMulti
+            isMulti={isMulti}
             isLoading={isLoading}
             closeMenuOnSelect={false}
             value={value}
             onChange={onChange}
+            isDisabled={isDisabled}
             styles={myStyles}
         />
     );

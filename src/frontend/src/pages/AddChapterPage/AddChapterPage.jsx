@@ -18,7 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 const AddChapterPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState('Loading');
     const [showNoti, setShowNoti] = useState(false);
     const [notiDetails, setNotiDetails] = useState({
@@ -120,6 +120,13 @@ const AddChapterPage = () => {
         setLoading(true);
 
         const mangaResponse = await getMangaByID(id);
+
+        const me = await getMe();
+        if (!me || (me && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== me._id)) {
+            navigate('/401');
+            return;
+        }
+
         if (mangaResponse.status !== 200) {
             // display error
             setNotiDetails({
@@ -129,19 +136,6 @@ const AddChapterPage = () => {
             });
             setShowNoti(true);
             setLoading(false);
-            return;
-        }
-
-        const me = await getMe();
-        if (!me || (me && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== me._id)) {
-            setNotiDetails({
-                success: false,
-                message: 'You are not authorized',
-                details: 'Only the uploader or admin can edit this, returning to home in 5 seconds',
-            });
-            setShowNoti(true);
-            setLoading(false);
-            setTimeout(() => navigate('/'), 5000);
             return;
         }
 
@@ -188,7 +182,8 @@ const AddChapterPage = () => {
 
         const response = await uploadChapter(id, formData);
         if (response.status === 200) {
-            navigate(`/mangas/${id}/chapters/${chapter.number}`);
+            freeImage();
+            navigate(`/mangas/${id}/chapters/edit`);
         }
         else {
             setNotiDetails({

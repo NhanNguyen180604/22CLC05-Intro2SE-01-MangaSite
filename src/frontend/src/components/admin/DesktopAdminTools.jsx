@@ -9,7 +9,7 @@ import {
 } from "react-icons/md";
 import { $adminPanel } from "../../stores/admin-tools.js";
 import ReportsPanel from "../reports/ReportsPanel.jsx";
-import AdminTab from "./AdminTab.jsx";
+import UserManagementPanel from "../UserManagementPanel";
 import EmptyAdminPanel from "./EmptyAdminPanel.jsx";
 
 export default function DesktopAdminTools() {
@@ -24,55 +24,81 @@ export default function DesktopAdminTools() {
 
       <div className="flex w-full flex-row items-start justify-center">
         <fieldset className="flex min-w-[13.5rem] shrink-0 flex-col gap-2">
-          <AdminTab
-            icon={<MdOutlineManageAccounts color="white" className="size-6" />}
-            label={"Manage Users"}
-            checked={selection == 0}
-            onClick={() => {
-              setSelection(0);
-              // Set $adminPanel to manage users panel.
-              $adminPanel.set(null);
-            }}
-          />
+          <label className="flex w-full cursor-pointer flex-row items-center gap-2 px-6 py-2 font-semibold opacity-50 duration-200 hover:opacity-100 has-[:checked]:opacity-100">
+            <MdOutlineManageAccounts color="white" className="size-6" />
+            <input
+              type="radio"
+              name="admin"
+              className="m-0 size-0 appearance-none p-0"
+              checked={selection == 0}
+              onChange={() => {
+                setSelection(0);
+                $adminPanel.set(<UserManagementPanel />);
+              }}
+            />
+            Manage Users
+          </label>
+
           {/* React-icons doesn't have folder_managed symbol from Material Design */}
-          <AdminTab
-            icon={<LuFolderCog color="white" className="size-6" />}
-            label={"Manage Publications"}
-            checked={selection == 1}
-            onClick={() => {
-              setSelection(1);
-              // Set $adminPanel to manage publications panel.
-              $adminPanel.set(null);
-            }}
-          />
-          <AdminTab
-            icon={<MdOutlineFlag color="white" className="size-6" />}
-            label={"Manage Reports"}
-            checked={selection == 2}
-            onClick={() => {
-              setSelection(2);
-              $adminPanel.set(<ReportsPanel />);
-            }}
-          />
-          <AdminTab
-            icon={<MdOutlineCategory color="white" className="size-6" />}
-            label={"Manage Categories"}
-            checked={selection == 3}
-            onClick={() => {
-              setSelection(3);
-              // Set $adminPanel to manage categories panel.
-              $adminPanel.set(null);
-            }}
-          />
-          <AdminTab
-            icon={<MdOutlineFace color="white" className="size-6" />}
-            label={"Manage Authors"}
-            checked={selection == 4}
-            onClick={() => {
-              setSelection(4);
-              $adminPanel.set(null);
-            }}
-          />
+          <label className="flex w-full cursor-pointer flex-row items-center gap-2 px-6 py-2 font-semibold opacity-50 duration-200 hover:opacity-100 has-[:checked]:opacity-100">
+            <LuFolderCog color="white" className="size-6" />
+            <input
+              type="radio"
+              name="admin"
+              className="m-0 size-0 appearance-none p-0"
+              checked={selection == 1}
+              onChange={() => {
+                setSelection(1);
+                $adminPanel.set(null);
+              }}
+            />
+            Manage Publications
+          </label>
+
+          <label className="flex w-full cursor-pointer flex-row items-center gap-2 px-6 py-2 font-semibold opacity-50 duration-200 hover:opacity-100 has-[:checked]:opacity-100">
+            <MdOutlineFlag color="white" className="size-6" />
+            <input
+              type="radio"
+              name="admin"
+              className="m-0 size-0 appearance-none p-0"
+              checked={selection == 2}
+              onChange={() => {
+                setSelection(2);
+                $adminPanel.set(<ReportsPanel />);
+              }}
+            />
+            Manage Reports
+          </label>
+
+          <label className="flex w-full cursor-pointer flex-row items-center gap-2 px-6 py-2 font-semibold opacity-50 duration-200 hover:opacity-100 has-[:checked]:opacity-100">
+            <MdOutlineCategory color="white" className="size-6" />
+            <input
+              type="radio"
+              name="admin"
+              className="m-0 size-0 appearance-none p-0"
+              checked={selection == 3}
+              onChange={() => {
+                setSelection(3);
+                $adminPanel.set(<ReportsPanel />);
+              }}
+            />
+            Manage Categories
+          </label>
+
+          <label className="flex w-full cursor-pointer flex-row items-center gap-2 px-6 py-2 font-semibold opacity-50 duration-200 hover:opacity-100 has-[:checked]:opacity-100">
+            <MdOutlineFace color="white" className="size-6" />
+            <input
+              type="radio"
+              name="admin"
+              className="m-0 size-0 appearance-none p-0"
+              checked={selection == 4}
+              onChange={() => {
+                setSelection(4);
+                $adminPanel.set(null);
+              }}
+            />
+            Manage Authors
+          </label>
         </fieldset>
 
         {adminPanel ? (

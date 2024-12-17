@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { getMangaByID, getChapterList } from "../../service/mangaService";
+import { getMangaByID, getChapterList, getReadingHistory } from "../../service/mangaService";
 import { getMe } from "../../service/userService.js"
 import { useParams } from "react-router-dom"
 import { FaGear } from "react-icons/fa6"
@@ -21,10 +21,17 @@ import RatingPopup from "../../components/RatingPopup"
 import LibraryPopup from "../../components/LibraryPopup"
 import ReportPopup from "../../components/ReportPopup"
 import CommentPopup from "../../components/CommentPopup"
+import NotiPopup from "../../components/NotiPopup"
 
 const MangaPage = () => {
 	const { id } = useParams();
 	const [loading, setLoading] = useState(true);
+	const [showNoti, setShowNoti] = useState(false);
+	const [notiDetails, setNotiDetails] = useState({
+		success: false,
+		message: '',
+		details: '',
+	});
 
 	const [me, setMe] = useState({
 		avatar: '',
@@ -47,32 +54,61 @@ const MangaPage = () => {
 		uploader: null,
 	});
 	const [firstChapter, setFirstChapter] = useState(-1);
+	const [history, setHistory] = useState({
+		_id: '',
+		user: '',
+		chapters: [],
+	});
 
 	const navigate = useNavigate();
 
-	useEffect(() => {
+	const fetchData = async () => {
 		setLoading(true);
-		const fetchData = async () => {
-			const response = await getMangaByID(id);
-			if (response.status === 200) {
-				setManga(response.manga);
 
-				const chapterResponse = await getChapterList(id, 1, 1);
-				if (chapterResponse.status === 200 && chapterResponse.chaptersInfo.chapters.length) {
-					setFirstChapter(chapterResponse.chaptersInfo.chapters[0].number);
+		const getMeResponse = await getMe();
+		if (getMeResponse)
+			setMe(getMeResponse);
+
+		const response = await getMangaByID(id);
+
+		if (response.status === 200) {
+			setManga(response.manga);
+
+			const chapterListResponse = await getChapterList(id, 1, 1, true);
+			let tempChapterList = chapterListResponse.chaptersInfo.chapters;
+			if (chapterListResponse.status === 200 && tempChapterList.length) {
+				setFirstChapter(tempChapterList[0].number);
+			}
+
+			if (getMeResponse) {
+				const historyResponse = await getReadingHistory(id);
+				if (historyResponse.status === 200 && historyResponse.history) {
+					const fetchedHistory = historyResponse.history;
+					setHistory(fetchedHistory);
+					if (fetchedHistory.chapters.length) {
+						const tempChapter = tempChapterList.find(element => element._id === fetchedHistory.chapters[fetchedHistory.chapters.length - 1]);
+						if (tempChapter)
+							setFirstChapter(tempChapter.number);
+					}
 				}
 			}
-			else {
-				console.log(response.message);
-			}
-
-			const getMeResponse = await getMe();
-			if (getMeResponse)
-				setMe(getMeResponse);
-
-			setLoading(false);
+		}
+		else if (response.status === 404) {
+			navigate('/404');
+		}
+		else {
+			setNotiDetails({
+				success: false,
+				message: "Something went wrong, please try again",
+				details: response.message,
+			});
+			setShowNoti(true);
 		}
 
+		setLoading(false);
+	}
+
+	useEffect(() => {
 		fetchData()
 	}, []);
 
@@ -111,7 +147,7 @@ const MangaPage = () => {
 							) : (
 								<span className={styles.disabledBTN}><FaCommentSlash /></span>
 							)}
-							{manga.uploader?._id === me?._id &&
+							{(manga.uploader?._id === me?._id || me.accountType === 'admin') &&
 								<span
 									className={styles.editBTN}
 									onClick={() => navigate(`/mangas/${id}/edit`)}
@@ -141,7 +177,7 @@ const MangaPage = () => {
 							className={styles.startReadingBTN}
 							disabled={firstChapter === -1}
 						>
-							Start Reading
+							{history.chapters.length ? `Continue at chapter #${firstChapter}` : 'Start Reading'}
 						</button>
 					</LeftColumnContainer>
 
@@ -162,7 +198,7 @@ const MangaPage = () => {
 
 						<Tab>
 							<TabPanel title='Chapters'>
-								<ChapterList mangaID={id} />
+								<ChapterList mangaID={id} history={history} />
 							</TabPanel>
 							<TabPanel title='Art'>
 								<CoverGallery id={id} />
@@ -213,7 +249,7 @@ const Details = ({ manga, mobile = false }) => {
 }
 
 const MangaPageLoading = () => {
-	return <div>Loading</div>
+	return <div className={styles.loadingContainer}>Loading</div>
 }
 
 export default MangaPage

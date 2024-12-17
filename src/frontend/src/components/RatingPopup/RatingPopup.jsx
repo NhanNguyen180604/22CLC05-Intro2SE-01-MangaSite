@@ -16,7 +16,7 @@ const RatingPopup = ({ loggedIn, mangaID }) => {
     const [ratings, setRatings] = useState([]);
     const ratingTerms = ['Bad', 'Ok', 'Mid', 'Good', 'Peak'];
     const [currentTerm, setCurrentTerm] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState('');
     const [myRating, setMyRating] = useState(0);   // previous rating on this manga
 
@@ -36,7 +36,7 @@ const RatingPopup = ({ loggedIn, mangaID }) => {
             setShowThis(false);
             setShowNoti(true);
         }
-        else{
+        else {
             setShowThis(true);
             await fetchMyRating();
         }
@@ -62,7 +62,8 @@ const RatingPopup = ({ loggedIn, mangaID }) => {
         setLoading(true);
         setLoadingMessage('Loading');
         await fetchRatings();
-        await fetchMyRating();
+        if (loggedIn)
+            await fetchMyRating();
         setCurrentTerm(ratingTerms[currentRating - 1]);
         setLoading(false);
     }

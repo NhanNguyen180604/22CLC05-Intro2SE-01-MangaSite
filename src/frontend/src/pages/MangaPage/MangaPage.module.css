@@ -1,3 +1,10 @@
+.loadingContainer{
+	font-size: 2rem;
+	font-weight: bold;
+	margin-top: 3rem;
+	text-align: center;
+}
+
 .mobileDisplay{
 	display: none;
 	width: 100%;

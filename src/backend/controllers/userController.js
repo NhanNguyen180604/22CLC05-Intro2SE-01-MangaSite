@@ -41,17 +41,17 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const updateUserById = asyncHandler(async (req, res) => {
-    const {_id} = await User.findById(req.user.id);
-    if(!_id){
+    const { _id } = await User.findById(req.user.id);
+    if (!_id) {
         res.status(400);
         throw new Error('You are not logged in');
     }
-    if(!req.body.email && !req.body.name){
-      res.status(401);
-      throw new Error('No email or name');  
+    if (!req.body.email && !req.body.name) {
+        res.status(401);
+        throw new Error('No email or name');
     }
     const userUpdate = await User.findByIdAndUpdate(req.user.id, req.body, { new: true });
-    if(!userUpdate){
+    if (!userUpdate) {
         res.status(402);
         throw new Error('Cannot update user');
     }
@@ -69,7 +69,23 @@ const changeUserRole = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error('Wrong user id');
     }
+
+    if (user.accountType === 'admin') {
+        res.status(405);
+        throw new Error("Not allowed");
+    }
     const userUpdate = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('email name accountType');
+
+    if (req.body.accountType === 'approved') {
+        await Approval.deleteOne({ user: user._id });
+    }
+
+    const userNoti = await UserNoti.create({
+        user: user._id,
+        message: req.body.accountType === 'approved' ? 'You have become an approved user' : 'You are no longer an approved user',
+        read: false,
+        createdAt: new Date(),
+    });
     res.json(userUpdate);
 });
 
@@ -126,12 +142,35 @@ const requestApproval = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error('You are not logged in');
     }
+
+    if (req.user.accountType === 'approved') {
+        res.status(400);
+        throw new Error("You are already an approved user");
+    }
+
+    const approvalExist = await Approval.findOne({ user: _id });
+    if (approvalExist) {
+        res.status(400);
+        throw new Error("Your request form is waiting to be processed");
+    }
+
     const approval = await Approval.create({
         user: _id,
         reason: req.body.reason,
         createdAt: new Date()
     });
     res.json(approval);
+});
+
+const getApprovalRequests = asyncHandler(async (req, res) => {
+    const accountType = req.user.accountType;
+    if (accountType !== "admin") {
+        res.status(401);
+        throw new Error("Permission denied");
+    }
+
+    const approvalRequests = await Approval.find();
+    res.json(approvalRequests);
 });
 
 const getLibrary = asyncHandler(async (req, res) => {
@@ -224,9 +263,9 @@ const getBlacklist = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error("You are not logged in");
     }
-    const realblacklist = await blacklist.populate([{path: 'authors', model: 'Author'}
-                                                   ,{path: 'categories', model: 'Category'}]);
-                                
+    const realblacklist = await blacklist.populate([{ path: 'authors', model: 'Author' }
+        , { path: 'categories', model: 'Category' }]);
+
     res.json(realblacklist);
 });
 
@@ -263,6 +302,13 @@ const banUser = asyncHandler(async (req, res) => {
         reason: reason || 'unknow',
     });
 
+    const userNoti = await UserNoti.create({
+        user: id,
+        message: "You are banned, reason: " + reason,
+        read: false,
+        createdAt: new Date(),
+    });
+
     res.json(banUser);
 });
 
@@ -283,6 +329,17 @@ const unbanUser = asyncHandler(async (req, res) => {
     await banUserExists.deleteOne();
 
     res.json({ message: "success" });
+});
+
+const getBannedUser = asyncHandler(async (req, res) => {
+    const accountType = req.user.accountType
+    if (accountType !== "admin") {
+        res.status(401);
+        throw new Error("Permission denied")
+    }
+
+    const bannedUsers = await BanList.find();
+    res.status(200).json(bannedUsers);
 });
 
 const notifyUser = asyncHandler(async (req, res) => {
@@ -311,7 +368,7 @@ const getUserNoti = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    const {avatar}  = req.files;
+    const { avatar } = req.files;
     const user = await User.findById(req.user.id);
     if (!user) {
         res.status(401);
@@ -325,7 +382,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         await cloudinaryWrapper.deleteResources(user.avatar.publicID);
     }
     const [publicID, url] = await cloudinaryWrapper.uploadSingleImage(avatar.data, `avatar/${req.user.id}`);
-    if(!publicID || !url){
+    if (!publicID || !url) {
         res.status(402);
         throw new Error("Failed to upload image to cloudinary");
     }
@@ -369,6 +426,7 @@ module.exports = {
     registerUser,
     loginUser,
     requestApproval,
+    getApprovalRequests,
     changeUserRole,
     getLibrary,
     updateLibrary,
@@ -378,6 +436,7 @@ module.exports = {
     updateBlacklist,
     banUser,
     unbanUser,
+    getBannedUser,
     notifyUser,
     getUserNoti,
     updateUserAvatar,

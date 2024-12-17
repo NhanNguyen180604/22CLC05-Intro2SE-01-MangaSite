@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import { FaXmark } from "react-icons/fa6";
 import { getMe } from "../../service/userService.js";
 import { postComment } from "../../service/mangaService.js";
+import { sendReport } from "../../service/reportService.js";
 
 const CommentPopup = ({ loggedIn }) => {
     const [showThis, setShowThis] = useState(false);
@@ -29,7 +30,7 @@ const CommentPopup = ({ loggedIn }) => {
             setShowThis(false);
             setShowNoti(true);
         }
-        else{
+        else {
             setShowThis(true);
             await fetchData(perPage);
         }
@@ -51,7 +52,6 @@ const CommentPopup = ({ loggedIn }) => {
     const [totalPages, setTotalPages] = useState(1);
     const perPageInc = 10;
     const [perPage, setPerPage] = useState(perPageInc);
-    const [firstTime, setFirstTime] = useState(true);
 
     const [isInputFilled, setIsInputFilled] = useState(false);
     const [commentInput, setCommentInput] = useState('');
@@ -82,7 +82,7 @@ const CommentPopup = ({ loggedIn }) => {
     }
 
     // load the next comment page
-    const loadMore = async (event) => {
+    const loadMore = (event) => {
         event.preventDefault();
         setPage(prev => prev + 1);
         setPerPage(prev => prev + perPageInc);
@@ -92,10 +92,7 @@ const CommentPopup = ({ loggedIn }) => {
         const response = !chapterNumber ? await getMangaComments(id, 1, per_page) : await getChapterComments(id, chapterNumber, 1, per_page);
 
         if (response.status === 200) {
-            if (firstTime) {
-                setTotalPages(response.comments.total_pages);
-                setFirstTime(false);
-            }
+            setTotalPages(response.comments.total_pages);
 
             const fetchedComments = response.comments.comments;
             // group reply comments
@@ -123,7 +120,9 @@ const CommentPopup = ({ loggedIn }) => {
                 setMe(getMeResponse);
             }
         }
-        initialize();
+
+        if (loggedIn)
+            initialize();
     }, []);
 
     useEffect(() => {
@@ -223,7 +222,7 @@ const CommentPopup = ({ loggedIn }) => {
                                 <button onClick={(e) => { e.preventDefault(); resetReplying(); }}><FaXmark /></button>
                             </div>
                             <div className={styles.commentInput}>
-                                <img src={me.avatar?.url} className={styles.userAvatar} />
+                                <img src={me.avatar?.url || 'https://placehold.co/50x50?text=User+Avatar'} className={styles.userAvatar} />
                                 <input
                                     type='text'
                                     placeholder="Comment..."
@@ -256,16 +255,24 @@ const CommentPopup = ({ loggedIn }) => {
 export default CommentPopup
 
 const CommentContainer = ({ commentObj, setReplying, isReply = false }) => {
+    const [show, setShow] = useState(false);
+
     const formatDate = (date) => {
         const localDate = new Date(date);
         return localDate.toLocaleString();
     };
 
+    const submitReport = async (reason) => {
+        setShow(false);
+        const response = await sendReport('comment', commentObj._id, reason);
+        console.log(response);
+    }
+
     return (
         <div className={styles.commentWrapper}>
             <div className={`${styles.commentContainer} ${isReply && styles.replyContainer}`}>
                 <div className={styles.userInfo}>
-                    <img src={commentObj.user.avatar?.url} className={styles.userAvatar} />
+                    <img src={commentObj.user.avatar?.url || 'https://placehold.co/50x50?text=User+Avatar'} className={styles.userAvatar} />
                     <span>{commentObj.user.name}</span>
                 </div>
                 <div>{commentObj.content}</div>
@@ -285,9 +292,22 @@ const CommentContainer = ({ commentObj, setReplying, isReply = false }) => {
                 >
                     Reply
                 </button>}
-                <button onClick={(e) => {
-                    e.preventDefault();
-                }}>Report</button>
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setShow(!show);
+                    }}
+                >
+                    Report
+                </button>
+
+                {show && (
+                    <div className={styles.reportReasons}>
+                        <div onClick={() => submitReport('Hate speech')}>Hate speech</div>
+                        <div onClick={() => submitReport('Hate speech')}>Harassment</div>
+                        <div onClick={() => submitReport('Hate speech')}>Spam</div>
+                    </div>
+                )}
             </div>
         </div>
     );

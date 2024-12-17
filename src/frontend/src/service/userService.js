@@ -5,8 +5,7 @@
  */
 import axios from "axios";
 import { $token } from "../stores/auth.js";
-import { API_URL } from "./service.js";
-import { waitFor } from "@testing-library/react";
+import { API_URL, getErrorMessage } from "./service.js";
 const API = API_URL + '/users/';
 
 // get mangas
@@ -38,7 +37,7 @@ export const postRegister = async (email, username, password) => {
 };
 
 export async function getMe() {
-  const token = $token.get();
+    const token = $token.get();
     if (!token)
         return null;
     const res = await fetch(API + "me", {
@@ -52,11 +51,11 @@ export async function getMe() {
     return await res.json();
 }
 
-export async function putMe(email, name){
+export async function putMe(email, name) {
     const token = localStorage.getItem('token');
     if (!token)
         return null;
-    const res = await axios.put(API + "me", 
+    const res = await axios.put(API + "me",
         {
             email,
             name
@@ -76,7 +75,7 @@ export const changeAvatar = async (avatar) => {
     const token = localStorage.getItem('token');
     if (!token)
         return null;
-    const res = await axios.put(API + "avatar", 
+    const res = await axios.put(API + "avatar",
         avatar,
         {
             headers: {
@@ -92,7 +91,7 @@ export const getBlacklist = async () => {
     const token = localStorage.getItem('token');
     if (!token)
         return null;
-    const res = await axios.get(API + "blacklist", 
+    const res = await axios.get(API + "blacklist",
         {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -108,7 +107,7 @@ export const putBlacklist = async (blacklist) => {
     if (!token)
         return null;
     const res = await axios.put(API + "blacklist",
-        {blacklist}, 
+        { blacklist },
         {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -186,22 +185,8 @@ export const deleteFromLibrary = async (mangaID, tab) => {
     }
 };
 
-export const getErrorMessage = (error) => {
-    if (error.response) {
-        return {
-            status: error.response.status,
-            message: error.response.data.message
-        }
-    }
-
-    return {
-        status: 500,
-        message: "Something went wrong, and we have no idea"
-    }
-}
-
 export async function getUserNotifications() {
-  const token = $token.get();
+    const token = $token.get();
     if (!token)
         return null;
     const res = await fetch(API + "notifications", {
@@ -228,3 +213,126 @@ export async function readUserNoti(id) {
     if (res.status == 401) return null;
     return await res.json();
 }
+
+export const getAllUsers = async () => {
+    const token = $token.get();
+    if (!token)
+        return null;
+
+    const res = await axios.get(API, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (res.status !== 200) return null;
+    return res.data;
+};
+
+export const changeUserRole = async (userID, role) => {
+    const token = $token.get();
+    if (!token)
+        return {
+            status: 401,
+            message: 'You have no token!',
+        };
+
+    const data = {
+        accountType: role,
+    };
+
+    try {
+        const response = await axios.put(API + userID, data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return { status: response.status, data: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const banUser = async (userID, reason) => {
+    const token = $token.get();
+    if (!token)
+        return {
+            status: 401,
+            message: 'You have no token!',
+        };
+
+    try {
+        const body = {
+            id: userID,
+            reason: reason,
+        };
+
+        const response = await axios.post(API + 'ban', body, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return { status: response.status, data: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+}
+
+export const unbanUser = async (userID) => {
+    const token = $token.get();
+    if (!token)
+        return {
+            status: 401,
+            message: 'You have no token!',
+        };
+
+    try {
+        const response = await axios.delete(API + 'ban', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            data: {
+                id: userID,
+            }
+        });
+
+        return { status: response.status, data: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+}
+
+export const getBannedUsers = async () => {
+    const token = $token.get();
+    if (!token)
+        return null;
+
+    const response = await axios.get(API + 'ban', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (response.status !== 200) return null;
+    return response.data;
+};
+
+export const getApprovalRequests = async () => {
+    const token = $token.get();
+    if (!token)
+        return null;
+
+    const response = await axios.get(API + 'approval', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (response.status !== 200) return null;
+    return response.data;
+};

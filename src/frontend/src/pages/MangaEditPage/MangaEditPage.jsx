@@ -1,7 +1,7 @@
 import styles from "./MangaEditPage.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getMangaByID, updateMangaInfo, getCovers, getDefaultCover, deleteCover } from "../../service/mangaService";
+import { getMangaByID, updateMangaInfo, deleteManga, getCovers, getDefaultCover, deleteCover } from "../../service/mangaService.js";
 import { getMe } from "../../service/userService.js"
 import { getAllAuthors, postNewAuthor } from "../../service/authorService.js";
 import { getAllCategories } from "../../service/categoryService.js";
@@ -19,8 +19,14 @@ import CoverUploadPopup from "../../components/CoverUploadPopup";
 import MySelect from "../../components/MySelect";
 
 const MangaEditPage = () => {
+    const [me, setMe] = useState({
+        name: '',
+        email: '',
+        accountType: '',
+    });
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
+    const [loadingMessage, setLoadingMessage] = useState('Loading');
     const [showNoti, setShowNoti] = useState(false);
     const [notiDetails, setNotiDetails] = useState({
         success: false,
@@ -153,7 +159,7 @@ const MangaEditPage = () => {
 
     const authorsRef = useRef([]);
     const categoriesRef = useRef([]);
-    const [newAuthor, setNewAuthor] = useState('');  // for posting new autho
+    const [newAuthor, setNewAuthor] = useState('');  // for posting new author
     const handleTextInput = (e) => {
         const { value } = e.target;
         setNewAuthor(value);
@@ -215,16 +221,19 @@ const MangaEditPage = () => {
             return;
         }
 
-        const me = await getMe();
-        if (!me || (me.accountType !== 'admin' && (me && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== me._id))) {
-            setNotiDetails({
-                success: false,
-                message: 'You are not authorized',
-                details: 'Only the uploader or admin can edit this, returning to home in 5 seconds',
-            });
-            setShowNoti(true);
-            setLoading(false);
-            setTimeout(() => navigate('/'), 5000);
+        const meResponse = await getMe();
+        if (meResponse) {
+            setMe(meResponse);
+        }
+
+        if (
+            !meResponse ||
+            (
+                meResponse.accountType !== 'admin' &&
+                (meResponse && mangaResponse.status === 200 && mangaResponse.manga.uploader._id !== meResponse._id)
+            )
+        ) {
+            navigate('/401');
             return;
         }
 
@@ -273,6 +282,8 @@ const MangaEditPage = () => {
 
     const submit = async (e) => {
         e.preventDefault();
+        setLoadingMessage("Updating manga's information");
+        setLoading(true);
         const response = await updateMangaInfo(id, updatedManga);
         if (response.status === 200) {
             navigate(`/mangas/${id}`);
@@ -284,11 +295,33 @@ const MangaEditPage = () => {
                 details: response.message,
             });
             setShowNoti(true);
+            setLoading(false);
         }
     };
 
     const canSave = () => {
         return updatedManga.name.length && updatedManga.authors.length && updatedManga.categories.length;
+    };
+
+    // real shiet
+    const deleteMangaWrapper = async (e) => {
+        e.preventDefault();
+        setLoadingMessage("Deleting the manga");
+        setLoading(true);
+        const response = await deleteManga(id);
+        console.log(response);
+        if (response.status === 200) {
+            navigate('/');
+        }
+        else {
+            setNotiDetails({
+                success: false,
+                message: 'Failed to delete the manga',
+                details: response.message,
+            });
+            setShowNoti(true);
+            setLoading(false);
+        }
     };
 
     return (
@@ -300,17 +333,19 @@ const MangaEditPage = () => {
                 </div>
             </header>
 
-            {loading ? <div>Loading</div> :
+            {loading ? <div className={styles.loadingContainer}>{loadingMessage}</div> :
                 <MangaPageLayout tag='form'>
                     <LeftColumnContainer>
                         <img src={updatedManga.cover} className={styles.coverImg} />
 
                         <ActionBTNs
+                            me={me}
                             reset={reset}
                             submit={submit}
                             mangaID={id}
                             navigate={navigate}
                             canSave={canSave}
+                            deleteMangaWrapper={deleteMangaWrapper}
                         />
                     </LeftColumnContainer>
                     <RightColumnContainer>
@@ -322,6 +357,7 @@ const MangaEditPage = () => {
                                         value={updatedManga.name}
                                         onChange={(e) => handleTextareaChange(e, 'name')}
                                         onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                                        disabled={me.accountType === 'admin'}
                                     ></textarea>
                                     {showNameWarning && <div className={styles.failMsg}>Manga's title cannot be empty</div>}
                                 </section>
@@ -338,36 +374,44 @@ const MangaEditPage = () => {
                                                 value: author._id,
                                             };
                                         })}
+                                        isDisabled={me.accountType === 'admin'}
                                     />
                                     {showAuthorWarning && <div className={styles.failMsg}>Must select at least 1 author</div>}
                                 </section>
 
-                                <section className={styles.mySection}>
-                                    <h1>Not finding your author? Post a new one</h1>
-                                    <div className={styles.newAuthorInput}>
-                                        <input
-                                            type='text'
-                                            onChange={handleTextInput}
-                                        />
-                                        <button
-                                            onClick={submitNewAuthor}
-                                            disabled={!newAuthor.length}
-                                        >
-                                            Post
-                                        </button>
-                                    </div>
-                                    {authorPostingResult.length > 0 &&
-                                        <div
-                                            className={addAuthorSuccess ? styles.successMsg : styles.failMsg}
-                                        >
-                                            {authorPostingResult}
+                                {me.accountType !== 'admin' && (
+                                    <section className={styles.mySection}>
+                                        <h1>Not finding your author? Post a new one</h1>
+                                        <div className={styles.newAuthorInput}>
+                                            <input
+                                                type='text'
+                                                onChange={handleTextInput}
+                                                disabled={me.accountType === 'admin'}
+                                            />
+                                            <button
+                                                onClick={submitNewAuthor}
+                                                disabled={!newAuthor.length}
+                                            >
+                                                Post
+                                            </button>
                                         </div>
-                                    }
-                                </section>
+                                        {authorPostingResult.length > 0 &&
+                                            <div
+                                                className={addAuthorSuccess ? styles.successMsg : styles.failMsg}
+                                            >
+                                                {authorPostingResult}
+                                            </div>
+                                        }
+                                    </section>
+                                )}
 
                                 <section className={styles.mySection}>
                                     <h1>Synopsis</h1>
-                                    <textarea value={updatedManga.description} onChange={(e) => handleTextareaChange(e, 'description')}></textarea>
+                                    <textarea
+                                        value={updatedManga.description}
+                                        onChange={(e) => handleTextareaChange(e, 'description')}
+                                        disabled={me.accountType === 'admin'}
+                                    ></textarea>
                                 </section>
 
                                 <section className={styles.mySection}>
@@ -382,56 +426,99 @@ const MangaEditPage = () => {
                                             };
                                         })}
                                         isLoading={loading}
+                                        isDisabled={me.accountType === 'admin'}
                                     />
                                     {showCateWarning && <div className={styles.failMsg}>Must select at least 1 tag</div>}
                                 </section>
 
+                                <section className={styles.mySection}>
+                                    <h1>Status</h1>
+                                    <MySelect
+                                        isMulti={false}
+                                        onChange={(value) => setUpdatedManga({
+                                            ...updatedManga,
+                                            status: value.value,
+                                        })}
+                                        options={[
+                                            {
+                                                label: 'Completed', value: 'Completed'
+                                            },
+                                            {
+                                                label: 'In progress', value: 'In progress'
+                                            },
+                                            {
+                                                label: 'Suspended', value: 'Suspended'
+                                            },
+                                        ]}
+                                        isLoading={loading}
+                                        value={{ label: updatedManga.status, value: updatedManga.status }}
+                                        isDisabled={me.accountType === 'admin'}
+                                    />
+                                </section>
+
                                 <label className={styles.formControl}>
-                                    <input type='checkbox' name='canComment' checked={updatedManga.canComment} onChange={handleCheckboxChange} />
+                                    <input
+                                        type='checkbox'
+                                        name='canComment'
+                                        checked={updatedManga.canComment}
+                                        onChange={handleCheckboxChange}
+                                        disabled={me.accountType === 'admin'}
+                                    />
                                     Allow Comments
                                 </label>
                             </TabPanel>
 
                             <TabPanel title="Art">
-                                <div className={styles.coverListContainer}>
-                                    {covers.map(cover => (
-                                        <div key={cover._id} className={styles.coverContainer}>
-                                            <img src={cover.imageURL} className={styles.smolCover} />
-                                            <div>#{cover.number}</div>
-                                            <div className={styles.coverBTNs}>
-                                                <div
-                                                    onClick={() => setUpdatedManga({
-                                                        ...updatedManga,
-                                                        cover: cover.imageURL,
-                                                    })}
-                                                >
-                                                    Set as thumbnail
-                                                </div>
-                                                <div
-                                                    onClick={() => setDelCoverNum(cover.number)}
-                                                >
-                                                    Remove
-                                                </div>
+                                {covers.length ? (
+                                    <div className={styles.coverListContainer}>
+                                        {covers.map(cover => (
+                                            <div key={cover._id} className={styles.coverContainer}>
+                                                <img src={cover.imageURL} className={styles.smolCover} />
+                                                <div>#{cover.number}</div>
+                                                {me.accountType !== 'admin' && (
+                                                    <div className={styles.coverBTNs}>
+                                                        <div
+                                                            onClick={() => setUpdatedManga({
+                                                                ...updatedManga,
+                                                                cover: cover.imageURL,
+                                                            })}
+                                                        >
+                                                            Set as thumbnail
+                                                        </div>
+                                                        <div
+                                                            onClick={() => setDelCoverNum(cover.number)}
+                                                        >
+                                                            Remove
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                        </div>
-                                    ))}
-                                    <div
-                                        className={styles.coverPlaceholder}
-                                        onClick={() => setShowCoverUploadPopup(true)}
-                                    >
-                                        <FaPlus />
+                                        ))}
+                                        {me.accountType !== 'admin' && (
+                                            <div
+                                                className={styles.coverPlaceholder}
+                                                onClick={() => setShowCoverUploadPopup(true)}
+                                            >
+                                                <FaPlus />
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
+                                ) : (
+                                    <div>No art</div>
+                                )}
+
                             </TabPanel>
                         </Tab>
 
                         <ActionBTNs
+                            me={me}
                             reset={reset}
                             submit={submit}
                             myClassName="mobileDisplay"
                             mangaID={id}
                             navigate={navigate}
                             canSave={canSave}
+                            deleteMangaWrapper={deleteMangaWrapper}
                         />
                     </RightColumnContainer>
 
@@ -443,17 +530,19 @@ const MangaEditPage = () => {
                         loading={popupLoading}
                     />
 
-                    <CoverUploadPopup
-                        open={showCoverUploadPopup}
-                        setShowThis={setShowCoverUploadPopup}
-                        loading={popupLoading}
-                        setLoading={setPopupLoading}
-                        mangaID={id}
-                        covers={covers}
-                        setCovers={setCovers}
-                        setNotiDetails={setNotiDetails}
-                        setShowNoti={setShowNoti}
-                    />
+                    {me.accountType !== 'admin' && (
+                        <CoverUploadPopup
+                            open={showCoverUploadPopup}
+                            setShowThis={setShowCoverUploadPopup}
+                            loading={popupLoading}
+                            setLoading={setPopupLoading}
+                            mangaID={id}
+                            covers={covers}
+                            setCovers={setCovers}
+                            setNotiDetails={setNotiDetails}
+                            setShowNoti={setShowNoti}
+                        />
+                    )}
 
                     <NotiPopup
                         open={showNoti}
@@ -470,16 +559,18 @@ const MangaEditPage = () => {
 }
 export default MangaEditPage;
 
-const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', navigate, mangaID, canSave }) => {
+const ActionBTNs = ({ me, reset, submit, myClassName = 'desktopDisplay', navigate, mangaID, canSave, deleteMangaWrapper }) => {
     return (
         <div className={`${styles.actionBTNs} ${styles[myClassName]}`}>
-            <button
-                className={styles.blueBTN}
-                onClick={(e) => submit(e)}
-                disabled={!canSave()}
-            >
-                Save changes
-            </button>
+            {me.accountType !== 'admin' && (
+                <button
+                    className={styles.blueBTN}
+                    onClick={(e) => submit(e)}
+                    disabled={!canSave()}
+                >
+                    Save changes
+                </button>
+            )}
 
             <button
                 className={styles.blueBTN}
@@ -491,11 +582,16 @@ const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', navigate, m
                 Go to Chapters
             </button>
 
-            <button className={styles.discardBTN} onClick={reset}>
-                Discard changes
-            </button>
+            {me.accountType !== 'admin' && (
+                <button className={styles.discardBTN} onClick={reset}>
+                    Discard changes
+                </button>
+            )}
 
-            <button className={styles.deleteBTN}>
+            <button
+                className={styles.deleteBTN}
+                onClick={deleteMangaWrapper}
+            >
                 Delete this manga
             </button>
         </div>

@@ -35,6 +35,12 @@ describe("category controller", () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it("returns 200 if get all", async () => {
+    const res = await supertest(app).get("/api/categories").query({ all: true }).send();
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveLength(7);
+  });
+
   it("returns 200 if get categories correctly", async () => {
     const res = await supertest(app).get("/api/categories").send();
     expect(res.statusCode).toBe(200);
