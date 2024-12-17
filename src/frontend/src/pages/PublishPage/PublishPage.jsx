@@ -18,9 +18,8 @@ const PublishPage = () => {
     });
     const [mangas, setMangas] = useState([]);
     const [page, setPage] = useState(1);
+    const perPage = 2;
     const [totalPages, setTotalPages] = useState(1);
-    const perPageInc = 2;
-    const [perPage, setPerPage] = useState(perPageInc);
     const [loading, setLoading] = useState(true);
 
     const [showNoti, setShowNoti] = useState(false);
@@ -30,12 +29,12 @@ const PublishPage = () => {
         details: '',
     });
 
-    const fetchData = async (per_page = 20) => {
+    const fetchData = async (local_page = 1, per_page = 20) => {
         const fetchManga = async (me) => {
-            const mangaResponse = await getMangaByUploader(me._id, 1, per_page);
+            const mangaResponse = await getMangaByUploader(me._id, local_page, per_page);
             if (mangaResponse.status === 200) {
                 setTotalPages(mangaResponse.mangas.total_pages);
-                setMangas(mangaResponse.mangas.mangas);
+                setMangas([...mangas, ...mangaResponse.mangas.mangas]);
             }
             else {
                 setNotiDetails({
@@ -74,7 +73,7 @@ const PublishPage = () => {
     };
 
     useEffect(() => {
-        fetchData(perPage);
+        fetchData(page, perPage);
     }, [page]);
 
     const loadMore = () => {
@@ -82,7 +81,6 @@ const PublishPage = () => {
             return;
 
         setPage(prev => prev + 1);
-        setPerPage(prev => prev + perPageInc);
     };
 
     return (
@@ -115,7 +113,7 @@ const PublishPage = () => {
                             ))}
                         </div>
 
-                        {page < totalPages + 1 && (
+                        {page < totalPages && (
                             <div className={styles.loadMoreBTNContainer}>
                                 <button onClick={loadMore}>Load more</button>
                             </div>

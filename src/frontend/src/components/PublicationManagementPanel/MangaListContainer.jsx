@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { secondSearch } from "../../service/searchService.js";
 import { deleteManga } from "../../service/mangaService.js";
 import MangaNode from "./MangaNode.jsx";
+import NotiPopup from "../NotiPopup";
 
 const MangaListContainer = ({ search }) => {
     const [mangas, setMangas] = useState([]);
@@ -9,6 +10,12 @@ const MangaListContainer = ({ search }) => {
     const perPage = 2;
     const [totalPages, setTotalPages] = useState(100);
     const [loading, setLoading] = useState(true);
+    const [showNoti, setShowNoti] = useState(false);
+    const [notiDetails, setNotiDetails] = useState({
+        success: false,
+        message: '',
+        details: '',
+    });
 
     const fetchManga = async (type = 'append', page, perPage) => {
         const mangaResponse = await secondSearch(search, page, perPage);
@@ -43,7 +50,13 @@ const MangaListContainer = ({ search }) => {
     const deleteMangaWrapper = async (mangaID) => {
         const response = await deleteManga(mangaID);
         if (response.status !== 200) {
-
+            setNotiDetails({
+                success: false,
+                message: `Failed to delete manga`,
+                details: response.message,
+            });
+            setShowNoti(true);
+            return;
         }
 
         setMangas(mangas.filter(manga => manga._id !== mangaID));
@@ -66,7 +79,7 @@ const MangaListContainer = ({ search }) => {
             ) : (
                 <div className="grid grid-cols-1 gap-2 max-h-[33.5rem] overflow-y-auto">
                     {mangas.map(manga => (
-                        <MangaNode manga={manga} key={manga._id} deleteMangaWrapper={deleteMangaWrapper}/>
+                        <MangaNode manga={manga} key={manga._id} deleteMangaWrapper={deleteMangaWrapper} />
                     ))}
 
                     {page < totalPages && (
@@ -77,6 +90,15 @@ const MangaListContainer = ({ search }) => {
                             Show more
                         </button>
                     )}
+
+
+                    <NotiPopup
+                        open={showNoti}
+                        onClose={() => setShowNoti(false)}
+                        success={notiDetails.success}
+                        message={notiDetails.message}
+                        details={notiDetails.details}
+                    />
                 </div>
             )}
         </>

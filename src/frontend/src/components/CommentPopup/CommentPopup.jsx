@@ -32,7 +32,6 @@ const CommentPopup = ({ loggedIn }) => {
         }
         else {
             setShowThis(true);
-            await fetchData(perPage);
         }
     };
 
@@ -40,7 +39,9 @@ const CommentPopup = ({ loggedIn }) => {
 
     const [me, setMe] = useState({
         loggedIn: false,
-        avatar: '',
+        avatar: {
+            url: '',
+        },
         accountType: 'user',
         email: '',
         name: '',
@@ -49,9 +50,8 @@ const CommentPopup = ({ loggedIn }) => {
 
     const [comments, setComments] = useState([]);
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const perPageInc = 10;
-    const [perPage, setPerPage] = useState(perPageInc);
+    const [totalPages, setTotalPages] = useState(100);
+    const perPage = 10;
 
     const [isInputFilled, setIsInputFilled] = useState(false);
     const [commentInput, setCommentInput] = useState('');
@@ -84,12 +84,15 @@ const CommentPopup = ({ loggedIn }) => {
     // load the next comment page
     const loadMore = (event) => {
         event.preventDefault();
-        setPage(prev => prev + 1);
-        setPerPage(prev => prev + perPageInc);
+        if (page < totalPages)
+            setPage(prev => prev + 1);
     }
 
-    const fetchData = async (per_page = 20) => {
-        const response = !chapterNumber ? await getMangaComments(id, 1, per_page) : await getChapterComments(id, chapterNumber, 1, per_page);
+    const fetchData = async (local_page = 1, per_page = 20) => {
+        if (local_page === 0)
+            local_page = 1;  // idk why, someone finds this bug for me
+
+        const response = !chapterNumber ? await getMangaComments(id, local_page, per_page) : await getChapterComments(id, chapterNumber, local_page, per_page);
 
         if (response.status === 200) {
             setTotalPages(response.comments.total_pages);
@@ -105,11 +108,11 @@ const CommentPopup = ({ loggedIn }) => {
             });
 
             // sort by time
-            const newComments = nonReplyingComments.sort((a, b) => {
+            let newComments = nonReplyingComments.sort((a, b) => {
                 return (new Date(b.createdAt)).getTime() - (new Date(a.createdAt)).getTime()
             });
-
-            setComments(newComments);
+            newComments = newComments.filter(comment => !comments.some(currentComment => currentComment._id === comment._id));
+            setComments([...comments, ...newComments]);
         }
     };
 
@@ -121,12 +124,12 @@ const CommentPopup = ({ loggedIn }) => {
             }
         }
 
-        if (loggedIn)
+        if (loggedIn !== false)
             initialize();
     }, []);
 
     useEffect(() => {
-        fetchData(perPage);
+        fetchData(page, perPage);
     }, [page]);
 
     const onSubmit = async (e) => {
@@ -134,15 +137,34 @@ const CommentPopup = ({ loggedIn }) => {
 
         // API call here
         const response = await postComment(commentInput, id, chapterNumber, replying._id.length ? replying._id : null);
-
         // set result popup details based on api call result
         if (response.status === 200) {
-            setNotiDetails({
-                success: true,
-                message: "Successfully post comment!",
-                details: ``
-            });
-            await fetchData(perPage);
+            const newComment = response.comment;
+            newComment.user = me; // to get avatar
+
+            let newComments = [];
+
+            if (!replying._id.length) { // not a replying comment
+                newComments = [response.comment, ...comments];
+                setComments(newComments);
+            }
+            else {
+                newComments = comments.map(comment => {
+                    const newComment = { ...comment };
+                    if (comment.replies)
+                        newComment.replies = [...comment.replies];
+                    if (comment._id === response.comment.replyTo._id) {
+                        if (!newComment.replies)
+                            newComment.replies = [];
+                        newComment.replies?.push(response.comment);
+                    }
+                    return newComment;
+                });
+                setComments(newComments);
+            }
+
+            // prevent pagination from foaking up
+            setPage(Math.floor(newComments.length / perPage));
         }
         else {
             setNotiDetails({
@@ -265,14 +287,13 @@ const CommentContainer = ({ commentObj, setReplying, isReply = false }) => {
     const submitReport = async (reason) => {
         setShow(false);
         const response = await sendReport('comment', commentObj._id, reason);
-        console.log(response);
     }
 
     return (
         <div className={styles.commentWrapper}>
             <div className={`${styles.commentContainer} ${isReply && styles.replyContainer}`}>
                 <div className={styles.userInfo}>
-                    <img src={commentObj.user.avatar?.url || 'https://placehold.co/50x50?text=User+Avatar'} className={styles.userAvatar} />
+                    <img src={commentObj.user?.avatar?.url || 'https://placehold.co/50x50?text=User+Avatar'} className={styles.userAvatar} />
                     <span>{commentObj.user.name}</span>
                 </div>
                 <div>{commentObj.content}</div>
@@ -280,18 +301,18 @@ const CommentContainer = ({ commentObj, setReplying, isReply = false }) => {
             </div>
 
             <div className={styles.commentActionBTNs}>
-                {!commentObj.replyTo && <button
+                <button
                     onClick={(e) => {
                         e.preventDefault();
                         setReplying({
-                            _id: commentObj._id,
+                            _id: commentObj.replyTo ? commentObj.replyTo : commentObj._id,  // I'm a fraud
                             name: commentObj.user.name,
                             content: commentObj.content,
                         });
                     }}
                 >
                     Reply
-                </button>}
+                </button>
                 <button
                     onClick={(e) => {
                         e.preventDefault();
