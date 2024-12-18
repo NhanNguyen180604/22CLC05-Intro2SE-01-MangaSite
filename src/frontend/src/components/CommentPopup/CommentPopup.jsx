@@ -3,7 +3,7 @@ import NotiPopup from "../NotiPopup/NotiPopup.jsx";
 import "./CommentPopup.css";
 import styles from "./CommentPopup.module.css";
 import { FaComment } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getMangaComments, getChapterComments } from "../../service/mangaService.js";
 import { useParams } from "react-router-dom";
 import { FaXmark } from "react-icons/fa6";
@@ -50,6 +50,7 @@ const CommentPopup = ({ loggedIn }) => {
 
     const [comments, setComments] = useState([]);
     const [page, setPage] = useState(1);
+    const pageInc = useRef(0);
     const [totalPages, setTotalPages] = useState(100);
     const perPage = 10;
 
@@ -147,6 +148,7 @@ const CommentPopup = ({ loggedIn }) => {
             if (!replying._id.length) { // not a replying comment
                 newComments = [response.comment, ...comments];
                 setComments(newComments);
+                pageInc.current++;
             }
             else {
                 newComments = comments.map(comment => {
@@ -165,6 +167,10 @@ const CommentPopup = ({ loggedIn }) => {
 
             // prevent pagination from foaking up
             setPage(Math.floor(newComments.length / perPage));
+            if (pageInc.current === perPage) {
+                setTotalPages(prev => prev + 1);
+                pageInc.current = 0;
+            }
         }
         else {
             setNotiDetails({

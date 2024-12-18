@@ -2,7 +2,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { LuPencil } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
-const MangaNode = ({ manga, deleteMangaWrapper }) => {
+const MangaNode = ({ manga, showDeletePopup }) => {
     const navigate = useNavigate();
 
     return (
@@ -31,7 +31,7 @@ const MangaNode = ({ manga, deleteMangaWrapper }) => {
                         <LuPencil />
                     </button>
                     <button
-                        onClick={() => deleteMangaWrapper(manga._id)}
+                        onClick={() => showDeletePopup(manga._id, manga.name)}
                         className="hover:bg-white/10 duration-200 p-1 rounded-lg"
                     >
                         <FaRegTrashAlt />

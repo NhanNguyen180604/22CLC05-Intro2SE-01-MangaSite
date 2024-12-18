@@ -1,4 +1,4 @@
-.cover-delete-popup-content {
+.delete-popup-content {
   margin: auto !important;
   background: none !important;
   border: none !important;
@@ -10,13 +10,13 @@
 }
 
 @media only screen and (max-width: 1000px) {
-  .cover-delete-popup-content {
+  .delete-popup-content {
     width: 80% !important;
   }
 }
 
 @media only screen and (max-width: 800px) {
-  .cover-delete-popup-content {
+  .delete-popup-content {
     width: 90% !important;
   }
 }

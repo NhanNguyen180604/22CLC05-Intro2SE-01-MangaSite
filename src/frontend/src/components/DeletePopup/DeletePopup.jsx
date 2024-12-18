@@ -1,25 +1,27 @@
 import Popup from "reactjs-popup";
-import "./CoverDeletePopup.css";
-import styles from "./CoverDeletePopup.module.css";
+import "./DeletePopup.css";
+import styles from "./DeletePopup.module.css";
 
-const CoverDeletePopup = ({ open, onClose, callback, loading }) => {
+const DeletePopup = ({ open, onClose, callback, loading, message }) => {
 	return (
 		<Popup
 			open={open}
 			onClose={onClose}
 			modal
-			lockScroll
 			closeOnDocumentClick={!loading}
 			closeOnEscapse={!loading}
-			className='cover-delete-popup'
+			className='delete-popup'
 		>
-			{loading ? <div className={styles.loadingMsg}>Deleting cover image</div> : (
+			{loading ? <div className={styles.loadingMsg}>Deleting...</div> : (
 				<div className={styles.coverDeleteContainer}>
-					<div className={styles.message}>You are about to delete this cover image</div>
+					<div className={styles.message}>{message}</div>
 					<div className={styles.message}>This action cannot be undone</div>
 					<div className={styles.btnContainer}>
 						<button
-							onClick={callback}
+							onClick={(e) => {
+								e.preventDefault();
+								callback();
+							}}
 							className={styles.confirmBTN}
 						>
 							Confirm
@@ -37,4 +39,4 @@ const CoverDeletePopup = ({ open, onClose, callback, loading }) => {
 		</Popup>
 	);
 }
-export default CoverDeletePopup;
+export default DeletePopup;

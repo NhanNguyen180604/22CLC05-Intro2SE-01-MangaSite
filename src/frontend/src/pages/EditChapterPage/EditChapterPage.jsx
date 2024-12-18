@@ -9,11 +9,12 @@ import styles from './EditChapterPage.module.css';
 import { getMangaByID, getChapter, getChapterNumbers, updateChapter, deleteChapter } from '../../service/mangaService.js';
 import { getMe } from '../../service/userService.js';
 import NotiPopup from '../../components/NotiPopup';
+import DeletePopup from '../../components/DeletePopup';
 import { FaPlus } from 'react-icons/fa';
-import { FaCircleXmark } from 'react-icons/fa6';
 import { closestCorners, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { ActionBTNs } from './ActionBTNs.jsx';
+import { SortableItem } from './SortableItem.jsx';
 
 const EditChapterPage = () => {
     const [me, setMe] = useState({
@@ -215,12 +216,46 @@ const EditChapterPage = () => {
         setImages(chapterRef.current.images);
     };
 
-    const removeChapter = async (e) => {
+    const [delPopupDetails, setDelPopupDetails] = useState({
+        show: false,
+        loading: false,
+        onClose: () => { },
+        message: '',
+        callback: () => { },
+    });
+
+    const showDeletePopup = (e) => {
         e.preventDefault();
-        setLoadingMessage('Deleting chapter');
-        setLoading(true);
+        setDelPopupDetails({
+            show: true,
+            loading: false,
+            onClose: () => {
+                setDelPopupDetails({
+                    ...delPopupDetails,
+                    show: false,
+                    loading: false,
+                });
+            },
+            message: "You are about to delete this chapter.",
+            callback: removeChapter,
+        });
+    };
+
+    const removeChapter = async () => {
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: true,
+            show: true,
+        });
 
         const response = await deleteChapter(id, chapterNumber);
+
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: false,
+            show: false,
+        });
+
         if (response.status !== 200) {
             setNotiDetails({
                 success: false,
@@ -228,7 +263,6 @@ const EditChapterPage = () => {
                 details: response.message,
             });
             setShowNoti(true);
-            setLoading(false);
             return;
         }
 
@@ -317,7 +351,7 @@ const EditChapterPage = () => {
                                 submit={submit}
                                 canSubmit={canSubmit}
                                 reset={reset}
-                                removeChapter={removeChapter}
+                                showDeletePopup={showDeletePopup}
                             />
                         </LeftColumnContainer>
                         <RightColumnContainer>
@@ -394,7 +428,7 @@ const EditChapterPage = () => {
                                 submit={submit}
                                 canSubmit={canSubmit}
                                 reset={reset}
-                                removeChapter={removeChapter}
+                                showDeletePopup={showDeletePopup}
                                 myClassName='mobileDisplay'
                             />
                         </RightColumnContainer>
@@ -406,6 +440,14 @@ const EditChapterPage = () => {
                             details={notiDetails.details}
                             success={notiDetails.success}
                         />
+
+                        <DeletePopup
+                            open={delPopupDetails.show}
+                            onClose={delPopupDetails.onClose}
+                            message={delPopupDetails.message}
+                            callback={delPopupDetails.callback}
+                            loading={delPopupDetails.loading}
+                        />
                     </MangaPageLayout>
                 </>
             )}
@@ -414,63 +456,3 @@ const EditChapterPage = () => {
 }
 export default EditChapterPage;
 
-const ActionBTNs = ({ me, reset, submit, removeChapter, myClassName = 'desktopDisplay', canSubmit }) => {
-    return (
-        <div className={`${styles.actionBTNs} ${styles[myClassName]}`}>
-            {me.accountType !== 'admin' && (
-                <>
-                    <button
-                        className={styles.blueBTN}
-                        onClick={submit}
-                        disabled={!canSubmit()}
-                    >
-                        Update Chapter
-                    </button>
-
-                    <button className={styles.discardBTN} onClick={reset}>
-                        Reset
-                    </button>
-                </>
-            )}
-
-            <button className={styles.deleteBTN} onClick={removeChapter}>
-                Delete this Chapter
-            </button>
-        </div>
-    );
-};
-
-const SortableItem = ({ me, image, removeImage }) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: image.id });
-
-    const style = {
-        transition,
-        transform: CSS.Transform.toString(transform),
-    };
-
-    return (
-        <div className={styles.pageContainer}>
-            <div
-                ref={setNodeRef}
-                {...attributes}
-                {...listeners}
-                style={style}
-                className={`${styles.noTouchAction} ${me.accountType === 'admin' && styles.cursorNotAllowed}`}
-            >
-                <img src={image.url ? image.url : image.objectURL} />
-
-            </div>
-            {me.accountType !== 'admin' && (
-                <button
-                    className={styles.removePageBTN}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        removeImage(image.id);
-                    }}
-                >
-                    <FaCircleXmark />
-                </button>
-            )}
-        </div>
-    );
-};

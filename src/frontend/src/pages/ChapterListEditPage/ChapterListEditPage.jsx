@@ -9,6 +9,7 @@ import { getMangaByID } from '../../service/mangaService.js';
 import { getMe } from '../../service/userService.js';
 import { FaPlus, FaXmark } from 'react-icons/fa6';
 import NotiPopup from '../../components/NotiPopup';
+import DeletePopup from '../../components/DeletePopup';
 
 const ChapterListEditPage = () => {
     const [me, setMe] = useState({
@@ -28,8 +29,45 @@ const ChapterListEditPage = () => {
 
     const [chapters, setChapters] = useState([]);
 
+    const [delPopupDetails, setDelPopupDetails] = useState({
+        show: false,
+        loading: false,
+        onClose: () => { },
+        message: '',
+        callback: () => { },
+    });
+
+    const showDeletePopup = (chapterNumber) => {
+        setDelPopupDetails({
+            show: true,
+            loading: false,
+            onClose: () => {
+                setDelPopupDetails({
+                    ...delPopupDetails,
+                    show: false,
+                    loading: false,
+                });
+            },
+            message: `You are about to delete chapter #${chapterNumber}.`,
+            callback: () => removeChapter(chapterNumber),
+        });
+    };
+
     const removeChapter = async (chapterNumber) => {
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: true,
+            show: true,
+        });
+
         const response = await deleteChapter(id, chapterNumber);
+
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: false,
+            show: false,
+        });
+
         if (response.status !== 200) {
             setNotiDetails({
                 success: false,
@@ -136,7 +174,7 @@ const ChapterListEditPage = () => {
                                         </div>
 
                                         <button
-                                            onClick={() => removeChapter(chapter.number)}
+                                            onClick={() => showDeletePopup(chapter.number)}
                                             className={styles.deleteChapterBTN}
                                         >
                                             <FaXmark />
@@ -166,6 +204,14 @@ const ChapterListEditPage = () => {
                         message={notiDetails.message}
                         details={notiDetails.details}
                         success={notiDetails.success}
+                    />
+
+                    <DeletePopup
+                        open={delPopupDetails.show}
+                        onClose={delPopupDetails.onClose}
+                        message={delPopupDetails.message}
+                        callback={delPopupDetails.callback}
+                        loading={delPopupDetails.loading}
                     />
                 </div>
             )}

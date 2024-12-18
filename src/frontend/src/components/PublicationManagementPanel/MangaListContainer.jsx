@@ -3,6 +3,7 @@ import { secondSearch } from "../../service/searchService.js";
 import { deleteManga } from "../../service/mangaService.js";
 import MangaNode from "./MangaNode.jsx";
 import NotiPopup from "../NotiPopup";
+import DeletePopup from "../DeletePopup";
 
 const MangaListContainer = ({ search }) => {
     const [mangas, setMangas] = useState([]);
@@ -47,8 +48,45 @@ const MangaListContainer = ({ search }) => {
             setPage(prev => prev + 1);
     };
 
+    const [delPopupDetails, setDelPopupDetails] = useState({
+        show: false,
+        loading: false,
+        onClose: () => { },
+        message: '',
+        callback: () => { },
+    });
+
+    const showDeletePopup = (mangaID, mangaTitle) => {
+        setDelPopupDetails({
+            show: true,
+            loading: false,
+            onClose: () => {
+                setDelPopupDetails({
+                    ...delPopupDetails,
+                    show: false,
+                    loading: false,
+                });
+            },
+            message: `You are about to delete the manga ${mangaTitle}.`,
+            callback: () => deleteMangaWrapper(mangaID),
+        });
+    };
+
     const deleteMangaWrapper = async (mangaID) => {
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: true,
+            show: true,
+        });
+
         const response = await deleteManga(mangaID);
+
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: false,
+            show: false,
+        });
+
         if (response.status !== 200) {
             setNotiDetails({
                 success: false,
@@ -79,7 +117,7 @@ const MangaListContainer = ({ search }) => {
             ) : (
                 <div className="grid grid-cols-1 gap-2 max-h-[33.5rem] overflow-y-auto">
                     {mangas.map(manga => (
-                        <MangaNode manga={manga} key={manga._id} deleteMangaWrapper={deleteMangaWrapper} />
+                        <MangaNode manga={manga} key={manga._id} showDeletePopup={showDeletePopup} />
                     ))}
 
                     {page < totalPages && (
@@ -98,6 +136,14 @@ const MangaListContainer = ({ search }) => {
                         success={notiDetails.success}
                         message={notiDetails.message}
                         details={notiDetails.details}
+                    />
+
+                    <DeletePopup
+                        open={delPopupDetails.show}
+                        onClose={delPopupDetails.onClose}
+                        message={delPopupDetails.message}
+                        callback={delPopupDetails.callback}
+                        loading={delPopupDetails.loading}
                     />
                 </div>
             )}

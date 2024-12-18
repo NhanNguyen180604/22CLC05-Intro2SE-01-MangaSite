@@ -6,12 +6,16 @@ import { $token } from "../stores/auth.js";
 // get mangas
 export const getMangas = async (page = 1, per_page = 20, type) => {
     try {
+        const token = $token.get();
         const response = await axios.get(API, {
             params: {
                 page: page,
                 per_page: per_page,
                 type,
             },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
         })
         return { status: response.status, mangas: response.data }
     } catch (error) {

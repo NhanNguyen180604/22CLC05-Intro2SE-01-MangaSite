@@ -279,7 +279,7 @@ const MangaEditPage = () => {
     };
 
     const canSave = () => {
-        return manga.name.length && manga.authors.length && manga.categories.length;
+        return manga.name.length && manga.authors.length && manga.categories.length && manga.status.length;
     };
 
     return (

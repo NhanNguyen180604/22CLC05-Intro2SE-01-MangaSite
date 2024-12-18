@@ -207,6 +207,10 @@
   gap: 5px;
 }
 
+.coverContainer .coverNumber{
+  text-align: center;
+}
+
 .coverBTNs {
   display: none;
   position: absolute;

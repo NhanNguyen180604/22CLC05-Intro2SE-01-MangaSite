@@ -7,16 +7,18 @@ import { getAllAuthors, postNewAuthor } from "../../service/authorService.js";
 import { getAllCategories } from "../../service/categoryService.js";
 import DesktopLogo from "../../components/main/DesktopLogo.jsx";
 import DesktopNavigationBar from "../../components/main/DesktopNavigationBar.jsx";
+import MobileNavigationBar from "../../components/main/MobileNavigationBar.jsx";
 import MainLayout from "../../components/main/MainLayout.jsx";
 import MangaPageLayoutComponents from "../../components/MangaPageLayout";
 const { MangaPageLayout, LeftColumnContainer, RightColumnContainer } = MangaPageLayoutComponents;
 import TabComponents from "../../components/Tab"
 const { Tab, TabPanel } = TabComponents;
 import { FaPlus } from "react-icons/fa";
-import CoverDeletePopup from "../../components/CoverDeletePopup";
+import DeletePopup from "../../components/DeletePopup";
 import NotiPopup from "../../components/NotiPopup";
 import CoverUploadPopup from "../../components/CoverUploadPopup";
 import MySelect from "../../components/MySelect";
+import { ActionBTNs } from "./ActionBTNs.jsx";
 
 const MangaEditPage = () => {
     const [me, setMe] = useState({
@@ -111,20 +113,21 @@ const MangaEditPage = () => {
     const [covers, setCovers] = useState([]);
     const defaultCoverRef = useRef(null);
     const [showCoverUploadPopup, setShowCoverUploadPopup] = useState(false);
-    const [showCoverDelPopup, setShowCoverDelPopup] = useState(false);
-    const [delCoverNum, setDelCoverNum] = useState(-1);
-    const [popupLoading, setPopupLoading] = useState(false);
+    const [coverUploadPopupLoading, setCoverUploadPopupLoading] = useState(false);
+    const [delPopupDetails, setDelPopupDetails] = useState({
+        show: false,
+        loading: false,
+        onClose: () => { },
+        message: '',
+        callback: () => { },
+    });
 
-    useEffect(() => {  // this might be stupid, idk, i'm noob at React
-        if (delCoverNum !== -1) {
-            setShowCoverDelPopup(true);
-        }
-        else setShowCoverDelPopup(false);
-    }, [delCoverNum]);
-
-    const deleteCoverImg = async (e) => {
-        setPopupLoading(true);
-        e.preventDefault();
+    const deleteCoverImg = async (delCoverNum) => {
+        setDelPopupDetails({
+            ...delPopupDetails,
+            show: true,
+            loading: true,
+        });
 
         const response = await deleteCover(id, delCoverNum);
         if (response.status === 200) {
@@ -152,8 +155,11 @@ const MangaEditPage = () => {
             });
         }
 
-        setDelCoverNum(-1);
-        setPopupLoading(false);
+        setDelPopupDetails({
+            ...delPopupDetails,
+            show: false,
+            loading: false,
+        });
         setShowNoti(true);
     };
 
@@ -304,24 +310,48 @@ const MangaEditPage = () => {
     };
 
     // real shiet
-    const deleteMangaWrapper = async (e) => {
+    const showDeleteMangaPopup = (e) => {
         e.preventDefault();
-        setLoadingMessage("Deleting the manga");
-        setLoading(true);
+        setDelPopupDetails({
+            show: true,
+            loading: false,
+            onClose: () => {
+                setDelPopupDetails({
+                    ...delPopupDetails,
+                    show: false,
+                    loading: false,
+                });
+            },
+            message: "You are about to delete this manga.",
+            callback: deleteMangaWrapper,
+        });
+    };
+
+    const deleteMangaWrapper = async () => {
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: true,
+            show: true,
+        });
+
         const response = await deleteManga(id);
-        console.log(response);
+        setDelPopupDetails({
+            ...delPopupDetails,
+            loading: false,
+            show: false,
+        });
+
         if (response.status === 200) {
             navigate('/');
+            return;
         }
-        else {
-            setNotiDetails({
-                success: false,
-                message: 'Failed to delete the manga',
-                details: response.message,
-            });
-            setShowNoti(true);
-            setLoading(false);
-        }
+
+        setNotiDetails({
+            success: false,
+            message: 'Failed to delete the manga',
+            details: response.message,
+        });
+        setShowNoti(true);
     };
 
     return (
@@ -345,7 +375,7 @@ const MangaEditPage = () => {
                             mangaID={id}
                             navigate={navigate}
                             canSave={canSave}
-                            deleteMangaWrapper={deleteMangaWrapper}
+                            showDeleteMangaPopup={showDeleteMangaPopup}
                         />
                     </LeftColumnContainer>
                     <RightColumnContainer>
@@ -474,7 +504,7 @@ const MangaEditPage = () => {
                                         {covers.map(cover => (
                                             <div key={cover._id} className={styles.coverContainer}>
                                                 <img src={cover.imageURL} className={styles.smolCover} />
-                                                <div>#{cover.number}</div>
+                                                <div className={styles.coverNumber}>#{cover.number}</div>
                                                 {me.accountType !== 'admin' && (
                                                     <div className={styles.coverBTNs}>
                                                         <div
@@ -486,7 +516,20 @@ const MangaEditPage = () => {
                                                             Set as thumbnail
                                                         </div>
                                                         <div
-                                                            onClick={() => setDelCoverNum(cover.number)}
+                                                            onClick={() => {
+                                                                setDelPopupDetails({
+                                                                    show: true,
+                                                                    loading: false,
+                                                                    onClose: () => {
+                                                                        setDelPopupDetails({
+                                                                            ...delPopupDetails,
+                                                                            show: false,
+                                                                        });
+                                                                    },
+                                                                    message: 'You are about to delete this cover image.',
+                                                                    callback: () => deleteCoverImg(cover.number),
+                                                                });
+                                                            }}
                                                         >
                                                             Remove
                                                         </div>
@@ -518,24 +561,24 @@ const MangaEditPage = () => {
                             mangaID={id}
                             navigate={navigate}
                             canSave={canSave}
-                            deleteMangaWrapper={deleteMangaWrapper}
+                            showDeleteMangaPopup={showDeleteMangaPopup}
                         />
                     </RightColumnContainer>
 
-                    <CoverDeletePopup
-                        open={showCoverDelPopup}
-                        onClose={() => setDelCoverNum(-1)}
-                        message='You are about to delete this cover image. This action cannot be undone.'
-                        callback={deleteCoverImg}
-                        loading={popupLoading}
+                    <DeletePopup
+                        open={delPopupDetails.show}
+                        onClose={delPopupDetails.onClose}
+                        message={delPopupDetails.message}
+                        callback={delPopupDetails.callback}
+                        loading={delPopupDetails.loading}
                     />
 
                     {me.accountType !== 'admin' && (
                         <CoverUploadPopup
                             open={showCoverUploadPopup}
                             setShowThis={setShowCoverUploadPopup}
-                            loading={popupLoading}
-                            setLoading={setPopupLoading}
+                            loading={coverUploadPopupLoading}
+                            setLoading={setCoverUploadPopupLoading}
                             mangaID={id}
                             covers={covers}
                             setCovers={setCovers}
@@ -554,46 +597,10 @@ const MangaEditPage = () => {
                 </MangaPageLayout>
             }
 
+            <footer>
+                <MobileNavigationBar />
+            </footer>
         </MainLayout>
     )
 }
 export default MangaEditPage;
-
-const ActionBTNs = ({ me, reset, submit, myClassName = 'desktopDisplay', navigate, mangaID, canSave, deleteMangaWrapper }) => {
-    return (
-        <div className={`${styles.actionBTNs} ${styles[myClassName]}`}>
-            {me.accountType !== 'admin' && (
-                <button
-                    className={styles.blueBTN}
-                    onClick={(e) => submit(e)}
-                    disabled={!canSave()}
-                >
-                    Save changes
-                </button>
-            )}
-
-            <button
-                className={styles.blueBTN}
-                onClick={(e) => {
-                    e.preventDefault();
-                    navigate(`/mangas/${mangaID}/chapters/edit`)
-                }}
-            >
-                Go to Chapters
-            </button>
-
-            {me.accountType !== 'admin' && (
-                <button className={styles.discardBTN} onClick={reset}>
-                    Discard changes
-                </button>
-            )}
-
-            <button
-                className={styles.deleteBTN}
-                onClick={deleteMangaWrapper}
-            >
-                Delete this manga
-            </button>
-        </div>
-    );
-};
