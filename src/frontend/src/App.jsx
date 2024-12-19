@@ -14,6 +14,7 @@ import MyProfilePage from "./pages/MyProfilePage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import SearchPage from "./pages/SearchPage.jsx";
 import Page401 from "./pages/status/401.jsx";
+import LibraryPage from "./pages/LibraryPage.jsx";
 import useToken from "./service/useToken.js";
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Route path="login" element={<LoginPage setToken={setToken} />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="me" element={<MyProfilePage />} />
+          <Route path="library" element={<LibraryPage/>} />
         </Route>
         <Route path="/search" element={<SearchPage />} />
         <Route path="/401" element={<Page401 />} />
