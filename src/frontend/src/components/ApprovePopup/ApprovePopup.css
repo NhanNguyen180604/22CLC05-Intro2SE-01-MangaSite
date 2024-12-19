@@ -1,0 +1,35 @@
+.report-popup-content {
+  margin: auto !important;
+  background: none !important;
+  border: none !important;
+  width: 30% !important;
+  height: 50% !important;
+  border-radius: 20px !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+@media only screen and (max-width: 1200px){
+  .report-popup-content{
+    width: 40% !important;
+  }
+}
+
+@media only screen and (max-width: 900px){
+  .report-popup-content{
+    width: 50% !important;
+  }
+}
+
+@media only screen and (max-width: 768px){
+  .report-popup-content{
+    width: 60% !important;
+  }
+}
+
+@media only screen and (max-width: 600px){
+  .report-popup-content{
+    width: 95% !important;
+  }
+}

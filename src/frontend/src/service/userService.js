@@ -340,3 +340,21 @@ export const getApprovalRequests = async () => {
     if (response.status !== 200) return null;
     return response.data;
 };
+
+export const sendApprovalRequests = async (reason) => {
+    try{
+    const token = $token.get();
+    if (!token)
+        return null;
+
+    const response = await axios.post(API + 'approval', {reason},{
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    }
+    catch(error){
+        return getErrorMessage(error);
+    }
+    return response;
+};

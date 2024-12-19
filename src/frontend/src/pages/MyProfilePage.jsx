@@ -9,6 +9,7 @@ import NotiPopup from "../components/NotiPopup/NotiPopup.jsx"
 import MySelect from "../components/MySelect/MySelect.jsx"
 import { getAllAuthors } from "../service/authorService.js"
 import { getAllCategories } from "../service/categoryService.js"
+import ApprovePopup from "../components/ApprovePopup/ApprovePopup.jsx"
 
 const MyProfilePage = () => {
     const profile = useRef();
@@ -170,7 +171,7 @@ const MyProfilePage = () => {
                     alt="Book Character Cry"
                     className="mx-auto w-64 mt-28"
                 />
-                <div className="mx-auto text-5xl text-white font-bold">You haven't logged in!</div>
+                <div className="mx-auto text-5xl text-white text-center font-bold">You haven't logged in!</div>
             </MainLayout>
         )
     }
@@ -186,7 +187,6 @@ const MyProfilePage = () => {
             <span><NotiPopup open={showDiscardPopUp} onClose={() => setShowDiscardPopUp(false)} success={true} message={"Discard changes successfully!"}></NotiPopup></span>
             <span><NotiPopup open={showSavingPopUp} onClose={() => setShowSavingPopUp(false)} success={true} message={"Save changes successfully!"}></NotiPopup></span>
             <span><NotiPopup open={showErrorSavingPopUp} onClose={() => setShowErrorSavingPopUp(false)} success={false} message={"Email or name cannot be blank!"}></NotiPopup></span>
-
             <form className="mt-6 mx-auto w-full px-4" onSubmit={handleSave}>
                 <div
                     className="mx-auto my-6 relative w-52 h-52 rounded-full overflow-hidden group"
@@ -244,14 +244,17 @@ const MyProfilePage = () => {
                             <label htmlFor="role" className="block text-xl mb-2 font-bold">
                                 Role
                             </label>
+                            <div className="flex space-x-2 justify-between">
                             <input
                                 id="role"
                                 type="text"
                                 name="accountType"
-                                className="w-full px-4 py-2 rounded bg-darker-navy text-white"
+                                className="px-4 py-2 rounded bg-darker-navy text-white w-full"
                                 value={form.accountType}
                                 disabled
                             />
+                            <span><ApprovePopup loggedIn={true}/></span> 
+                            </div>                          
                         </div>
                     </div>
 
