@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { getCovers } from "../../service/mangaService.js"
 import styles from './CoverGallery.module.css';
+import CoverViewPopup from "../CoverViewPopup";
 
 const CoverGallery = ({ id }) => {
     const [covers, setCovers] = useState([]);
@@ -18,8 +19,8 @@ const CoverGallery = ({ id }) => {
     return (
         <div className={styles.coverGalleryContainer}>
             {covers.length ? covers.map((cover, index) => (
-                <div key={`cover-${index * 2}`} >
-                    <img src={cover.imageURL} />
+                <div key={`cover-${index}`} >
+                    <CoverViewPopup image={cover.imageURL} />
                 </div>
             )) : (
                 <div className={styles.bigText}>No Art</div>

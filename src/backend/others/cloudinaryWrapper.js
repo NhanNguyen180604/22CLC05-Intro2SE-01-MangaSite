@@ -1,14 +1,14 @@
 const cloudinary = require('cloudinary');
 const asyncHandler = require('express-async-handler');
 
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+});
+
 // upload images of a chapter to the cloud
 const uploadImages = asyncHandler(async function cloudinaryUploadWrapper(images, folder) {
-    cloudinary.v2.config({
-        cloud_name: process.env.CLOUDINARY_NAME,
-        api_key: process.env.CLOUDINARY_KEY,
-        api_secret: process.env.CLOUDINARY_SECRET
-    });
-
     const imageResult = await Promise.all(images.map(async (image) => {
         try {
             const buffer = Buffer.from(image);
@@ -48,12 +48,6 @@ const uploadImages = asyncHandler(async function cloudinaryUploadWrapper(images,
 
 // delete all resources by prefix on the cloud
 const deleteByPrefix = asyncHandler(async function cloudinaryDeleteWrapper(folder) {
-    cloudinary.v2.config({
-        cloud_name: process.env.CLOUDINARY_NAME,
-        api_key: process.env.CLOUDINARY_KEY,
-        api_secret: process.env.CLOUDINARY_SECRET
-    });
-
     try {
         await cloudinary.v2.api.delete_resources_by_prefix(folder);
     }
@@ -64,12 +58,6 @@ const deleteByPrefix = asyncHandler(async function cloudinaryDeleteWrapper(folde
 
 // upload an image to the cloud
 const uploadSingleImage = asyncHandler(async function cloudinaryUploadWrapper(image, folder) {
-    cloudinary.v2.config({
-        cloud_name: process.env.CLOUDINARY_NAME,
-        api_key: process.env.CLOUDINARY_KEY,
-        api_secret: process.env.CLOUDINARY_SECRET
-    });
-
     try {
         const buffer = Buffer.from(image);
 
@@ -97,14 +85,8 @@ const uploadSingleImage = asyncHandler(async function cloudinaryUploadWrapper(im
     }
 });
 
-// delete resources on the cloud
+// delete resources by their public IDs on the cloud
 const deleteResources = asyncHandler(async function cloudinaryDeleteResourcesWrapper(publicIDs) {
-    cloudinary.v2.config({
-        cloud_name: process.env.CLOUDINARY_NAME,
-        api_key: process.env.CLOUDINARY_KEY,
-        api_secret: process.env.CLOUDINARY_SECRET
-    });
-
     try {
         await cloudinary.v2.api.delete_resources(publicIDs);
     }
@@ -115,12 +97,6 @@ const deleteResources = asyncHandler(async function cloudinaryDeleteResourcesWra
 
 // delete a folder
 const deleteFolder = asyncHandler(async function cloudinaryDeleteFolderWrapper(folder) {
-    cloudinary.v2.config({
-        cloud_name: process.env.CLOUDINARY_NAME,
-        api_key: process.env.CLOUDINARY_KEY,
-        api_secret: process.env.CLOUDINARY_SECRET
-    });
-
     try {
         await cloudinary.v2.api.delete_folder(folder);
     }

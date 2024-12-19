@@ -209,9 +209,8 @@ const EditChapterPage = () => {
 
     const reset = async (e) => {
         e.preventDefault();
-
         setChapter(chapterRef.current);
-
+        setShowTitleMessage(false);
         freeImage();
         setImages(chapterRef.current.images);
     };

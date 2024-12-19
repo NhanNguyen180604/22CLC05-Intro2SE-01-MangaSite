@@ -10,10 +10,9 @@ import { getMangaByID, getChapterNumbers, uploadChapter } from '../../service/ma
 import { getMe } from '../../service/userService.js';
 import NotiPopup from '../../components/NotiPopup';
 import { FaPlus } from 'react-icons/fa';
-import { FaCircleXmark } from 'react-icons/fa6';
 import { closestCorners, DndContext } from '@dnd-kit/core';
-import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { arrayMove, rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+import { SortableItem } from './SortableItem.jsx';
 
 const AddChapterPage = () => {
     const { id } = useParams();
@@ -160,13 +159,13 @@ const AddChapterPage = () => {
 
     const reset = async (e) => {
         e.preventDefault();
-
         setChapter({
             title: 'Your chapter title',
             number: chapterNumbersRef.current[chapterNumbersRef.current.length - 1] + 1,
         });
-
         freeImage();
+        setShowTitleMessage(false);
+        setShowNumberMessage(false);
         setImages([]);
     };
 
@@ -343,35 +342,3 @@ const ActionBTNs = ({ reset, submit, myClassName = 'desktopDisplay', canPost }) 
     );
 };
 
-const SortableItem = ({ image, removeImage }) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: image.id });
-
-    const style = {
-        transition,
-        transform: CSS.Transform.toString(transform),
-    };
-
-    return (
-        <div className={styles.pageContainer}>
-            <div
-                ref={setNodeRef}
-                {...attributes}
-                {...listeners}
-                style={style}
-                className={styles.noTouchAction}
-            >
-                <img src={image.objectURL} />
-
-            </div>
-            <button
-                className={styles.removePageBTN}
-                onClick={(e) => {
-                    e.preventDefault();
-                    removeImage(image.id);
-                }}
-            >
-                <FaCircleXmark />
-            </button>
-        </div>
-    );
-};

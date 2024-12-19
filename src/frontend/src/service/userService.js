@@ -214,7 +214,7 @@ export async function readUserNoti(id) {
     return await res.json();
 }
 
-export const getAllUsers = async () => {
+export const getUsers = async (page = 1, per_page = 20) => {
     const token = $token.get();
     if (!token)
         return null;
@@ -222,6 +222,10 @@ export const getAllUsers = async () => {
     const res = await axios.get(API, {
         headers: {
             Authorization: `Bearer ${token}`,
+        },
+        params: {
+            page: page,
+            per_page: per_page,
         },
     });
 

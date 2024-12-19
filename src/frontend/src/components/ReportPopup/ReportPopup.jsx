@@ -11,7 +11,7 @@ const ReportPopup = ({ loggedIn, reportField, reportedId }) => {
     const [showThis, setShowThis] = useState(false);
     const [showNoti, setShowNoti] = useState(false);
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [isInputFilled, setIsInputFilled] = useState(false);
     const [formValues, setFormValues] = useState({
         Plagiarism: false,
@@ -122,7 +122,8 @@ const ReportPopup = ({ loggedIn, reportField, reportedId }) => {
             </div>
 
             <Popup
-                open={showThis} modal
+                open={showThis}
+                modal
                 onOpen={onOpen}
                 onClose={onClose}
                 closeOnDocumentClick

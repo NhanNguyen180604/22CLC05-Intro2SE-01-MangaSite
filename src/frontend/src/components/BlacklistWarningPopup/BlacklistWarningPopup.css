@@ -1,0 +1,17 @@
+.blacklist-warning-popup-content {
+  margin: auto !important;
+  background: none !important;
+  border: none !important;
+  width: fit-content !important;
+  border-radius: 20px !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.blacklist-warning-popup-content .popup-content {
+  margin: auto !important;
+  background: rgb(255, 255, 255) !important;
+  width: 50% !important;
+  padding: 5px !important;
+}

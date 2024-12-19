@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { getMangaByID, getChapterList, getReadingHistory } from "../../service/mangaService";
-import { getMe } from "../../service/userService.js"
+import { getMe, getBlacklist } from "../../service/userService.js"
 import { useParams } from "react-router-dom"
 import { FaGear } from "react-icons/fa6"
 import { FaCommentSlash } from "react-icons/fa";
@@ -21,17 +21,12 @@ import RatingPopup from "../../components/RatingPopup"
 import LibraryPopup from "../../components/LibraryPopup"
 import ReportPopup from "../../components/ReportPopup"
 import CommentPopup from "../../components/CommentPopup"
-import NotiPopup from "../../components/NotiPopup"
+import BlacklistWarningPopup from "../../components/BlacklistWarningPopup";
 
 const MangaPage = () => {
 	const { id } = useParams();
 	const [loading, setLoading] = useState(true);
-	const [showNoti, setShowNoti] = useState(false);
-	const [notiDetails, setNotiDetails] = useState({
-		success: false,
-		message: '',
-		details: '',
-	});
+	const [showWarning, setShowWarning] = useState(false);
 
 	const [me, setMe] = useState({
 		avatar: '',
@@ -66,8 +61,9 @@ const MangaPage = () => {
 		setLoading(true);
 
 		const getMeResponse = await getMe();
-		if (getMeResponse)
+		if (getMeResponse) {
 			setMe(getMeResponse);
+		}
 
 		const response = await getMangaByID(id);
 
@@ -81,6 +77,7 @@ const MangaPage = () => {
 			}
 
 			if (getMeResponse) {
+				// get reading history of user if logged in
 				const historyResponse = await getReadingHistory(id);
 				if (historyResponse.status === 200 && historyResponse.history) {
 					const fetchedHistory = historyResponse.history;
@@ -89,6 +86,18 @@ const MangaPage = () => {
 						const tempChapter = tempChapterList.find(element => element._id === fetchedHistory.chapters[fetchedHistory.chapters.length - 1]);
 						if (tempChapter)
 							setFirstChapter(tempChapter.number);
+					}
+				}
+
+				// get blacklist of user if logged in
+				const blacklist = await getBlacklist();
+				if (blacklist) {
+					// check if this manga has categories/authors in the blacklist
+					if (
+						blacklist.authors.some(author => response.manga.authors.some(mangaAuthor => mangaAuthor._id === author._id)) ||
+						blacklist.categories.some(category => response.manga.categories.some(mangaCategory => mangaCategory._id === category._id))
+					) {
+						setShowWarning(true);
 					}
 				}
 			}
@@ -205,6 +214,8 @@ const MangaPage = () => {
 							</TabPanel>
 						</Tab>
 					</RightColumnContainer>
+
+					<BlacklistWarningPopup open={showWarning} onClose={() => setShowWarning(false)} />
 				</MangaPageLayout>
 			)}
 

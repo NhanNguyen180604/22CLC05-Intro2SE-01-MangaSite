@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAllUsers, getBannedUsers, getApprovalRequests } from "../../service/userService.js";
+import { getUsers, getBannedUsers, getApprovalRequests } from "../../service/userService.js";
 
 import { changeUserRole, banUser, unbanUser } from "../../service/userService.js";
 import NotiPopup from "../NotiPopup";
@@ -16,17 +16,37 @@ const UserContainer = ({ search }) => {
         details: '',
     });
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const perPage = 2;
+    const [totalPages, setTotalPages] = useState(100);
+
+    const fetchUsers = async (local_page, per_page) => {
+        const response = await getUsers(local_page, per_page);
+        if (response) {
+            setTotalPages(response.total_pages);
+            setUsers([...users, ...response.users]);
+        }
+        else {
+            setNotiDetails({
+                success: false,
+                message: `Failed to fetch user`,
+                details: response.message,
+            });
+            setShowNoti(true);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers(page, perPage);
+    }, [page]);
+
+    const loadMore = () => {
+        if (page < totalPages)
+            setPage(prev => prev + 1);
+    };
 
     const initialize = async () => {
         setLoading(true);
-
-        const userResponse = await getAllUsers();
-        if (userResponse) {
-            setUsers(userResponse);
-        }
-        else {
-            console.log("Could not get user list");
-        }
 
         const bannedUserResponse = await getBannedUsers();
         if (bannedUserResponse) {
@@ -109,7 +129,7 @@ const UserContainer = ({ search }) => {
 
     const filterUser = (user) => {
         const regex = new RegExp(search.query, "gi");
-        let result = Boolean(user.name.match(regex) || user.email.match(regex));
+        let result = Boolean(user.name?.match(regex) || user.email?.match(regex));
         if (search.pendingApproval) {
             result = result && Boolean(approvalReq.some(approval => approval.user === user._id));
         }
@@ -129,7 +149,7 @@ const UserContainer = ({ search }) => {
                     Loading...
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-2 max-h-[50vh] overflow-y-auto">
+                <div className="grid grid-cols-1 gap-2 max-h-[33.5rem] overflow-y-auto">
                     {users
                         .filter(filterUser)
                         .map((user) => (
@@ -144,6 +164,15 @@ const UserContainer = ({ search }) => {
                             />
                         ))
                     }
+
+                    {page < totalPages && (
+                        <button
+                            className="justify-self-center px-[12px] py-[4px] mt-2 border border-2 rounded-full duration-200 hover:bg-white/25"
+                            onClick={() => loadMore()}
+                        >
+                            Show more
+                        </button>
+                    )}
 
                     <NotiPopup
                         open={showNoti}

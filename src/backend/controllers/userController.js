@@ -22,8 +22,40 @@ const getUsers = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error('You are not admin');
     }
-    const users = await User.find().select('email name accountType avatar.url');
-    res.json(users.filter(user => user.accountType !== 'admin'));
+
+    let page = req.query.page ? parseInt(req.query.page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 20;
+
+    // Validation.
+    if (Number.isNaN(page) || !Number.isSafeInteger(page) || page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query page.");
+    }
+
+    if (Number.isNaN(per_page) || !Number.isSafeInteger(per_page) || per_page <= 0) {
+        res.status(400);
+        throw new Error("Bad Request: Invalid query per_page.");
+    }
+
+    const filter = { accountType: { $ne: 'admin' } };
+    const count = await User.countDocuments(filter);
+    const total_pages = Math.ceil(count / per_page);
+    page = Math.min(page, total_pages);
+    page = Math.max(page, 1);
+    const skip = (page - 1) * per_page;
+
+    const users = await User.find(filter)
+        .skip(skip)
+        .limit(per_page)
+        .select('email name accountType avatar.url');
+
+    res.status(200).json({
+        users: users,
+        page: page,
+        per_page: per_page,
+        total: count,
+        total_pages: total_pages,
+    });
 });
 
 const getUserById = asyncHandler(async (req, res) => {
