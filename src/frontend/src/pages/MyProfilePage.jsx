@@ -253,7 +253,7 @@ const MyProfilePage = () => {
                                 value={form.accountType}
                                 disabled
                             />
-                            <span><ApprovePopup loggedIn={true}/></span> 
+                            {form.accountType === 'user' && <span><ApprovePopup loggedIn={true}/></span>} 
                             </div>                          
                         </div>
                     </div>
