@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react"
-import { FaBookmark, FaSlidersH, FaList, FaEllipsisV, FaBookOpen, FaCheckCircle, FaRecycle} from "react-icons/fa"
+import { FaBookmark, FaSlidersH, FaList, FaEllipsisV, FaBookOpen, FaCheckCircle, FaRecycle, FaSortAlphaDown, FaSortDown, FaSortAmountUp} from "react-icons/fa"
 import DesktopLogo from "../components/main/DesktopLogo.jsx"
 import DesktopNavigationBar from "../components/main/DesktopNavigationBar.jsx"
 import MainLayout from "../components/main/MainLayout.jsx"
@@ -11,6 +11,7 @@ import { getAllCategories } from "../service/categoryService.js"
 import { FaTrashCan } from "react-icons/fa6"
 import { useNavigate } from "react-router-dom"
 import { getChapterList, getReadingHistory } from "../service/mangaService.js"
+import NotiPopup from "../components/NotiPopup/NotiPopup.jsx"
 
 const LibraryPage = () => {
     const blacklist = useRef();
@@ -27,6 +28,7 @@ const LibraryPage = () => {
     const [filterList, setFilterList] = useState({authors:[], categories:[]});
     const [sortOption, setSortOption] = useState("");
     const [readingProcess, setReadingProcess] = useState({});
+    const [noti, setNoti] = useState({open:false, success:null, message:null});
     const navigate = useNavigate();
     const reload = useRef(0);
 
@@ -149,6 +151,7 @@ const LibraryPage = () => {
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
     };
+    // checkthisone
     const handleReadLatest = async(id) => {
         const chapterListResponse = await getChapterList(id, 1, 1, true);
         let tempChapterList = chapterListResponse.chaptersInfo.chapters;
@@ -190,10 +193,12 @@ const LibraryPage = () => {
     };
     const handleUpdateLibrary = async(id, tab) => {
         await updateLibrary(id, tab);
+        showNotiPopup(true, true, `Move manga to ${tab} successfully`);
         reload.current++;
     }
     const handleDeleteFromLibrary = async(id, tab) => {
         await deleteFromLibrary(id, tab)
+        showNotiPopup(true, true, "Delete manga from library successfully");
         reload.current++;
     }
     const handleDisplayLibrary = () => {
@@ -202,7 +207,12 @@ const LibraryPage = () => {
         setLibraryLoading(true);
         setLibraryShow(filterAndSortLibrary());
         setLibraryLoading(false);
+        showNotiPopup(true, true, "Organize manga in library successfully");
     };
+    const showNotiPopup = (open, success, message) => {
+        const noti = {open, success, message};
+        setNoti(noti);
+    }
 
 
     useEffect(() => {
@@ -242,12 +252,13 @@ const LibraryPage = () => {
                     <DesktopNavigationBar />
                 </div>
             </header>
+            <span><NotiPopup open={noti.open} onClose={()=>setNoti({open:false})} success={noti.success} message={noti.message}></NotiPopup></span>
             <div className="flex justify-between items-center mt-3 mb-6 pb-3 text-3xl font-bold border-b">
                 <div className="flex space-x-2"><FaBookmark /><div>Library</div></div>
                 <div className="flex space-x-3">
                     <div className="relative">
                         <FaSlidersH className="text-gray-400 hover:text-white" onClick={toggleFilter}/>
-                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10" onMouseLeave={handleDisplayLibrary} tabIndex={0}>                                  
+                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10" onMouseLeave={toggleFilter}>                                  
                         <div>Filter by authors</div>
                         <MySelect
                             options={authorsRef.current}
@@ -268,18 +279,28 @@ const LibraryPage = () => {
                                 value: category._id,
                             }))}
                         />
+                        <div className="flex justify-end space-x-2">
+                            <div className="rounded-3xl text-sm bg-blue hover:bg-light-blue p-2" onClick={handleDisplayLibrary}>Confirm</div>
+                            <div className="rounded-3xl text-sm bg-gray-700 hover:bg-gray-500 p-2" onClick={toggleFilter}>Cancel</div>
+                        </div>
                         </div>
                         }
                     </div>
                     <div className="relative">
                     <FaList className="text-gray-400 hover:text-white" onClick={toggleSort}/>
-                    {sortShow && (<div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10" onMouseLeave={handleDisplayLibrary} tabIndex={0}>
+                    {sortShow && (<div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 h-44 z-10" onMouseLeave={toggleSort}>
                     <div>Sort by</div>
-                    <select id="sortby" className="bg-darker-navy text-white text-sm rounded-lg focus:ring-white block w-full p-2.5" value={sortOption} onChange={handleSortChange}>
+                    <div className="flex flex-col justify-between h-5/6">
+                    <select id="sortby" className="bg-darker-navy text-white text-sm focus:ring-white block w-full p-3 my-2" value={sortOption} onChange={handleSortChange}>
                         <option value="">No sort</option>
                         <option value="name">Name</option>
                         <option value="publish">Published Date</option>
                     </select>
+                    <div className="flex justify-end space-x-2">
+                        <div className="rounded-3xl text-sm bg-blue hover:bg-light-blue p-2" onClick={handleDisplayLibrary}>Confirm</div>
+                        <div className="rounded-3xl text-sm bg-gray-700 hover:bg-gray-500 p-2" onClick={toggleSort}>Cancel</div>
+                    </div>
+                    </div>
                     </div>)} 
                     </div>
                 </div>
@@ -404,7 +425,7 @@ const LibraryPage = () => {
                         </div>
                     ))
                 }
-            </div></>):<div className="mx-auto my-auto text-xl">Library is loading...</div>}
+            </div></>):<div className="min-h-screen flex items-center justify-center text-xl">Library is loading...</div>}
             <footer>
                 <MobileNavigationBar />
             </footer>
