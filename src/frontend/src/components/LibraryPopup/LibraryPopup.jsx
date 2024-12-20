@@ -38,6 +38,7 @@ const LibraryPopup = ({ loggedIn, title }) => {
             setShowThis(true);
             await fetchMyLibrary();
         }
+        setLoading(false);
     };
 
     const fetchMyLibrary = async () => {
@@ -62,18 +63,6 @@ const LibraryPopup = ({ loggedIn, title }) => {
             setOldTab('none');
         }
     };
-
-    useEffect(() => {
-        const initialize = async () => {
-            if (loggedIn) {
-                setLoading(true);
-                await fetchMyLibrary();
-                setLoading(false);
-            }
-        };
-
-        initialize();
-    }, []);
 
     const selectOption = (option) => {
         setSelected(option.toLowerCase());

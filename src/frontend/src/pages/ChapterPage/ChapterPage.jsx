@@ -114,7 +114,7 @@ const ChapterPage = () => {
             }
         }
         else if (response.status === 404) {
-            navigate('/notfound');
+            navigate('/404');
         }
         else {
             setNotiDetails({
