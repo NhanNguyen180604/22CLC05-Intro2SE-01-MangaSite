@@ -32,7 +32,7 @@ const LibraryPage = () => {
     const navigate = useNavigate();
     const reload = useRef(0);
 
-    const fetchProfile = async () => {
+    const fetchLibrary = async () => {
         try {
             const res = await getLibrary();
             if (!res) {
@@ -41,8 +41,6 @@ const LibraryPage = () => {
             }
             library.current = resolveReferences(res);
             setLibraryShow(filterAndSortLibrary());          
-            const resblacklist = await getBlacklist();
-            blacklist.current = resblacklist;
         } catch (error) {
             console.error('Error fetching profile:', error);
         }
@@ -50,10 +48,13 @@ const LibraryPage = () => {
     const fetchAuthorList = async () => {
         try {
             const response = await getAllAuthors();
-            authorsRef.current = response.authors.map((author) => ({
-                label: author.name,
-                value: author._id,
-            }));
+            authorsRef.current = response.authors
+                                .filter(author=>!(blacklist.current.authors.map(au=>au._id)).includes(author._id))
+                                .map((author) => ({
+                                    label: author.name,
+                                    value: author._id,
+                                }));
+            console.log(authorsRef.current)
         } catch (error) {
             console.error('Error fetching author list:', error);
         }
@@ -61,17 +62,26 @@ const LibraryPage = () => {
     const fetchCategoryList = async () => {
         try {
             const response = await getAllCategories();
-            categoriesRef.current = response.categories.map((category) => ({
-                label: category.name,
-                value: category._id,
-            }));
+            categoriesRef.current = response.categories
+                                    .filter(category=>!(blacklist.current.categories.map(cat=>cat._id)).includes(category._id))
+                                    .map((category) => ({
+                                        label: category.name,
+                                        value: category._id,
+                                    }));
+            console.log(categoriesRef.current)
         } catch (error) {
             console.error('Error fetching author list:', error);
         }
     };
-    const toggleMenu = (id) => {
-        setMenuShow(id);
-    };
+    const fetchBlacklist = async () => {
+        try {
+            const response = await getBlacklist();
+            blacklist.current = response;
+        } catch (error) {
+            console.error('Error fetching blacklist:', error);
+        }
+    }
+
     const toggleFilter = () => {
         setSortShow(false);
         setFilterShow(prev =>!prev);
@@ -151,14 +161,13 @@ const LibraryPage = () => {
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
     };
-    // checkthisone
     const handleReadLatest = async(id) => {
         const chapterListResponse = await getChapterList(id, 1, 1, true);
         let tempChapterList = chapterListResponse.chaptersInfo.chapters;
         if (chapterListResponse.status !== 200 || tempChapterList.length === 0) {
-            return;
+            showNotiPopup(true, false, "This manga doesn't have any chapters");
         }
-        const firstChapter = 0;
+        const firstChapter = tempChapterList[0].number;
         const historyResponse = await getReadingHistory(id);
         if (historyResponse.status === 200 && historyResponse.history) {
             const fetchedHistory = historyResponse.history;
@@ -168,8 +177,9 @@ const LibraryPage = () => {
                     navigate(`/mangas/${id}/chapters/${tempChapter.number}`);
                 else navigate(`/mangas/${id}/chapters/${firstChapter}`)
             }
-            else return;
+            else navigate(`/mangas/${id}/chapters/${firstChapter}`);
         }
+        else navigate(`/mangas/${id}/chapters/${firstChapter}`);
     };
     const getReadingProcess = async(id) => {
         const chapterListResponse = await getChapterList(id, 1, 1, true);
@@ -177,14 +187,14 @@ const LibraryPage = () => {
         if (chapterListResponse.status !== 200 || tempChapterList.length === 0) {
             return setReadingProcess((prev) => ({ ...prev, [id]: 0 }));
         }
+        const firstChapter = tempChapterList[0].number;
         const historyResponse = await getReadingHistory(id);
         if (historyResponse.status === 200 && historyResponse.history) {
             const fetchedHistory = historyResponse.history;
-            console.log(fetchedHistory)
             if (fetchedHistory.chapters.length) {
                 const tempChapter = tempChapterList.find(element => element._id === fetchedHistory.chapters[fetchedHistory.chapters.length - 1]);
                 if (tempChapter)
-                    return setReadingProcess((prev) => ({ ...prev, [id]: Math.round((tempChapter.number - 1)/tempChapterList.length*100)}));
+                    return setReadingProcess((prev) => ({ ...prev, [id]: Math.round((tempChapter.number - firstChapter + 1)/tempChapterList.length*100)}));
                 else return setReadingProcess((prev) => ({ ...prev, [id]: 0 }));
             }
             else return setReadingProcess((prev) => ({ ...prev, [id]: 0 }));
@@ -193,7 +203,8 @@ const LibraryPage = () => {
     };
     const handleUpdateLibrary = async(id, tab) => {
         await updateLibrary(id, tab);
-        showNotiPopup(true, true, `Move manga to ${tab} successfully`);
+        tab = tab.charAt(0).toUpperCase() + tab.slice(1).replace('_', '-');
+        showNotiPopup(true, true, `Move manga to ${tab} tab successfully`);
         reload.current++;
     }
     const handleDeleteFromLibrary = async(id, tab) => {
@@ -214,13 +225,17 @@ const LibraryPage = () => {
         setNoti(noti);
     }
 
-
     useEffect(() => {
         setLoading(true);
+        fetchBlacklist();
         fetchAuthorList();
         fetchCategoryList();
-        fetchProfile();
         setLoading(false);
+    }, [blacklist.current]);
+    useEffect(() => {
+        setLibraryLoading(true);
+        fetchLibrary();
+        setLibraryLoading(false);
     }, [reload.current]);
 
     if (loading) {
@@ -253,12 +268,12 @@ const LibraryPage = () => {
                 </div>
             </header>
             <span><NotiPopup open={noti.open} onClose={()=>setNoti({open:false})} success={noti.success} message={noti.message}></NotiPopup></span>
-            <div className="flex justify-between items-center mt-3 mb-6 pb-3 text-3xl font-bold border-b">
+            <div className="flex justify-between items-center my-6 pb-3 text-3xl font-bold border-b">
                 <div className="flex space-x-2"><FaBookmark /><div>Library</div></div>
                 <div className="flex space-x-3">
                     <div className="relative">
-                        <FaSlidersH className="text-gray-400 hover:text-white" onClick={toggleFilter}/>
-                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10" onMouseLeave={toggleFilter}>                                  
+                        <FaSlidersH className={`${filterShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleFilter}/>
+                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10">                                  
                         <div>Filter by authors</div>
                         <MySelect
                             options={authorsRef.current}
@@ -280,15 +295,15 @@ const LibraryPage = () => {
                             }))}
                         />
                         <div className="flex justify-end space-x-2">
-                            <div className="rounded-3xl text-sm bg-blue hover:bg-light-blue p-2" onClick={handleDisplayLibrary}>Confirm</div>
-                            <div className="rounded-3xl text-sm bg-gray-700 hover:bg-gray-500 p-2" onClick={toggleFilter}>Cancel</div>
+                            <div className="rounded-3xl text-sm bg-blue hover:bg-light-blue p-2 cursor-pointer" onClick={handleDisplayLibrary}>Confirm</div>
+                            <div className="rounded-3xl text-sm bg-gray-700 hover:bg-gray-500 p-2 cursor-pointer" onClick={toggleFilter}>Cancel</div>
                         </div>
                         </div>
                         }
                     </div>
                     <div className="relative">
-                    <FaList className="text-gray-400 hover:text-white" onClick={toggleSort}/>
-                    {sortShow && (<div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 h-44 z-10" onMouseLeave={toggleSort}>
+                    <FaList className={`${sortShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleSort}/>
+                    {sortShow && (<div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 h-44 z-10">
                     <div>Sort by</div>
                     <div className="flex flex-col justify-between h-5/6">
                     <select id="sortby" className="bg-darker-navy text-white text-sm focus:ring-white block w-full p-3 my-2" value={sortOption} onChange={handleSortChange}>
@@ -297,8 +312,8 @@ const LibraryPage = () => {
                         <option value="publish">Published Date</option>
                     </select>
                     <div className="flex justify-end space-x-2">
-                        <div className="rounded-3xl text-sm bg-blue hover:bg-light-blue p-2" onClick={handleDisplayLibrary}>Confirm</div>
-                        <div className="rounded-3xl text-sm bg-gray-700 hover:bg-gray-500 p-2" onClick={toggleSort}>Cancel</div>
+                        <div className="rounded-3xl text-sm bg-blue hover:bg-light-blue p-2 cursor-pointer" onClick={handleDisplayLibrary}>Confirm</div>
+                        <div className="rounded-3xl text-sm bg-gray-700 hover:bg-gray-500 p-2 cursor-pointer" onClick={toggleSort}>Cancel</div>
                     </div>
                     </div>
                     </div>)} 
@@ -312,7 +327,7 @@ const LibraryPage = () => {
                     libraryShow.reading.map((manga) =>(
                         <div>
                             <div className="relative group">
-                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"></div>
+                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
                                 <img
                                 src={manga.cover}
                                 alt={manga.name}
@@ -325,9 +340,9 @@ const LibraryPage = () => {
                                 <div className="absolute top-0 right-0 bg-light-blue text-white text-sm font-bold px-2 py-4" style={{
                                     clipPath: "polygon(0% 0%, 100% 0%, 100% 70%, 50% 100%, 0% 70%)"
                                 }}>
-                                   {readingProcess[manga._id]+'%'} 
+                                   {readingProcess[manga._id] + '%'} 
                                 </div>
-                                <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={()=>toggleMenu(manga._id)}/></div>
+                                <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={()=>setMenuShow(manga._id)}/></div>
                                 {menuShow === manga._id &&(
                                     <div
                                     className="absolute bottom-2 right-1 p-1 flex justify-between space-x-4 text-xl bg-light-blue rounded-md"
@@ -335,11 +350,11 @@ const LibraryPage = () => {
                                     tabIndex={0}
                                     >
                                         <FaTrashCan className="hover:text-blue cursor-pointer" onClick={()=>handleDeleteFromLibrary(manga._id, 'reading')}/>
-                                        <FaRecycle className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 're_reading')}/>
                                         <FaCheckCircle className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 'completed')}/>
+                                        <FaRecycle className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 're_reading')}/>
                                         <FaBookmark className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 'reading')}/>
                                         <FaBookOpen className="hover:text-blue cursor-pointer" onClick={()=>handleReadLatest(manga._id)}/>
-                                        <FaEllipsisV  className="hover:text-blue cursor-pointer" onClick={()=>toggleMenu(null)}/>                                       
+                                        <FaEllipsisV  className="hover:text-blue cursor-pointer" onClick={()=>setMenuShow(null)}/>                                       
                                     </div>)}
                             </div>
                         </div>
@@ -352,7 +367,7 @@ const LibraryPage = () => {
                     libraryShow.re_reading.map((manga) =>(
                         <div>
                             <div className="relative group">
-                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"></div>
+                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
                                 <img
                                 src={manga.cover}
                                 alt={manga.name}
@@ -367,7 +382,7 @@ const LibraryPage = () => {
                                 }}>
                                    {readingProcess[manga._id]+'%'} 
                                 </div>
-                                <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={()=>toggleMenu(manga._id)}/></div>
+                                <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={()=>setMenuShow(manga._id)}/></div>
                                 {menuShow === manga._id &&(
                                     <div
                                     className="absolute bottom-2 right-1 p-1 flex justify-between space-x-4 text-xl bg-light-blue rounded-md"
@@ -375,11 +390,11 @@ const LibraryPage = () => {
                                     tabIndex={0}
                                     >
                                         <FaTrashCan className="hover:text-blue cursor-pointer" onClick={()=>handleDeleteFromLibrary(manga._id, 're_reading')}/>
-                                        <FaRecycle className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 're_reading')}/>
                                         <FaCheckCircle className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 'completed')}/>
+                                        <FaRecycle className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 're_reading')}/>                                        
                                         <FaBookmark className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 'reading')}/>
                                         <FaBookOpen className="hover:text-blue cursor-pointer" onClick={()=>handleReadLatest(manga._id)}/>
-                                        <FaEllipsisV  className="hover:text-blue cursor-pointer" onClick={()=>toggleMenu(null)}/>                                       
+                                        <FaEllipsisV  className="hover:text-blue cursor-pointer" onClick={()=>setMenuShow(null)}/>                                       
                                     </div>)}
                             </div>
                         </div>
@@ -392,7 +407,7 @@ const LibraryPage = () => {
                     libraryShow.completed.map((manga) =>(
                         <div>
                             <div className="relative group">
-                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"></div>
+                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
                                 <img
                                 src={manga.cover}
                                 alt={manga.name}
@@ -407,7 +422,7 @@ const LibraryPage = () => {
                                 }}>
                                    100% 
                                 </div>
-                                <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={()=>toggleMenu(manga._id)}/></div>
+                                <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={()=>setMenuShow(manga._id)}/></div>
                                 {menuShow === manga._id &&(
                                     <div
                                     className="absolute bottom-2 right-1 p-1 flex justify-between space-x-4 text-xl bg-light-blue rounded-md"
@@ -419,7 +434,7 @@ const LibraryPage = () => {
                                         <FaRecycle className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 're_reading')}/>                       
                                         <FaBookmark className="hover:text-blue cursor-pointer" onClick={()=>handleUpdateLibrary(manga._id, 'reading')}/>
                                         <FaBookOpen className="hover:text-blue cursor-pointer" onClick={()=>handleReadLatest(manga._id)}/>
-                                        <FaEllipsisV  className="hover:text-blue cursor-pointer" onClick={()=>toggleMenu(null)}/>                                       
+                                        <FaEllipsisV  className="hover:text-blue cursor-pointer" onClick={()=>setMenuShow(null)}/>                                       
                                     </div>)}
                             </div>
                         </div>

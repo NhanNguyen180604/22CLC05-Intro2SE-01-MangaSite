@@ -93,7 +93,7 @@ const ReportPopup = ({ loggedIn}) => {
 
     return (
         <>
-            <div className="w-full max-w-xl py-2 px-6 rounded-3xl text-sm bg-blue hover:bg-light-blue text-center cursor-pointer" onClick={onOpen}>Approval Request</div>
+            <div className="w-full max-w-xl p-1.5 rounded-xl text-xs bg-blue hover:bg-light-blue text-center cursor-pointer" onClick={onOpen}>Approval Request</div>
 
             <Popup
                 open={showThis} modal
