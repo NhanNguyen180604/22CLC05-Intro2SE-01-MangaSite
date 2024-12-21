@@ -2,12 +2,7 @@ import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import AuthorEditing from "./AuthorEditing.jsx";
 import { deleteAuthor, editAuthor } from "../../service/authorService.js";
 
-export default function AuthorItem({
-  author,
-  isEditing,
-  onEdit,
-  cancelEdit,
-}) {
+export default function AuthorItem({ author, isEditing, onEdit, cancelEdit }) {
   const { _id, name, publications } = author;
 
   const handleEditAuthor = async (name) => {
@@ -19,11 +14,12 @@ export default function AuthorItem({
   };
 
   return (
-    <div className="rounded-xl lg:bg-dark-navy bg-darker-navy">
+    <div className="rounded-xl bg-darker-navy lg:bg-dark-navy">
       <div className="rounded-xl bg-medium-navy p-4 text-white">
         <div className="text-base font-semibold">{name}</div>
         <div className="text-sm font-normal">
-          <span className="font-semibold">{publications}</span> publications
+          <span className="font-semibold">{publications || 0}</span>{" "}
+          publications
         </div>
       </div>
 

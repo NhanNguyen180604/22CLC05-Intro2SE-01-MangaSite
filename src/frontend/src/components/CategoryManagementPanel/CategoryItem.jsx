@@ -19,11 +19,12 @@ export default function CategoryItem({
   };
 
   return (
-    <div className="rounded-xl lg:bg-dark-navy bg-darker-navy">
+    <div className="rounded-xl bg-darker-navy lg:bg-dark-navy">
       <div className="rounded-xl bg-medium-navy p-4 text-white">
         <div className="text-base font-semibold">{name}</div>
         <div className="text-sm font-normal">
-          <span className="font-semibold">{publications}</span> publications
+          <span className="font-semibold">{publications || 0}</span>{" "}
+          publications
         </div>
       </div>
 

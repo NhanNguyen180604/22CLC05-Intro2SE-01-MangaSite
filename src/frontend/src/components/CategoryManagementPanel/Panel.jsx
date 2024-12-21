@@ -1,18 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdChevronLeft, MdOutlineSearch } from "react-icons/md";
 import { $adminPanel } from "../../stores/admin-tools.js";
 import { FaPlus } from "react-icons/fa";
 import CategoryItem from "./CategoryItem.jsx";
+import { getAllCategories } from "../../service/categoryService.js";
 
 function CategoryPanel() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState();
+  const [categories, setCategories] = useState([])
 
-  const categories = Array.from({ length: 8 }, (_, i) => ({
-    _id: i,
-    name: `Category ${i}`,
-    publications: i * 200,
-  }));
+  useEffect(() => {
+    (async () => {
+      const res = await getAllCategories()
+      if (res.status === 200) {
+        setCategories(res.categories)
+      }
+    })()
+  }, [])
 
   return (
     <section className="flex flex-col gap-6 p-6">

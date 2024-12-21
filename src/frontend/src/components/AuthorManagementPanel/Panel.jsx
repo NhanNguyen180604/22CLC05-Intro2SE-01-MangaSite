@@ -1,18 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdChevronLeft, MdOutlineSearch } from "react-icons/md";
 import { $adminPanel } from "../../stores/admin-tools.js";
 import { FaPlus } from "react-icons/fa";
 import CategoryItem from "./AuthorItem.jsx";
+import { getAllAuthors } from "../../service/authorService.js";
 
 function AuthorPanel() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState();
+  const [authors, setAuthors] = useState([])
 
-  const authors = Array.from({ length: 8 }, (_, i) => ({
-    _id: i,
-    name: `Author ${i}`,
-    publications: i * 200,
-  }));
+  useEffect(() => {
+    (async () => {
+      const res = await getAllAuthors()
+      if (res.status === 200) {
+        setAuthors(res.authors)
+      }
+    })()
+  }, [])
 
   return (
     <section className="flex flex-col gap-6 p-6">
