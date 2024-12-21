@@ -1,6 +1,6 @@
-import { API_URL } from "./service.js";
 import axios from "axios";
 import { $token } from "../stores/auth.js";
+import { API_URL } from "./service.js";
 
 /**
  * Retrieves all categories through a fetch. This only reads a page of 30 tags,
@@ -55,4 +55,3 @@ export const deleteCategory = async (id) => {
     return err;
   }
 };
-

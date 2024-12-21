@@ -1,20 +1,22 @@
 import MainLayout from "../../components/main/MainLayout.jsx";
 
-export default function Page401() {
+export default function Page404() {
   return (
     <MainLayout>
       <div className="flex h-full flex-col items-center gap-8 text-center">
         <img
-          src="/assets/tachiiri_kinshi_tape.png"
-          alt="立入禁止のだ。出てけアホ"
+          src="/assets/internet_404_page_not_found.png"
+          alt="Chirp Chirp! This page doesn't exist."
           className="size-20 lg:size-48"
         />
 
         <div className="flex flex-col gap-4">
           <h1 className="cursor-pointer bg-gradient-to-r from-pink-300 via-green-500 to-sky-500 bg-clip-text bg-left text-3xl font-bold duration-200 hover:bg-right">
-            Where does bro thing bro is going?
+            Uh oh! You hit a roadblock!
           </h1>
-          <p className="text-lg font-semibold">You are not allowed here!</p>
+          <p className="text-lg font-semibold">
+            Did you make a mistake in the link?
+          </p>
         </div>
 
         <a
