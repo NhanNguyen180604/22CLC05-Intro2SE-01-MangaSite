@@ -1,6 +1,7 @@
 import { API_URL, getErrorMessage } from './service.js';
 import axios from 'axios';
 const API = API_URL + '/authors';
+import { $token } from "../stores/auth.js";
 
 export const getAllAuthors = async () => {
     try {
@@ -39,3 +40,36 @@ export const postNewAuthor = async (name) => {
         return getErrorMessage(error);
     }
 };
+
+export const editAuthor = async (data) => {
+  try {
+    const token = $token.get();
+    const res = await axios.put(`${API}/categories/${data._id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.status !== 200) return null;
+
+    return { status: 200, authors: res.data };
+  } catch (err) {
+    return err;
+  }
+};
+
+export const deleteAuthor = async (id) => {
+  try {
+    const token = $token.get();
+    const res = await axios.delete(`${API}/categories/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.status !== 200) return null;
+
+    return { status: 200, authors: res.data };
+  } catch (err) {
+    return err;
+  }
+};
+

@@ -12,6 +12,8 @@ import ReportsPanel from "../reports/ReportsPanel.jsx";
 import UserManagementPanel from "../UserManagementPanel";
 import PublicationManagementPanel from "../PublicationManagementPanel";
 import EmptyAdminPanel from "./EmptyAdminPanel.jsx";
+import CategoryPanel from "../CategoryManagementPanel/Panel";
+import AuthorPanel from "../AuthorManagementPanel/Panel.jsx";
 
 export default function DesktopAdminTools() {
   const [selection, setSelection] = useState(-1);
@@ -80,7 +82,7 @@ export default function DesktopAdminTools() {
               checked={selection == 3}
               onChange={() => {
                 setSelection(3);
-                $adminPanel.set(<ReportsPanel />);
+                $adminPanel.set(<CategoryPanel />);
               }}
             />
             Manage Categories
@@ -95,7 +97,7 @@ export default function DesktopAdminTools() {
               checked={selection == 4}
               onChange={() => {
                 setSelection(4);
-                $adminPanel.set(null);
+                $adminPanel.set(<AuthorPanel />);
               }}
             />
             Manage Authors
