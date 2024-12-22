@@ -61,6 +61,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     enum: ["admin", "approved", "user"],
   },
+  deletedDate: Date,
 });
 
 module.exports = mongoose.models["User"] || mongoose.model("User", userSchema);

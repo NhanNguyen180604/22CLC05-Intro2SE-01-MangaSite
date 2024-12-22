@@ -13,6 +13,7 @@ import MainLayout from "../components/main/MainLayout.jsx";
 import MobileNavigationBar from "../components/main/MobileNavigationBar.jsx";
 import { redirect } from "../service/service.js";
 import { $token, checkClearance } from "../stores/auth.js";
+import { deleteMe } from "../service/userService.js";
 
 export default function SettingsPage() {
   useStore($token);
@@ -97,8 +98,15 @@ export default function SettingsPage() {
 
           <button
             className="flex flex-row items-center gap-2 p-4 px-6 font-semibold text-light-red hover:bg-blue focus:bg-blue lg:gap-4"
-            onClick={() => {
-              // Implement Deletion.
+            onClick={async () => {
+              const response = await deleteMe();
+              if (response.status === 200) {
+                $token.set(null);
+                redirect('/');
+              }
+              else {
+                console.log('Failed to delete account');
+              }
             }}
           >
             <MdDeleteOutline color="white" className="size-6" /> Delete Account

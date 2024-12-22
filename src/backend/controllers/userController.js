@@ -37,7 +37,7 @@ const getUsers = asyncHandler(async (req, res) => {
         throw new Error("Bad Request: Invalid query per_page.");
     }
 
-    const filter = { accountType: { $ne: 'admin' } };
+    const filter = { accountType: { $ne: 'admin' }, deletedDate: { $exists: false } };
     const count = await User.countDocuments(filter);
     const total_pages = Math.ceil(count / per_page);
     page = Math.min(page, total_pages);
@@ -139,6 +139,10 @@ const loginUser = asyncHandler(async (req, res) => {
     if (await BanList.findOne({ user: user._id })) {
         res.status(402);
         throw new Error('The user is banned');
+    }
+    if (user.deletedDate) {
+        res.status(400);
+        throw new Error("The user doesn't exist");  // have to xiaoloz
     }
     res.status(201).json({ token: generateToken(user._id) });
 });
@@ -448,8 +452,19 @@ const deleteUserAvatar = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(req.user.id, deletedAvatar, { new: true });
     // user.updateOne(newAvatar, {new: true})    
     res.json({ message: 'Succesfully deleted avatar' });
-})
+});
 
+const deleteMe = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    if (user.deletedDate) {
+        res.status(400);
+        throw new Error("What the hellllllll");
+    }
+
+    user.deletedDate = new Date();
+    await user.save();
+    res.status(200).json({ deletedDate: user.deletedDate });
+});
 
 module.exports = {
     getMe,
@@ -473,6 +488,7 @@ module.exports = {
     getUserNoti,
     updateUserAvatar,
     deleteUserAvatar,
-    updateUserById
+    updateUserById,
+    deleteMe,
 };
 
