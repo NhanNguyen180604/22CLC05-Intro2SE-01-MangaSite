@@ -1,22 +1,15 @@
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
-import { deleteCategory, editCategory } from "../../service/categoryService.js";
 import CategoryEditing from "./CategoryEditing.jsx";
 
 export default function CategoryItem({
   category,
   isEditing,
+  onOpenEditing,
   onEdit,
   cancelEdit,
+  onDelete,
 }) {
   const { _id, name, publications } = category;
-
-  const handleEditCategory = async (name) => {
-    await editCategory({ _id, name });
-  };
-
-  const handleDeleteCategory = async () => {
-    await deleteCategory(_id);
-  };
 
   return (
     <div className="rounded-xl bg-darker-navy lg:bg-dark-navy">
@@ -32,19 +25,20 @@ export default function CategoryItem({
         <MdOutlineEdit
           className="cursor-pointer hover:opacity-60"
           size={24}
-          onClick={() => onEdit(_id)}
+          onClick={() => onOpenEditing(_id)}
         />
         <MdDeleteOutline
           className="cursor-pointer hover:opacity-60"
           size={24}
-          onClick={() => handleDeleteCategory()}
+          onClick={() => onDelete(_id)}
         />
       </div>
 
       <CategoryEditing
+        title="Editing Category"
         category={category}
         isOpen={isEditing}
-        onEdit={handleEditCategory}
+        onEdit={onEdit}
         onCancel={cancelEdit}
       />
     </div>

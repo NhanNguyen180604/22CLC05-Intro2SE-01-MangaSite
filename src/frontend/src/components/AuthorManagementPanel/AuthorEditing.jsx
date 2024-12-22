@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 export default function AuthorEditing({
+  title,
   author,
   isOpen,
   onEdit,
@@ -12,7 +13,7 @@ export default function AuthorEditing({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
       <div className="w-80 rounded-xl bg-blue px-5 py-4 text-white">
-        <h4 className="text-base font-semibold">Editing Author</h4>
+        <h4 className="text-base font-semibold">{title}</h4>
 
         <label htmlFor="category-name" className="mt-4 text-sm font-semibold">
           Name
@@ -27,7 +28,7 @@ export default function AuthorEditing({
         <button
           className="mt-4 flex w-full items-center justify-center rounded-full bg-sky-blue py-2 text-base font-semibold text-black hover:opacity-50"
           onClick={() => {
-            onEdit(name);
+            onEdit(author._id, name);
             onCancel();
           }}
         >

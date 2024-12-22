@@ -2,16 +2,15 @@ import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import AuthorEditing from "./AuthorEditing.jsx";
 import { deleteAuthor, editAuthor } from "../../service/authorService.js";
 
-export default function AuthorItem({ author, isEditing, onEdit, cancelEdit }) {
+export default function AuthorItem({
+  author,
+  isEditing,
+  onOpenEditing,
+  onEdit,
+  cancelEdit,
+  onDelete,
+}) {
   const { _id, name, publications } = author;
-
-  const handleEditAuthor = async (name) => {
-    await editAuthor({ _id, name });
-  };
-
-  const handleDeleteAuthor = async () => {
-    await deleteAuthor(_id);
-  };
 
   return (
     <div className="rounded-xl bg-darker-navy lg:bg-dark-navy">
@@ -27,19 +26,20 @@ export default function AuthorItem({ author, isEditing, onEdit, cancelEdit }) {
         <MdOutlineEdit
           className="cursor-pointer hover:opacity-60"
           size={24}
-          onClick={() => onEdit(_id)}
+          onClick={() => onOpenEditing(_id)}
         />
         <MdDeleteOutline
           className="cursor-pointer hover:opacity-60"
           size={24}
-          onClick={() => handleDeleteAuthor()}
+          onClick={() => onDelete(_id)}
         />
       </div>
 
       <AuthorEditing
+        title="Editing Category"
         author={author}
         isOpen={isEditing}
-        onEdit={handleEditAuthor}
+        onEdit={onEdit}
         onCancel={cancelEdit}
       />
     </div>

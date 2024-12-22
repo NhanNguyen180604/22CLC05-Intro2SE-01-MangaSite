@@ -3,12 +3,14 @@ import { MdChevronLeft, MdOutlineSearch } from "react-icons/md";
 import { $adminPanel } from "../../stores/admin-tools.js";
 import { FaPlus } from "react-icons/fa";
 import CategoryItem from "./CategoryItem.jsx";
-import { getAllCategories } from "../../service/categoryService.js";
+import { createCategory, deleteCategory, editCategory, getAllCategories } from "../../service/categoryService.js";
+import CategoryEditing from "./CategoryEditing.jsx";
 
 function CategoryPanel() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState();
   const [categories, setCategories] = useState([])
+  const [isCreating, setCreating] = useState(false)
 
   useEffect(() => {
     (async () => {
@@ -18,6 +20,27 @@ function CategoryPanel() {
       }
     })()
   }, [])
+
+  const handleCreate = async (_id, name) => {
+    const res = await createCategory(name)
+    if (res?.status === 200) {
+      setCategories([...categories, res.category])
+    }
+  }
+
+  const handleEdit = async (id, name) => {
+    await editCategory({id, name})
+    setCategories((categories) =>
+      categories.map((cate) =>
+        cate._id === id ? { ...cate, name: name } : cate,
+      ),
+    );
+  }
+
+  const handleDelete = async (id) => {
+    await deleteCategory(id);
+    setCategories(categories => categories.filter(cate => cate._id !== id))
+  }
 
   return (
     <section className="flex flex-col gap-6 p-6">
@@ -40,10 +63,20 @@ function CategoryPanel() {
         />
       </div>
 
-      <button className="ml-auto flex flex-row items-center justify-center gap-1 rounded-full bg-very-light-blue px-3 py-1 font-semibold text-black hover:bg-light-blue">
+      <button className="ml-auto flex flex-row items-center justify-center gap-1 rounded-full bg-very-light-blue px-3 py-1 font-semibold text-black hover:bg-light-blue"
+        onClick={() => setCreating(true)}
+      >
         <FaPlus size={12} />
         Create
       </button>
+
+      <CategoryEditing
+        title="Create Category"
+        category={{name: ''}}
+        isOpen={isCreating}
+        onEdit={handleCreate}
+        onCancel={() => setCreating(false)}
+      />
 
       <div className="flex max-h-[400px] flex-col items-center overflow-y-scroll">
         <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
@@ -52,8 +85,10 @@ function CategoryPanel() {
               key={category._id}
               category={category}
               isEditing={editing === category._id}
-              onEdit={(id) => setEditing(id)}
+              onOpenEditing={(id) => setEditing(id)}
+              onEdit={handleEdit}
               cancelEdit={() => setEditing(null)}
+              onDelete={handleDelete}
             />
           ))}
         </div>
