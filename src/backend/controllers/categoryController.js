@@ -74,4 +74,36 @@ const uploadCategory = expressAsyncHandler(async (req, res) => {
   return res.status(200).json({ _id: created._id, name: created.name });
 });
 
-module.exports = { getCategories, uploadCategory };
+const updateCategory = expressAsyncHandler(async (req, res) => {
+  if (req.user.accountType != "admin") {
+    res.status(401);
+    throw new Error("Unauthorized access");
+  }
+
+  if (!req.body.name) {
+    res.status(400);
+    throw new Error("Bad Request: No name specified.");
+  }
+
+  const updated = await Category.findByIdAndUpdate(req.params.id, {
+    name: req.body.name,
+  });
+
+  res.status(200).json(updated)
+})
+
+const deleteCategory = expressAsyncHandler(async (req, res) => {
+  if (req.user.accountType != "admin") {
+    res.status(401);
+    throw new Error("Unauthorized access");
+  }
+
+  const deleted = await Category.findByIdAndDelete(req.params.id)
+  if (deleted) {
+    res.status(200).json({ message: 'Document deleted successfully.' })
+  } else {
+    res.status(400).json({ message: 'No document found to delete.' })
+  }
+})
+
+module.exports = { getCategories, uploadCategory, updateCategory, deleteCategory };
