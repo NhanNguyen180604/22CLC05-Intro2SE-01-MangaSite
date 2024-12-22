@@ -17,6 +17,7 @@ router.route('/me')
     .put(authorize, userController.updateUserById)
     .delete(authorize, userController.deleteMe);
 router.route('/notifications').post(authorize, userController.notifyUser).get(authorize, userController.getUserNoti);
+router.route('/notifications/:id/read').post(authorize, userController.readUserNoti)
 router.route('/ban')
     .get(authorize, userController.getBannedUser)
     .post(authorize, userController.banUser)
