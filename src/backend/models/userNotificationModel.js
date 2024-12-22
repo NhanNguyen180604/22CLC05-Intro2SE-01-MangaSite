@@ -10,8 +10,9 @@ const userNotiSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    manga: {
-        type: String,
+    mangaNoti: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MangaNoti',
     },
     read: {
         type: Boolean,

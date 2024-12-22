@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const Approval = require('../models/approvalRequestModel');
 const BanList = require('../models/banUserModel');
 const UserNoti = require("../models/userNotificationModel");
+const MangaNoti = require("../models/mangaNotificationModel");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cloudinaryWrapper = require('../others/cloudinaryWrapper');
@@ -400,8 +401,45 @@ const getUserNoti = asyncHandler(async (req, res) => {
         user: req.user.id,
     });
 
+    const library = [
+        ...req.user.library.reading,
+        ...req.user.library.completed,
+        ...req.user.library.re_reading,
+    ]
+
+    library.forEach(async( manga) => {
+        const mangaNotis = await MangaNoti.find({
+            manga: manga
+        })
+        mangaNotis.forEach(async mangaNoti => {
+            if (
+              !userNotifications.some((userNoti) =>
+                mangaNoti._id.equals(userNoti.mangaNoti),
+              )
+            ) {
+              const newUserNoti = await UserNoti.create({
+                  user: req.user.id,
+                  message: mangaNoti.message,
+                  mangaNoti: mangaNoti._id,
+                  createdAt: mangaNoti.createdAt,
+              })
+              userNotifications.push(newUserNoti)
+            }
+        })
+    })
+
     res.json(userNotifications);
 });
+
+const readUserNoti =  asyncHandler(async (req, res) => {
+    const noti = await UserNoti.findById(req.params.id)
+    if (!noti.user.equals(req.user._id)) {
+        res.status(401)
+        throw new Error('Permission denied')
+    }
+    const updated = await noti.updateOne({read: true})
+    res.json(updated)
+})
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
     const { avatar } = req.files;
@@ -486,6 +524,7 @@ module.exports = {
     getBannedUser,
     notifyUser,
     getUserNoti,
+    readUserNoti,
     updateUserAvatar,
     deleteUserAvatar,
     updateUserById,
