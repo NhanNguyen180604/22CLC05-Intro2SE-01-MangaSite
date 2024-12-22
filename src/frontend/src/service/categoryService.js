@@ -24,10 +24,24 @@ export const getAllCategories = async () => {
   }
 };
 
+export const createCategory = async (name) => {
+  try {
+    const token = $token.get();
+    const res = await axios.post(API_URL + "/categories", {name}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    })
+    return { status: 200, category: res.data };
+  } catch (err) {
+    return err
+  }
+}
+
 export const editCategory = async (data) => {
   try {
     const token = $token.get();
-    const res = await axios.put(API_URL + `/categories/${data._id}`, data, {
+    const res = await axios.put(API_URL + `/categories/${data.id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

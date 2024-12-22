@@ -44,7 +44,7 @@ export const postNewAuthor = async (name) => {
 export const editAuthor = async (data) => {
   try {
     const token = $token.get();
-    const res = await axios.put(`${API}/categories/${data._id}`, data, {
+    const res = await axios.put(`${API}/${data._id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -60,7 +60,7 @@ export const editAuthor = async (data) => {
 export const deleteAuthor = async (id) => {
   try {
     const token = $token.get();
-    const res = await axios.delete(`${API}/categories/${id}`, {
+    const res = await axios.delete(`${API}/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

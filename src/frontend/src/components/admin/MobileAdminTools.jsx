@@ -11,6 +11,8 @@ import UserManagementPanel from "../UserManagementPanel";
 import PublicationManagementPanel from "../PublicationManagementPanel";
 import ReportsPanel from "../reports/ReportsPanel.jsx";
 import MobileAdminPanel from "./MobileAdminPanel.jsx";
+import CategoryPanel from "../CategoryManagementPanel/Panel.jsx";
+import AuthorPanel from "../AuthorManagementPanel/Panel.jsx";
 
 export default function MobileAdminTools() {
   return (
@@ -68,7 +70,7 @@ export default function MobileAdminTools() {
         <button
           className="flex w-full cursor-pointer flex-row items-center justify-between px-6 py-5 duration-200 hover:bg-medium-navy"
           onClick={() => {
-            $adminPanel.set(null);
+            $adminPanel.set(<CategoryPanel />);
           }}
         >
           <div className="flex flex-row items-center gap-2 font-semibold duration-200">
@@ -82,7 +84,7 @@ export default function MobileAdminTools() {
         <button
           className="flex w-full cursor-pointer flex-row items-center justify-between px-6 py-5 duration-200 hover:bg-medium-navy"
           onClick={() => {
-            $adminPanel.set(null);
+            $adminPanel.set(<AuthorPanel />);
           }}
         >
           <div className="flex flex-row items-center gap-2 font-semibold duration-200">
