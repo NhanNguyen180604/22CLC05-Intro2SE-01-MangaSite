@@ -14,11 +14,47 @@ import MobileNavigationBar from "../components/main/MobileNavigationBar.jsx";
 import { redirect } from "../service/service.js";
 import { $token, checkClearance } from "../stores/auth.js";
 import { deleteMe } from "../service/userService.js";
+import DeletePopup from "../components/DeletePopup";
 
 export default function SettingsPage() {
   useStore($token);
   const [loading, setLoading] = useState(true);
   const [clearance, setClearance] = useState(0);
+
+  const [delPopupDetails, setDelPopupDetails] = useState({
+    show: false,
+    loading: false,
+    onClose: () => { },
+    message: '',
+    callback: () => { },
+  });
+  const showDeletePopup = (e) => {
+    e.preventDefault();
+    setDelPopupDetails({
+      show: true,
+      loading: false,
+      onClose: () => {
+        setDelPopupDetails({
+          ...delPopupDetails,
+          show: false,
+          loading: false,
+        });
+      },
+      message: "You are about to delete this your account.",
+      callback: deleteAccount,
+    });
+  };
+
+  const deleteAccount = async () => {
+    const response = await deleteMe();
+    if (response.status === 200) {
+      $token.set(null);
+      redirect('/');
+    }
+    else {
+      console.log('Failed to delete account');
+    }
+  };
 
   useEffect(() => {
     checkClearance().then((clearance) => {
@@ -98,20 +134,19 @@ export default function SettingsPage() {
 
           <button
             className="flex flex-row items-center gap-2 p-4 px-6 font-semibold text-light-red hover:bg-blue focus:bg-blue lg:gap-4"
-            onClick={async () => {
-              const response = await deleteMe();
-              if (response.status === 200) {
-                $token.set(null);
-                redirect('/');
-              }
-              else {
-                console.log('Failed to delete account');
-              }
-            }}
+            onClick={showDeletePopup}
           >
             <MdDeleteOutline color="white" className="size-6" /> Delete Account
           </button>
         </div>
+
+        <DeletePopup
+          open={delPopupDetails.show}
+          onClose={delPopupDetails.onClose}
+          message={delPopupDetails.message}
+          callback={delPopupDetails.callback}
+          loading={delPopupDetails.loading}
+        />
       </div>
 
       <footer>

@@ -219,7 +219,7 @@ const updateChapter = asyncHandler(async (req, res) => {
 
     // delete images
     if (req.body.deleting)
-        cloudinaryWrapper.deleteResources(req.body.deleting);
+        await cloudinaryWrapper.deleteResources(req.body.deleting);
 
     // upload new images
     let newImages = null;

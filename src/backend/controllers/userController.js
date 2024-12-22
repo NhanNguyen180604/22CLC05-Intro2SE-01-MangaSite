@@ -407,37 +407,36 @@ const getUserNoti = asyncHandler(async (req, res) => {
         ...req.user.library.re_reading,
     ]
 
-    library.forEach(async( manga) => {
-        const mangaNotis = await MangaNoti.find({
-            manga: manga
-        })
+    library.forEach(async (manga) => {
+        const mangaNotis = await MangaNoti.find({ manga: manga })
         mangaNotis.forEach(async mangaNoti => {
-            if (
-              !userNotifications.some((userNoti) =>
+            if (!userNotifications.some((userNoti) =>
                 mangaNoti._id.equals(userNoti.mangaNoti),
-              )
-            ) {
-              const newUserNoti = await UserNoti.create({
-                  user: req.user.id,
-                  message: mangaNoti.message,
-                  mangaNoti: mangaNoti._id,
-                  createdAt: mangaNoti.createdAt,
-              })
-              userNotifications.push(newUserNoti)
+            )) {
+                const newUserNoti = await UserNoti.create({
+                    user: req.user.id,
+                    message: mangaNoti.message,
+                    mangaNoti: mangaNoti._id,
+                    createdAt: mangaNoti.createdAt,
+                })
+                userNotifications.push(newUserNoti)
             }
         })
     })
 
-    res.json(userNotifications);
+    // sort by date
+    res.json(userNotifications.sort((a, b) => {
+        return (new Date(b.createdAt)).getTime() - (new Date(a.createdAt)).getTime()
+    }));
 });
 
-const readUserNoti =  asyncHandler(async (req, res) => {
+const readUserNoti = asyncHandler(async (req, res) => {
     const noti = await UserNoti.findById(req.params.id)
     if (!noti.user.equals(req.user._id)) {
         res.status(401)
         throw new Error('Permission denied')
     }
-    const updated = await noti.updateOne({read: true})
+    const updated = await noti.updateOne({ read: true })
     res.json(updated)
 })
 

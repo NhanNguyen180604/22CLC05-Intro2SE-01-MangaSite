@@ -77,24 +77,28 @@ const HomePage = () => {
             <h4 className={styles.notificationHeader}>Notifications</h4>
 
             {noti ? (
-              noti.map((noti) => {
-                const createdAt = new Date(noti.createdAt);
-                const date = createdAt.toLocaleDateString();
-                const time = createdAt.toLocaleTimeString();
-                return (
-                  <div
-                    className={`${styles.notiBox} ${noti.read ? styles.read : ""}`}
-                    key={noti._id}
-                    onClick={() => !noti.read && readNoti(noti._id)}
-                  >
-                    <p className={styles.notiMessage}>{noti.message}</p>
-                    <span className={styles.notiTime}>{`${date} ${time}`}</span>
-                    {!noti.read && (
-                      <div className={styles.notiUnreadMark}></div>
-                    )}
-                  </div>
-                );
-              })
+              noti.length ? (
+                noti.map((noti) => {
+                  const createdAt = new Date(noti.createdAt);
+                  const date = createdAt.toLocaleDateString();
+                  const time = createdAt.toLocaleTimeString();
+                  return (
+                    <div
+                      className={`${styles.notiBox} ${noti.read ? styles.read : ""}`}
+                      key={noti._id}
+                      onClick={() => !noti.read && readNoti(noti._id)}
+                    >
+                      <p className={styles.notiMessage}>{noti.message}</p>
+                      <span className={styles.notiTime}>{`${date} ${time}`}</span>
+                      {!noti.read && (
+                        <div className={styles.notiUnreadMark}></div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <p>You have no notifications</p>
+              )
             ) : (
               <p>Please login to see your notifications</p>
             )}
