@@ -3,12 +3,14 @@ import { MdChevronLeft, MdOutlineSearch } from "react-icons/md";
 import { $adminPanel } from "../../stores/admin-tools.js";
 import { FaPlus } from "react-icons/fa";
 import CategoryItem from "./AuthorItem.jsx";
-import { getAllAuthors } from "../../service/authorService.js";
+import { deleteAuthor, editAuthor, getAllAuthors, postNewAuthor } from "../../service/authorService.js";
+import AuthorEditing from "./AuthorEditing.jsx";
 
 function AuthorPanel() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState();
   const [authors, setAuthors] = useState([])
+  const [isCreating, setCreating] = useState(false)
 
   useEffect(() => {
     (async () => {
@@ -18,6 +20,27 @@ function AuthorPanel() {
       }
     })()
   }, [])
+
+  const handleCreate = async (_id, name) => {
+    const res = await postNewAuthor(name)
+    if (res?.status === 200) {
+      setAuthors([...authors, res.author])
+    }
+  }
+
+  const handleEdit = async (id, name) => {
+    await editAuthor({id, name})
+    setAuthors((authors) =>
+      authors.map((author) =>
+        author._id === id ? { ...author, name: name } : author,
+      ),
+    );
+  }
+
+  const handleDelete = async (id) => {
+    await deleteAuthor(id);
+    setAuthors(authors => authors.filter(author => author._id !== id))
+  }
 
   return (
     <section className="flex flex-col gap-6 p-6">
@@ -40,10 +63,20 @@ function AuthorPanel() {
         />
       </div>
 
-      <button className="ml-auto flex flex-row items-center justify-center gap-1 rounded-full bg-very-light-blue px-3 py-1 font-semibold text-black hover:bg-light-blue">
+      <button className="ml-auto flex flex-row items-center justify-center gap-1 rounded-full bg-very-light-blue px-3 py-1 font-semibold text-black hover:bg-light-blue"
+        onClick={() => setCreating(true)}
+      >
         <FaPlus size={12} />
         Create
       </button>
+
+      <AuthorEditing
+        title="Create Author"
+        author={{name: ''}}
+        isOpen={isCreating}
+        onEdit={handleCreate}
+        onCancel={() => setCreating(false)}
+      />
 
       <div className="flex max-h-[400px] flex-col items-center overflow-y-scroll">
         <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
@@ -52,8 +85,10 @@ function AuthorPanel() {
               key={author._id}
               author={author}
               isEditing={editing === author._id}
-              onEdit={(id) => setEditing(id)}
+              onOpenEditing={(id) => setEditing(id)}
+              onEdit={handleEdit}
               cancelEdit={() => setEditing(null)}
+              onDelete={handleDelete}
             />
           ))}
         </div>

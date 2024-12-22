@@ -44,7 +44,7 @@ export const postNewAuthor = async (name) => {
 export const editAuthor = async (data) => {
   try {
     const token = $token.get();
-    const res = await axios.put(`${API}/${data._id}`, data, {
+    const res = await axios.put(`${API}/${data.id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
