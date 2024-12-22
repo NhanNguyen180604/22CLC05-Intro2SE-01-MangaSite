@@ -1,6 +1,5 @@
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import AuthorEditing from "./AuthorEditing.jsx";
-import { deleteAuthor, editAuthor } from "../../service/authorService.js";
 
 export default function AuthorItem({
   author,
@@ -16,10 +15,12 @@ export default function AuthorItem({
     <div className="rounded-xl bg-darker-navy lg:bg-dark-navy">
       <div className="rounded-xl bg-medium-navy p-4 text-white">
         <div className="text-base font-semibold">{name}</div>
-        <div className="text-sm font-normal">
-          <span className="font-semibold">{publications || 0}</span>{" "}
-          publications
-        </div>
+        {publications && (
+          <div className="text-sm font-normal">
+            <span className="font-semibold">{publications || 0}</span>{" "}
+            publications
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-center gap-2 p-[10px]">

@@ -93,9 +93,9 @@ function AuthorPanel() {
           ))}
         </div>
 
-        <button className="mt-4 rounded-full border-2 border-very-light-blue px-2 py-1 font-semibold text-white hover:opacity-60">
-          Show More
-        </button>
+        {/* <button className="mt-4 rounded-full border-2 border-very-light-blue px-2 py-1 font-semibold text-white hover:opacity-60"> */}
+        {/*   Show More */}
+        {/* </button> */}
       </div>
     </section>
   );
