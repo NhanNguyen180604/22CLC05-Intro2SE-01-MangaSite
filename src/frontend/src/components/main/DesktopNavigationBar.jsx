@@ -59,7 +59,7 @@ export default function DesktopNavigationBar() {
         <a href="/publish" aria-label="Publish">
           <MdAddCircleOutline color="white" size={32} />
         </a>
-        <a href="/library" aria-label="Library">
+        <a href="/user/library" aria-label="Library">
           <IconBookmark className="size-8 fill-icon-white" />
         </a>
         <a href="/settings" aria-label="Notifications">

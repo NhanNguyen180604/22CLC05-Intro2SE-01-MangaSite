@@ -59,14 +59,14 @@ function SearchFilterDialog() {
   // Load the categories
   useEffect(() => {
     getCategories()
-      .then((categories) => {
-        if (categories) {
-          const retrieved = categories.map((cat) => cat.name);
+      .then((res) => {
+        if (res) {
+          const retrieved = res.categories.map((cat) => cat.name);
           $searchGenres.set(
             $searchGenres.get().filter((genre) => retrieved.includes(genre)),
           );
         }
-        setCategories(categories);
+        setCategories(res.categories);
       })
       .then(() => setLoading(false));
   }, []);

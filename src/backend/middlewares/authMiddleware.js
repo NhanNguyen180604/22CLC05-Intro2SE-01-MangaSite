@@ -12,6 +12,9 @@ const getToken = asyncHandler(async req => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         req.user = await User.findById(decoded.id).select('-password');
+        if (req.user.deletedDate){
+            throw new Error("User doesn't exist");  //xiao loz
+        }
     }
     catch (err) {
         return [null, err];

@@ -12,7 +12,10 @@ router.route('/library/:tab/:id').delete(authorize, userController.deleteFromLib
 router.route('/blacklist').get(authorize, userController.getBlacklist).put(authorize, userController.updateBlacklist);
 
 router.route('/').get(authorize, userController.getUsers);
-router.route('/me').get(authorize, userController.getMe).put(authorize, userController.updateUserById);
+router.route('/me')
+    .get(authorize, userController.getMe)
+    .put(authorize, userController.updateUserById)
+    .delete(authorize, userController.deleteMe);
 router.route('/notifications').post(authorize, userController.notifyUser).get(authorize, userController.getUserNoti);
 router.route('/ban')
     .get(authorize, userController.getBannedUser)
@@ -21,7 +24,9 @@ router.route('/ban')
 router.route('/approval')
     .get(authorize, userController.getApprovalRequests)
     .post(authorize, userController.requestApproval);
-router.route('/:id').get(authorize, userController.getUserById).put(authorize, userController.changeUserRole);
+router.route('/:id')
+    .get(authorize, userController.getUserById)
+    .put(authorize, userController.changeUserRole);
 router.route('/login').post(userController.loginUser);
 router.route('/register').post(userController.registerUser);
 

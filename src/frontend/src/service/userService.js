@@ -340,3 +340,39 @@ export const getApprovalRequests = async () => {
     if (response.status !== 200) return null;
     return response.data;
 };
+
+export const sendApprovalRequests = async (reason) => {
+    try {
+        const token = $token.get();
+        if (!token)
+            return null;
+
+        const response = await axios.post(API + 'approval', { reason }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
+
+export const deleteMe = async () => {
+    try {
+        const token = $token.get();
+        if (!token)
+            return null;
+
+        const response = await axios.delete(API + '/me', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return { status: response.status, data: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+};
