@@ -80,17 +80,21 @@ function AuthorPanel() {
 
       <div className="flex max-h-[400px] flex-col items-center overflow-y-scroll">
         <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
-          {authors.map((author) => (
-            <CategoryItem
-              key={author._id}
-              author={author}
-              isEditing={editing === author._id}
-              onOpenEditing={(id) => setEditing(id)}
-              onEdit={handleEdit}
-              cancelEdit={() => setEditing(null)}
-              onDelete={handleDelete}
-            />
-          ))}
+          {authors
+            .filter((author) =>
+              author.name.toLowerCase().includes(search.toLowerCase()),
+            )
+            .map((author) => (
+              <CategoryItem
+                key={author._id}
+                author={author}
+                isEditing={editing === author._id}
+                onOpenEditing={(id) => setEditing(id)}
+                onEdit={handleEdit}
+                cancelEdit={() => setEditing(null)}
+                onDelete={handleDelete}
+              />
+            ))}
         </div>
 
         {/* <button className="mt-4 rounded-full border-2 border-very-light-blue px-2 py-1 font-semibold text-white hover:opacity-60"> */}
