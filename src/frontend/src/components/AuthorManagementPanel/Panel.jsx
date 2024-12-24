@@ -78,7 +78,7 @@ function AuthorPanel() {
         onCancel={() => setCreating(false)}
       />
 
-      <div className="flex max-h-[400px] flex-col items-center overflow-y-scroll">
+      <div className="flex max-h-[400px] flex-col items-center overflow-y-auto">
         <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
           {authors
             .filter((author) =>
