@@ -4,12 +4,23 @@ import { useNavigate } from 'react-router-dom';
 const RegisterPage = () => {
   const [email, setEmail] = useState();
   const [username, setUsername] = useState();
+  const [nameError, setNameError] = useState();
   const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
+  const [passwordError, setPasswordError] = useState();
   const [error, setError] = useState();
   const navigate = useNavigate();
   const handleSubmit = async e => {
     e.preventDefault();
-    const response = await postRegister(email, username, password);
+    if (username.trim() === ''){
+      setNameError('Username cannot be filled with blank space');
+      return;
+    }
+    if (password !== confirmPassword){
+      setPasswordError(`Password confirmation doesn't match`);
+      return;
+    }
+    const response = await postRegister(email, username, password, checkMail);
     if(response?.status === 400){
       setError(response.message);
       return;
@@ -19,6 +30,8 @@ const RegisterPage = () => {
 
   const deleteErrorState = () => {
     setError(null);
+    setPasswordError(null);
+    setNameError(null);
   }
   return (
     <div className="flex items-center justify-center min-h-screen bg-dark-navy">
@@ -71,6 +84,7 @@ const RegisterPage = () => {
               onChange = {e=>setUsername(e.target.value)}
               required
             />
+            {nameError && (<p className="mt-1 text-sm text-red">{nameError}</p>)}
           </div>
 
           <div>
@@ -88,6 +102,24 @@ const RegisterPage = () => {
               onChange = {e=>setPassword(e.target.value)}
               required
             />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-300"
+            >
+              Confirm Password
+            </label>
+            <input
+              id="cpassword"
+              type="password"
+              placeholder="Confirm your password"
+              className="w-full px-4 py-2 mt-1 text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-darker-navy"
+              onChange = {e=>setConfirmPassword(e.target.value)}
+              required
+            />
+            {passwordError && (<p className="mt-1 text-sm text-red">{passwordError}</p>)}
           </div>
 
           <button
