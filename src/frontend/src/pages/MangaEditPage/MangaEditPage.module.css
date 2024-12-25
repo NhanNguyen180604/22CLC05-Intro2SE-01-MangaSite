@@ -255,6 +255,10 @@
   background: var(--sky-blue);
 }
 
+.min-height-placeholder{
+  min-height: 400px;
+}
+
 .mobileDisplay {
   display: none;
 }

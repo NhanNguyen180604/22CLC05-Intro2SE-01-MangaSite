@@ -402,7 +402,7 @@ const EditChapterPage = () => {
                                     {me.accountType !== 'admin' && (
                                         <>
                                             <label
-                                                className={styles.pagePlaceholder}
+                                                className={`${styles.pagePlaceholder} ${!images.length && styles.minHeightPlaceholder}`}
                                                 htmlFor="pageInput"
                                             >
                                                 <FaPlus />

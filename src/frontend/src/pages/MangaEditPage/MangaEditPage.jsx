@@ -499,57 +499,52 @@ const MangaEditPage = () => {
                             </TabPanel>
 
                             <TabPanel title="Art">
-                                {covers.length ? (
-                                    <div className={styles.coverListContainer}>
-                                        {covers.map(cover => (
-                                            <div key={cover._id} className={styles.coverContainer}>
-                                                <img src={cover.imageURL} className={styles.smolCover} />
-                                                <div className={styles.coverNumber}>#{cover.number}</div>
-                                                {me.accountType !== 'admin' && (
-                                                    <div className={styles.coverBTNs}>
-                                                        <div
-                                                            onClick={() => setUpdatedManga({
-                                                                ...updatedManga,
-                                                                cover: cover.imageURL,
-                                                            })}
-                                                        >
-                                                            Set as thumbnail
-                                                        </div>
-                                                        <div
-                                                            onClick={() => {
-                                                                setDelPopupDetails({
-                                                                    show: true,
-                                                                    loading: false,
-                                                                    onClose: () => {
-                                                                        setDelPopupDetails({
-                                                                            ...delPopupDetails,
-                                                                            show: false,
-                                                                        });
-                                                                    },
-                                                                    message: 'You are about to delete this cover image.',
-                                                                    callback: () => deleteCoverImg(cover.number),
-                                                                });
-                                                            }}
-                                                        >
-                                                            Remove
-                                                        </div>
+                                <div className={styles.coverListContainer}>
+                                    {covers.map(cover => (
+                                        <div key={cover._id} className={styles.coverContainer}>
+                                            <img src={cover.imageURL} className={styles.smolCover} />
+                                            <div className={styles.coverNumber}>#{cover.number}</div>
+                                            {me.accountType !== 'admin' && (
+                                                <div className={styles.coverBTNs}>
+                                                    <div
+                                                        onClick={() => setUpdatedManga({
+                                                            ...updatedManga,
+                                                            cover: cover.imageURL,
+                                                        })}
+                                                    >
+                                                        Set as thumbnail
                                                     </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                        {me.accountType !== 'admin' && (
-                                            <div
-                                                className={styles.coverPlaceholder}
-                                                onClick={() => setShowCoverUploadPopup(true)}
-                                            >
-                                                <FaPlus />
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div>No art</div>
-                                )}
-
+                                                    <div
+                                                        onClick={() => {
+                                                            setDelPopupDetails({
+                                                                show: true,
+                                                                loading: false,
+                                                                onClose: () => {
+                                                                    setDelPopupDetails({
+                                                                        ...delPopupDetails,
+                                                                        show: false,
+                                                                    });
+                                                                },
+                                                                message: 'You are about to delete this cover image.',
+                                                                callback: () => deleteCoverImg(cover.number),
+                                                            });
+                                                        }}
+                                                    >
+                                                        Remove
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {me.accountType !== 'admin' && (
+                                        <div
+                                            className={`${styles.coverPlaceholder} ${!covers.length && styles['min-height-placeholder']}`}
+                                            onClick={() => setShowCoverUploadPopup(true)}
+                                        >
+                                            <FaPlus />
+                                        </div>
+                                    )}
+                                </div>
                             </TabPanel>
                         </Tab>
 

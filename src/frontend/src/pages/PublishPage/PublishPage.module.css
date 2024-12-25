@@ -56,7 +56,6 @@
 .mangaGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr;
     gap: 1rem;
     margin-bottom: 4rem;
 }
@@ -64,7 +63,7 @@
 .mangaCover{
     object-fit: contain;
     max-width: 100%;
-    height: 160px;
+    /* height: 160px; */
 }
 
 .mangaContainer {
@@ -73,7 +72,6 @@
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
-    align-items: center;
 }
 
 .mangaName {

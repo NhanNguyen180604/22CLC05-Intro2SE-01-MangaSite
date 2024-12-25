@@ -190,7 +190,7 @@ const ChapterListEditPage = () => {
 
                         {me.accountType !== 'admin' && (
                             <div
-                                className={styles.addNewBTN}
+                                className={`${styles.addNewBTN} ${!chapters.length && styles.minHeightAddNewBTN}`}
                                 onClick={() => navigate(`/mangas/${id}/chapters/new`)}
                             >
                                 <FaPlus />Add a new chapter

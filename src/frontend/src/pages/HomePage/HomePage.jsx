@@ -20,7 +20,7 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getMangas(1, 10, 'top-rating');
+      const response = await getMangas(1, 15, 'top-rating');
       if (response.status === 200) {
         setRaingMangas(response.mangas.mangas);
       }
@@ -31,7 +31,7 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getMangas(1, 10, 'recently-updated');
+      const response = await getMangas(1, 15, 'recently-updated');
       if (response.status === 200) {
         setUpdatedMangas(response.mangas.mangas);
       }
