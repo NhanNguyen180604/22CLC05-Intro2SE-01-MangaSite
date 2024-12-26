@@ -13,9 +13,10 @@ import { useNavigate } from "react-router-dom"
 import { getChapterList, getReadingHistory } from "../service/mangaService.js"
 import NotiPopup from "../components/NotiPopup/NotiPopup.jsx"
 
+
 const LibraryPage = () => {
     const blacklist = useRef();
-    const library = useRef();
+    const library = useRef({ reading: [], re_reading: [], completed: [] });
     const [libraryShow, setLibraryShow] = useState({ reading: [], re_reading: [], completed: [] });
     const [loading, setLoading] = useState(true);
     const [libraryLoading, setLibraryLoading] = useState(false);
@@ -31,6 +32,12 @@ const LibraryPage = () => {
     const [noti, setNoti] = useState({ open: false, success: null, message: null });
     const navigate = useNavigate();
     const reload = useRef(0);
+    const perLoad = 4;
+    const [itemsToShow, setItemsToShow] = useState({
+        reading: perLoad,
+        completed: perLoad,
+        re_reading: perLoad
+    });
 
     const fetchLibrary = async () => {
         try {
@@ -104,11 +111,11 @@ const LibraryPage = () => {
                 readingProcess: getReadingProcess(manga._id)
             }));
 
-        return {
-            reading: resolveNames(library.reading),
-            completed: resolveNames(library.completed),
-            re_reading: resolveNames(library.re_reading),
-        };
+            return {
+                reading: resolveNames(library.reading),
+                completed: resolveNames(library.completed),
+                re_reading: resolveNames(library.re_reading),
+            };
     };
     const filterAndSortLibrary = () => {
         const applyFilters = (mangas) =>
@@ -139,9 +146,9 @@ const LibraryPage = () => {
             }
         };
         return {
-            reading: applySort(applyFilters(library.current.reading)),
-            completed: applySort(applyFilters(library.current.completed)),
-            re_reading: applySort(applyFilters(library.current.re_reading)),
+            reading: applySort(applyFilters(library.current.reading)).slice(0, itemsToShow.reading),
+            completed: applySort(applyFilters(library.current.completed)).slice(0, itemsToShow.completed),
+            re_reading: applySort(applyFilters(library.current.re_reading)).slice(0, itemsToShow.re_reading),
         };
     };
 
@@ -210,6 +217,13 @@ const LibraryPage = () => {
         showNotiPopup(true, true, "Delete manga from library successfully");
         reload.current++;
     }
+    const handleLoadMore = (state) => {
+        setItemsToShow(prev => ({
+            ...prev,
+            [state]: prev.state + 4
+        }));
+        handleDisplayLibrary();
+    };
     const handleDisplayLibrary = () => {
         setFilterShow(false);
         setSortShow(false);
@@ -323,41 +337,53 @@ const LibraryPage = () => {
             <>
             {Object.entries(libraryShow).map(([readingState, mangas]) =>(<>
             <div className="text-3xl text-white font-bold mt-9 mb-3">{readingState.charAt(0).toUpperCase() + readingState.slice(1).replace('_', '-')}</div>
-            <div className="flex flex-wrap justify-start gap-12 w-full">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {mangas.map(manga => (
                 <div key={manga._id}>
-                    <div className="relative group">
-                        <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
-                        <img
-                            src={manga.cover}
-                            alt={manga.name}
-                            onClick={() => {
-                                navigate(`/mangas/${manga._id}`);
-                            }}
-                            className="h-72 w-48 cursor-pointer"
-                        />
-                        <div className="absolute top-0 right-0 bg-light-blue text-white text-sm font-bold px-2 py-4" style={{
-                            clipPath: "polygon(0% 0%, 100% 0%, 100% 70%, 50% 100%, 0% 70%)"
-                        }}>
-                            {readingState === 'completed'? '100%':readingProcess[manga._id] + '%'}
+                    <div className="w-48 h-72">
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
+                            <img
+                                src={manga.cover}
+                                alt={manga.name}
+                                onClick={() => {
+                                    navigate(`/mangas/${manga._id}`);
+                                }}
+                                className="h-full w-full cursor-pointer"
+                            />
+                            <div className="absolute top-0 right-0 bg-light-blue text-white text-sm font-bold px-2 py-4" style={{
+                                clipPath: "polygon(0% 0%, 100% 0%, 100% 70%, 50% 100%, 0% 70%)"
+                            }}>
+                                {readingState === 'completed'? '100%':readingProcess[manga._id] + '%'}
+                            </div>
+                            <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={() => setMenuShow(manga._id)} /></div>
+                            {menuShow === manga._id && (
+                                <div
+                                    className="absolute bottom-2 right-1 p-1 flex justify-between space-x-4 text-xl bg-light-blue rounded-md"
+                                    onBlur={() => setMenuShow(false)}
+                                    tabIndex={0}
+                                >
+                                    <FaTrashCan className="hover:text-blue cursor-pointer" title="Delete from Library" onClick={() => handleDeleteFromLibrary(manga._id, `${readingState}`)} />
+                                    <FaCheckCircle className="hover:text-blue cursor-pointer" title= "Move to Completed" onClick={() => handleUpdateLibrary(manga._id, 'completed')} />
+                                    <FaRecycle className="hover:text-blue cursor-pointer" title="Move to Re-reading" onClick={() => handleUpdateLibrary(manga._id, 're_reading')} />
+                                    <FaBookmark className="hover:text-blue cursor-pointer" title="Move to Reading" onClick={() => handleUpdateLibrary(manga._id, 'reading')} />
+                                    <FaBookOpen className="hover:text-blue cursor-pointer" title="Read at current reading point" onClick={() => handleReadLatest(manga._id)} />
+                                    <FaEllipsisV className="hover:text-blue cursor-pointer" onClick={() => setMenuShow(null)} />
+                                </div>)}
                         </div>
-                        <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={() => setMenuShow(manga._id)} /></div>
-                        {menuShow === manga._id && (
-                            <div
-                                className="absolute bottom-2 right-1 p-1 flex justify-between space-x-4 text-xl bg-light-blue rounded-md"
-                                onBlur={() => setMenuShow(false)}
-                                tabIndex={0}
-                            >
-                                <FaTrashCan className="hover:text-blue cursor-pointer" title="Delete from Library" onClick={() => handleDeleteFromLibrary(manga._id, `${readingState}`)} />
-                                <FaCheckCircle className="hover:text-blue cursor-pointer" title= "Move to Completed" onClick={() => handleUpdateLibrary(manga._id, 'completed')} />
-                                <FaRecycle className="hover:text-blue cursor-pointer" title="Move to Re-reading" onClick={() => handleUpdateLibrary(manga._id, 're_reading')} />
-                                <FaBookmark className="hover:text-blue cursor-pointer" title="Move to Reading" onClick={() => handleUpdateLibrary(manga._id, 'reading')} />
-                                <FaBookOpen className="hover:text-blue cursor-pointer" title="Read at current reading point" onClick={() => handleReadLatest(manga._id)} />
-                                <FaEllipsisV className="hover:text-blue cursor-pointer" onClick={() => setMenuShow(null)} />
-                            </div>)}
                     </div>
                 </div>))}
-            </div></>))}
+            </div>
+            {library.current[readingState].length > itemsToShow[readingState] && (
+            <button 
+                onClick={() => handleLoadMore(readingState)}
+                className="mt-4 px-4 py-2 bg-light-blue text-white rounded-md hover:bg-blue"
+            >
+                Load More
+            </button>
+            )}
+            </>))}
+
             </>}
             <footer>
                 <MobileNavigationBar />
