@@ -3,6 +3,7 @@ import 'reactjs-popup/dist/index.css';
 import './RatingPopup.css';
 import styles from './RatingForm.module.css';
 import { FaStar } from 'react-icons/fa6';
+import { MdStars } from "react-icons/md";
 import { useState, useEffect } from 'react';
 import { getRatings, sendRating, getOneRating } from '../../service/mangaService.js';
 import NotiPopup from "../NotiPopup";
@@ -134,7 +135,10 @@ const RatingPopup = ({ loggedIn, mangaID }) => {
                         className="rating-popup"
                     >
                         <form className={styles.ratingForm}>
-                            <div>Rate</div>
+                            <div className={styles.title}>
+                                <MdStars />
+                                Rate
+                            </div>
                             <div>
                                 <div className={styles.overallRating}>
                                     <span>Overall Rating:</span> <span className={styles.idkWhatToNameThis}>{calAvgRating(ratings)}<FaStar className={styles.activeStar} /></span><span className={styles['white-50-opac']}>({ratings.length.toLocaleString()} ratings)</span>
