@@ -376,3 +376,13 @@ export const deleteMe = async () => {
         return getErrorMessage(error);
     }
 };
+
+export const getUserById = async (id) => {
+    try{
+        const response = await axios.get(API + `${id}`);
+        return { status: response.status, data: response.data };
+    }
+    catch (error) {
+        return getErrorMessage(error);
+    }
+}

@@ -26,7 +26,7 @@ router.route('/approval')
     .get(authorize, userController.getApprovalRequests)
     .post(authorize, userController.requestApproval);
 router.route('/:id')
-    .get(authorize, userController.getUserById)
+    .get(userController.getUserById)
     .put(authorize, userController.changeUserRole);
 router.route('/login').post(userController.loginUser);
 router.route('/register').post(userController.registerUser);

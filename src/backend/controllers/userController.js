@@ -60,11 +60,6 @@ const getUsers = asyncHandler(async (req, res) => {
 });
 
 const getUserById = asyncHandler(async (req, res) => {
-    const { accountType } = await User.findById(req.user.id);
-    if (accountType !== 'admin') {
-        res.status(401);
-        throw new Error('You are not admin');
-    }
     const user = await User.findById(req.params.id).select('email name accountType avatar.url');
     if (!user) {
         res.status(400);

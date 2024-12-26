@@ -18,6 +18,7 @@ import SettingsPage from "./pages/SettingsPage.jsx";
 import Page401 from "./pages/status/401.jsx";
 import Page404 from "./pages/status/404.jsx";
 import useToken from "./service/useToken.js";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 function App() {
   const { token, setToken } = useToken();
@@ -44,6 +45,7 @@ function App() {
           <Route path="register" element={<RegisterPage />} />
           <Route path="me" element={<MyProfilePage />} />
           <Route path="library" element={<LibraryPage />} />
+          <Route path=":id" element={<ProfilePage/>} />
         </Route>
         <Route path="/search" element={<SearchPage />} />
         <Route path="/admin" element={<AdminPage />} />
