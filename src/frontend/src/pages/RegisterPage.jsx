@@ -20,7 +20,7 @@ const RegisterPage = () => {
       setPasswordError(`Password confirmation doesn't match`);
       return;
     }
-    const response = await postRegister(email, username, password, checkMail);
+    const response = await postRegister(email, username, password);
     if(response?.status === 400){
       setError(response.message);
       return;
