@@ -49,7 +49,7 @@ export default function MobileNavigationBar() {
             className="size-8 rounded-full object-fill"
           />
         </a>
-        <a href="/library" aria-label="Library">
+        <a href="/user/library" aria-label="Library">
           <IconBookmark className="size-8 fill-icon-white" />
         </a>
         <a href="/settings" aria-label="Settings">
