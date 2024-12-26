@@ -270,8 +270,8 @@ const LibraryPage = () => {
                 <div className="flex space-x-2"><FaBookmark /><div>Library</div></div>
                 <div className="flex space-x-3">
                     <div className="relative">
-                        <FaSlidersH className={`${filterShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleFilter} />
-                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10">
+                        <FaSlidersH title="Filter" className={`${filterShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleFilter} />
+                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10 rounded-md">
                             <div>Filter by authors</div>
                             <MySelect
                                 options={authorsRef.current}
@@ -300,8 +300,8 @@ const LibraryPage = () => {
                         }
                     </div>
                     <div className="relative">
-                        <FaList className={`${sortShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleSort} />
-                        {sortShow && (<div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 h-44 z-10">
+                        <FaList title="Sort" className={`${sortShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleSort} />
+                        {sortShow && (<div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 h-44 z-10 rounded-md">
                             <div>Sort by</div>
                             <div className="flex flex-col justify-between h-5/6">
                                 <select id="sortby" className="bg-darker-navy text-white text-sm focus:ring-white block w-full p-3 my-2" value={sortOption} onChange={handleSortChange}>
@@ -348,11 +348,11 @@ const LibraryPage = () => {
                                 onBlur={() => setMenuShow(false)}
                                 tabIndex={0}
                             >
-                                <FaTrashCan className="hover:text-blue cursor-pointer" onClick={() => handleDeleteFromLibrary(manga._id, `${readingState}`)} />
-                                <FaCheckCircle className="hover:text-blue cursor-pointer" onClick={() => handleUpdateLibrary(manga._id, 'completed')} />
-                                <FaRecycle className="hover:text-blue cursor-pointer" onClick={() => handleUpdateLibrary(manga._id, 're_reading')} />
-                                <FaBookmark className="hover:text-blue cursor-pointer" onClick={() => handleUpdateLibrary(manga._id, 'reading')} />
-                                <FaBookOpen className="hover:text-blue cursor-pointer" onClick={() => handleReadLatest(manga._id)} />
+                                <FaTrashCan className="hover:text-blue cursor-pointer" title="Delete from Library" onClick={() => handleDeleteFromLibrary(manga._id, `${readingState}`)} />
+                                <FaCheckCircle className="hover:text-blue cursor-pointer" title= "Move to Completed" onClick={() => handleUpdateLibrary(manga._id, 'completed')} />
+                                <FaRecycle className="hover:text-blue cursor-pointer" title="Move to Re-reading" onClick={() => handleUpdateLibrary(manga._id, 're_reading')} />
+                                <FaBookmark className="hover:text-blue cursor-pointer" title="Move to Reading" onClick={() => handleUpdateLibrary(manga._id, 'reading')} />
+                                <FaBookOpen className="hover:text-blue cursor-pointer" title="Read at current reading point" onClick={() => handleReadLatest(manga._id)} />
                                 <FaEllipsisV className="hover:text-blue cursor-pointer" onClick={() => setMenuShow(null)} />
                             </div>)}
                     </div>
