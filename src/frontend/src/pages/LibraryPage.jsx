@@ -19,7 +19,7 @@ const LibraryPage = () => {
     const library = useRef({ reading: [], re_reading: [], completed: [] });
     const [libraryShow, setLibraryShow] = useState({ reading: [], re_reading: [], completed: [] });
     const [loading, setLoading] = useState(true);
-    const [libraryLoading, setLibraryLoading] = useState(false);
+    const [libraryLoading, setLibraryLoading] = useState(true);
     const [menuShow, setMenuShow] = useState(false);
     const [filterShow, setFilterShow] = useState(false);
     const [sortShow, setSortShow] = useState(false);
@@ -224,9 +224,8 @@ const LibraryPage = () => {
     const handleLoadMore = (state) => {
         setItemsToShow(prev => ({
             ...prev,
-            [state]: prev.state + 4
+            [state]: prev[state] + perLoad
         }));
-        handleDisplayLibrary();
     };
     const handleDisplayLibrary = () => {
         setFilterShow(false);
@@ -253,6 +252,13 @@ const LibraryPage = () => {
         fetchLibrary();
         setLibraryLoading(false);
     }, [reload.current]);
+    useEffect(() => {
+        if (!libraryLoading) {
+            setLibraryLoading(true);
+            setLibraryShow(filterAndSortLibrary());
+            setLibraryLoading(false);
+        }
+    }, [itemsToShow]);
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
