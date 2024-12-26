@@ -77,6 +77,10 @@
   font-size: 1.2rem;
 }
 
+.minHeightAddNewBTN{
+  height: 100px;
+}
+
 .deleteChapterBTN {
   position: absolute;
   top: 0;

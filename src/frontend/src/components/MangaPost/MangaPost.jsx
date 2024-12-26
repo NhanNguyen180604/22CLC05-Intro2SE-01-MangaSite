@@ -1,19 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import styles from './MangaPost.module.css'
 
-function MangaPost({manga}) {
-    const {_id, name, cover, authors, categories} = manga
+function MangaPost({ manga }) {
+    const { _id, name, cover, authors, categories } = manga
     const navigate = useNavigate();
     const mangaClickHandler = () => {
-        navigate(`/mangas/${_id}`, );
+        navigate(`/mangas/${_id}`,);
     };
 
     return (
-        <div className={styles.wrapper}>
+        <div
+            className={styles.wrapper}
+            onClick={mangaClickHandler}
+        >
             <img
                 className={styles.cover}
                 src={cover}
-                onClick={mangaClickHandler}
             />
             <div className={styles.content}>
                 <div className={styles.title}>{name}</div>

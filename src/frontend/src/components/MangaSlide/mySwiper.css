@@ -1,0 +1,18 @@
+.swiper-pagination {
+  /* bottom: -10px !important; */
+  position: relative;
+  margin-top: 1rem;
+}
+
+.swiper-pagination-bullet {
+  background: var(--darker-navy) !important;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--light-blue) !important;
+}
+
+.swiper-slide{
+    height: unset !important;
+}

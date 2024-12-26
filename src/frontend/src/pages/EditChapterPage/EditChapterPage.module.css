@@ -163,6 +163,10 @@
     background: var(--sky-blue);
 }
 
+.minHeightPlaceholder{
+    min-height: 300px;
+}
+
 .warningMsg {
     font-weight: bold;
     color: var(--red);

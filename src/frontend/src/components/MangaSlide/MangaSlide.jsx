@@ -1,21 +1,44 @@
 import MangaPost from "../MangaPost";
 import styles from "./MangaSlide.module.css"
+import { Swiper, SwiperSlide } from "swiper/react";
+import 'swiper/css';
+import { Pagination, Mousewheel, Autoplay } from "swiper/modules";
+import 'swiper/css/pagination';
+import './mySwiper.css'
 
-// temporary component for homepage, fix this if you need to, or just delete it
-const MangaCarousel = (props) => {
+const MangaSlide = ({ title, mangas }) => {
 	return (
 		<div className={styles.mainContainer}>
-			<div className={styles.mangaListTitle}>{props.title}</div>
-			<div className={styles.mangaListContainer}>
-				{props.mangas && props.mangas.length ? (
-					props.mangas.map(manga => (
-						<MangaPost key={manga._id} manga={manga} />
-					))
-				) : (
-					<div>Nothing here</div>
-				)}
-			</div>
+			<div className={styles.mangaListTitle}>{title}</div>
+			{mangas.length ? (
+				<Swiper
+					direction="horizontal"
+					spaceBetween={20}
+					slidesPerView={3}
+					pagination={{
+						clickable: true,
+					}}
+					mousewheel={{
+						enabled: true,
+						forceToAxis: true,
+					}}
+					autoplay={{
+						delay: 5000,
+						pauseOnMouseEnter: true,
+					}}
+					modules={[Pagination, Mousewheel, Autoplay]}
+					loop={mangas.length > 3}
+				>
+					{mangas.map(manga => (
+						<SwiperSlide key={manga._id}>
+							<MangaPost manga={manga} />
+						</SwiperSlide>
+					))}
+				</Swiper>
+			) : (
+				<div>Nothing here</div>
+			)}
 		</div>
 	)
 }
-export default MangaCarousel
+export default MangaSlide
