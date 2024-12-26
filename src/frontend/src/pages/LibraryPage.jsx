@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react"
-import { FaBookmark, FaSlidersH, FaList, FaEllipsisV, FaBookOpen, FaCheckCircle, FaRecycle, FaSortAlphaDown, FaSortDown, FaSortAmountUp } from "react-icons/fa"
+import { FaBookmark, FaSlidersH, FaList, FaEllipsisV, FaBookOpen, FaCheckCircle, FaRecycle, FaSortAlphaDown, FaSortDown, FaSortAmountUp, FaSort, FaThLarge } from "react-icons/fa"
 import DesktopLogo from "../components/main/DesktopLogo.jsx"
 import DesktopNavigationBar from "../components/main/DesktopNavigationBar.jsx"
 import MainLayout from "../components/main/MainLayout.jsx"
@@ -38,6 +38,7 @@ const LibraryPage = () => {
         completed: perLoad,
         re_reading: perLoad
     });
+    const [displayMode, setDisplayMode] = useState('grid');
 
     const fetchLibrary = async () => {
         try {
@@ -95,6 +96,9 @@ const LibraryPage = () => {
         setFilterShow(false);
         setSortShow(prev => !prev);
     }
+    const toggleDisplayMode = () => {
+        setDisplayMode(prev => prev === 'grid' ? 'list' : 'grid');
+    };
     const resolveReferences = (library) => {
         const resolveNames = (mangas) =>
             mangas.map((manga) => ({
@@ -314,7 +318,7 @@ const LibraryPage = () => {
                         }
                     </div>
                     <div className="relative">
-                        <FaList title="Sort" className={`${sortShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleSort} />
+                        <FaSort title="Sort" className={`${sortShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleSort} />
                         {sortShow && (<div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 h-44 z-10 rounded-md">
                             <div>Sort by</div>
                             <div className="flex flex-col justify-between h-5/6">
@@ -330,6 +334,20 @@ const LibraryPage = () => {
                             </div>
                         </div>)}
                     </div>
+                    <div>
+                    {displayMode === 'grid' ? 
+                        <FaList 
+                            title="Switch to List View" 
+                            className="text-gray-400 hover:text-white cursor-pointer"
+                            onClick={toggleDisplayMode}
+                        /> :
+                        <FaThLarge 
+                            title="Switch to Grid View"
+                            className="text-gray-400 hover:text-white cursor-pointer"
+                            onClick={toggleDisplayMode}
+                        />
+                    }
+                    </div>
                 </div>
             </div>
             
@@ -337,7 +355,7 @@ const LibraryPage = () => {
             <>
             {Object.entries(libraryShow).map(([readingState, mangas]) =>(<>
             <div className="text-3xl text-white font-bold mt-9 mb-3">{readingState.charAt(0).toUpperCase() + readingState.slice(1).replace('_', '-')}</div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {displayMode === 'grid'?<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {mangas.map(manga => (
                 <div key={manga._id}>
                     <div className="w-48 h-72">
@@ -374,6 +392,44 @@ const LibraryPage = () => {
                     </div>
                 </div>))}
             </div>
+            :
+            <div className="flex flex-col space-y-4">
+                {mangas.map(manga => (
+                <div key={manga._id}>
+                    <div className="w-48 h-72">
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
+                            <img
+                                src={manga.cover}
+                                alt={manga.name}
+                                onClick={() => {
+                                    navigate(`/mangas/${manga._id}`);
+                                }}
+                                className="h-full w-full cursor-pointer"
+                            />
+                            <div className="absolute top-0 right-0 bg-light-blue text-white text-sm font-bold px-2 py-4" style={{
+                                clipPath: "polygon(0% 0%, 100% 0%, 100% 70%, 50% 100%, 0% 70%)"
+                            }}>
+                                {readingState === 'completed'? '100%':readingProcess[manga._id] + '%'}
+                            </div>
+                            <div className="absolute bottom-2 right-1 p-1 text-xl hover:text-blue cursor-pointer"><FaEllipsisV onClick={() => setMenuShow(manga._id)} /></div>
+                            {menuShow === manga._id && (
+                                <div
+                                    className="absolute bottom-2 right-1 p-1 flex justify-between space-x-4 text-xl bg-light-blue rounded-md"
+                                    onBlur={() => setMenuShow(false)}
+                                    tabIndex={0}
+                                >
+                                    <FaTrashCan className="hover:text-blue cursor-pointer" title="Delete from Library" onClick={() => handleDeleteFromLibrary(manga._id, `${readingState}`)} />
+                                    <FaCheckCircle className="hover:text-blue cursor-pointer" title= "Move to Completed" onClick={() => handleUpdateLibrary(manga._id, 'completed')} />
+                                    <FaRecycle className="hover:text-blue cursor-pointer" title="Move to Re-reading" onClick={() => handleUpdateLibrary(manga._id, 're_reading')} />
+                                    <FaBookmark className="hover:text-blue cursor-pointer" title="Move to Reading" onClick={() => handleUpdateLibrary(manga._id, 'reading')} />
+                                    <FaBookOpen className="hover:text-blue cursor-pointer" title="Read at current reading point" onClick={() => handleReadLatest(manga._id)} />
+                                    <FaEllipsisV className="hover:text-blue cursor-pointer" onClick={() => setMenuShow(null)} />
+                                </div>)}
+                        </div>
+                    </div>
+                </div>))}
+            </div>}
             {library.current[readingState].length > itemsToShow[readingState] && (
             <button 
                 onClick={() => handleLoadMore(readingState)}
