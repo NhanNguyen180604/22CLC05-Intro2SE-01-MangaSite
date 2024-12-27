@@ -187,7 +187,7 @@ const MyProfilePage = () => {
             <span><NotiPopup open={showDiscardPopUp} onClose={() => setShowDiscardPopUp(false)} success={true} message={"Discard changes successfully!"}></NotiPopup></span>
             <span><NotiPopup open={showSavingPopUp} onClose={() => setShowSavingPopUp(false)} success={true} message={"Save changes successfully!"}></NotiPopup></span>
             <span><NotiPopup open={showErrorSavingPopUp} onClose={() => setShowErrorSavingPopUp(false)} success={false} message={"Email or name cannot be blank!"}></NotiPopup></span>
-            <form className="mt-6 mx-auto w-full px-4" onSubmit={handleSave}>
+            <form className="mt-6 mx-auto w-full px-4 mb-20" onSubmit={handleSave}>
                 <div
                     className="mx-auto my-6 relative w-52 h-52 rounded-full overflow-hidden group"
                     onClick={handleImageClick}

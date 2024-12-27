@@ -172,9 +172,9 @@ const LibraryPage = () => {
             }
         };
         return {
-            reading: applySort(applyFilters(library.current.reading)).slice(0, itemsToShow.reading),
-            completed: applySort(applyFilters(library.current.completed)).slice(0, itemsToShow.completed),
-            re_reading: applySort(applyFilters(library.current.re_reading)).slice(0, itemsToShow.re_reading),
+            reading: applySort(applyFilters(library.current.reading)),
+            completed: applySort(applyFilters(library.current.completed)),
+            re_reading: applySort(applyFilters(library.current.re_reading)),
         };
     };
 
@@ -280,13 +280,6 @@ const LibraryPage = () => {
         fetchLibrary();
         setLibraryLoading(false);
     }, [reload.current]);
-    useEffect(() => {
-        if (!libraryLoading) {
-            setLibraryLoading(true);
-            setLibraryShow(filterAndSortLibrary());
-            setLibraryLoading(false);
-        }
-    }, [itemsToShow]);
     useEffect(() => {
         setItemsToShow({
             reading: perLoad,
@@ -398,7 +391,7 @@ const LibraryPage = () => {
             <div className="text-3xl text-white font-bold mt-9 mb-3">{readingState.charAt(0).toUpperCase() + readingState.slice(1).replace('_', '-')}</div>
             <div className="mb-20">
             {displayMode === 'grid'?<div className="flex justify-center w-full"><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
-                {mangas.map(manga => (
+                {mangas.slice(0, itemsToShow[readingState]).map(manga => (
                 <div key={manga._id}>
                         <div className="relative group">                           
                             <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"></div>
@@ -434,7 +427,7 @@ const LibraryPage = () => {
             </div></div>
             :
             <div className="flex flex-col space-y-12 mb-12">
-                {mangas.map(manga => (
+                {mangas.slice(0, itemsToShow[readingState]).map(manga => (
                 <div key={manga._id}>
                     <div className="flex">
                         <div className="h-full w-48">
@@ -486,7 +479,7 @@ const LibraryPage = () => {
                     </div>
                 </div>))}
             </div>}
-            {library.current[readingState].length > itemsToShow[readingState] && (
+            {libraryShow[readingState].length > itemsToShow[readingState] && (
             <button 
                 onClick={() => handleLoadMore(readingState)}
                 className="block mx-auto p-2 mt-5 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
@@ -494,7 +487,7 @@ const LibraryPage = () => {
                 Load More
             </button>
             )}
-            {perLoad < libraryShow[readingState].length && (
+            {perLoad < mangas.slice(0, itemsToShow[readingState]).length && (
             <button 
                 onClick={() => handleLoadLess(readingState)}
                 className="block mx-auto p-2 mt-5 bg-red text-sm text-white rounded-md hover:bg-light-red"
