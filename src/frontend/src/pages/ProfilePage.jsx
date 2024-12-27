@@ -4,7 +4,7 @@ import MainLayout from "../components/main/MainLayout.jsx";
 import MobileNavigationBar from "../components/main/MobileNavigationBar.jsx";
 import { getMangaByUploader } from '../service/mangaService.js';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getUserById } from "../service/userService.js";
 
 const useResponsivePerLoad = () => {
@@ -18,9 +18,9 @@ const useResponsivePerLoad = () => {
     useEffect(() => {
         const handleResize = () => {
             const width = window.innerWidth;
-            if (width < 768) setPerLoad(2);
-            else if (width < 1024) setPerLoad(3);
-            else setPerLoad(4);
+            if (width < 768) {setPerLoad(2)}
+            else if (width < 1024) {setPerLoad(3)}
+            else {setPerLoad(4)};
         };
 
         window.addEventListener('resize', handleResize);
@@ -40,12 +40,18 @@ const ProfilePage = () => {
     const perLoad = useResponsivePerLoad();
     const [perPage, setPerPage] = useState(perLoad);
     const [loading, setLoading] = useState(true);
+    const resize = useRef(0);
 
     const fetchData = async (local_page = 1, per_page = 20) => {
         const fetchManga = async () => {
             const mangaResponse = await getMangaByUploader(id, local_page, per_page);
             if (mangaResponse.status === 200) {
-                setMangas([...mangas, ...mangaResponse.mangas.mangas].slice(0, page*per_page));
+                if(page === 1){
+                    setMangas(mangaResponse.mangas.mangas);
+                }
+                else {
+                    setMangas([...mangas, ...mangaResponse.mangas.mangas]);
+                }
                 setTotalPages(mangaResponse.mangas.total_pages);
             }
         }
@@ -75,13 +81,14 @@ const ProfilePage = () => {
     }, []);
     useEffect(() => {
         setPerPage(perLoad);
+        if(page === 1){
+            resize.current++;
+        }
+        setPage(1);
     }, [perLoad]);
     useEffect(() => {
-        setPage(1);
-    }, [perPage])
-    useEffect(() => {
         fetchData(page, perPage);
-    }, [page]);
+    }, [page, resize.current]);
 
     return (
         <MainLayout>
