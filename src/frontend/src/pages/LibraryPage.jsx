@@ -489,7 +489,7 @@ const LibraryPage = () => {
             {library.current[readingState].length > itemsToShow[readingState] && (
             <button 
                 onClick={() => handleLoadMore(readingState)}
-                className="block w-1/5 mx-auto py-2 my-2 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
+                className="block mx-auto p-2 mt-5 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
             >
                 Load More
             </button>
@@ -497,7 +497,7 @@ const LibraryPage = () => {
             {perLoad < libraryShow[readingState].length && (
             <button 
                 onClick={() => handleLoadLess(readingState)}
-                className="block w-1/5 mx-auto py-2 my-2 bg-red text-sm text-white rounded-md hover:bg-light-red"
+                className="block mx-auto p-2 mt-5 bg-red text-sm text-white rounded-md hover:bg-light-red"
             >
                 Load Less
             </button>
