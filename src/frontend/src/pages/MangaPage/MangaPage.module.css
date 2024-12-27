@@ -23,6 +23,7 @@
 
 .genreList{
 	flex-wrap: wrap;
+	justify-content: unset;
 	gap: 5px;
 }
 

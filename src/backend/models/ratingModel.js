@@ -32,7 +32,7 @@ ratingSchema.post('save', async function () {
     const averageRating = stats.length > 0 ? stats[0].averageRating : 0;
 
     // update the manga's overall rating
-    await Manga.findByIdAndUpdate(mangaID, { overallRating: averageRating });
+    await Manga.findByIdAndUpdate(mangaID, { overallRating: averageRating }, { timestamps: false });
 });
 
 module.exports = mongoose.model('Rating', ratingSchema);
