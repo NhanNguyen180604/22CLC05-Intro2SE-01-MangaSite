@@ -246,7 +246,7 @@ const LibraryPage = () => {
     const handleLoadMore = (state) => {
         setItemsToShow(prev => ({
             ...prev,
-            [state]: prev[state] + perLoad*5
+            [state]: prev[state] + perLoad * 5
         }));
     };
     const handleLoadLess = (state) => {
@@ -330,7 +330,7 @@ const LibraryPage = () => {
                 <div className="flex space-x-3">
                     <div className="relative">
                         <FaSlidersH title="Filter" className={`${filterShow ? "text-white" : "text-gray-400"} hover:text-white`} onClick={toggleFilter} />
-                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-96 z-10 rounded-md">
+                        {filterShow && <div className="absolute right-0 mt-2 bg-darker-navy p-2 text-sm w-80 sm:w-96 z-10 rounded-md">
                             <div>Filter by authors</div>
                             <MySelect
                                 options={authorsRef.current}
@@ -396,6 +396,7 @@ const LibraryPage = () => {
             <>
             {Object.entries(libraryShow).map(([readingState, mangas]) =>(<>
             <div className="text-3xl text-white font-bold mt-9 mb-3">{readingState.charAt(0).toUpperCase() + readingState.slice(1).replace('_', '-')}</div>
+            <div className="mb-20">
             {displayMode === 'grid'?<div className="flex justify-center w-full"><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
                 {mangas.map(manga => (
                 <div key={manga._id}>
@@ -469,7 +470,6 @@ const LibraryPage = () => {
                             <div className="text-white text-3xl font-bold mb-3">{manga.name}</div>
                             <div className="text-white text-sm"><b>Authors:</b> {manga.authorNames.join(", ")}</div>
                             <div className="text-white text-sm"><b>Categories:</b> {manga.categoryNames.join(", ")}</div>
-                            <div className="text-white text-sm"><b>Description:</b> {manga.description||'None'}</div>
                             <div className="text-white text-sm"><b>Published date:</b> {manga.createdAt.split('T')[0]}</div>
                             <div className="w-1/2">
                                 <div className="relative w-full h-6 bg-gray-700 rounded-full overflow-hidden">
@@ -491,12 +491,12 @@ const LibraryPage = () => {
             {library.current[readingState].length > itemsToShow[readingState] && (
             <button 
                 onClick={() => handleLoadMore(readingState)}
-                className="block w-1/5 mx-auto py-2 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
+                className="block w-1/5 mx-auto py-2 mb-2 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
             >
                 Load More
             </button>
             )}
-            {perLoad < itemsToShow[readingState] && (
+            {perLoad < libraryShow[readingState].length && (
             <button 
                 onClick={() => handleLoadLess(readingState)}
                 className="block w-1/5 mx-auto py-2 bg-red text-sm text-white rounded-md hover:bg-light-red"
@@ -504,6 +504,7 @@ const LibraryPage = () => {
                 Load Less
             </button>
             )}
+            </div>
             
             </>))}
 
