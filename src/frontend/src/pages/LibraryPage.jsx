@@ -13,6 +13,28 @@ import { useNavigate } from "react-router-dom"
 import { getChapterList, getReadingHistory } from "../service/mangaService.js"
 import NotiPopup from "../components/NotiPopup/NotiPopup.jsx"
 
+const useResponsivePerLoad = () => {
+    const [perLoad, setPerLoad] = useState(() => {
+        const width = window.innerWidth;
+        if (width < 768) return 2;
+        if (width < 1024) return 3;
+        return 4;
+    });
+
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            if (width < 768) setPerLoad(2);
+            else if (width < 1024) setPerLoad(3);
+            else setPerLoad(4);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return perLoad;
+};
 
 const LibraryPage = () => {
     const blacklist = useRef();
@@ -32,7 +54,7 @@ const LibraryPage = () => {
     const [noti, setNoti] = useState({ open: false, success: null, message: null });
     const navigate = useNavigate();
     const reload = useRef(0);
-    const perLoad = 4;
+    const perLoad = useResponsivePerLoad();
     const [itemsToShow, setItemsToShow] = useState({
         reading: perLoad,
         completed: perLoad,
@@ -224,7 +246,13 @@ const LibraryPage = () => {
     const handleLoadMore = (state) => {
         setItemsToShow(prev => ({
             ...prev,
-            [state]: prev[state] + perLoad
+            [state]: prev[state] + perLoad*5
+        }));
+    };
+    const handleLoadLess = (state) => {
+        setItemsToShow(prev => ({
+            ...prev,
+            [state]: perLoad
         }));
     };
     const handleDisplayLibrary = () => {
@@ -259,6 +287,13 @@ const LibraryPage = () => {
             setLibraryLoading(false);
         }
     }, [itemsToShow]);
+    useEffect(() => {
+        setItemsToShow({
+            reading: perLoad,
+            completed: perLoad,
+            re_reading: perLoad
+        });
+    }, [perLoad]);
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -361,7 +396,7 @@ const LibraryPage = () => {
             <>
             {Object.entries(libraryShow).map(([readingState, mangas]) =>(<>
             <div className="text-3xl text-white font-bold mt-9 mb-3">{readingState.charAt(0).toUpperCase() + readingState.slice(1).replace('_', '-')}</div>
-            {displayMode === 'grid'?<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {displayMode === 'grid'?<div className="flex justify-center w-full"><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
                 {mangas.map(manga => (
                 <div key={manga._id}>
                     <div className="w-48 h-72">
@@ -397,7 +432,7 @@ const LibraryPage = () => {
                         </div>
                     </div>
                 </div>))}
-            </div>
+            </div></div>
             :
             <div className="flex flex-col space-y-3">
                 {mangas.map(manga => (
@@ -456,11 +491,20 @@ const LibraryPage = () => {
             {library.current[readingState].length > itemsToShow[readingState] && (
             <button 
                 onClick={() => handleLoadMore(readingState)}
-                className="block w-1/5 mx-auto mt-4 px-4 py-2 bg-light-blue text-white rounded-md hover:bg-blue"
+                className="block w-1/5 mx-auto py-2 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
             >
                 Load More
             </button>
             )}
+            {perLoad < itemsToShow[readingState] && (
+            <button 
+                onClick={() => handleLoadLess(readingState)}
+                className="block w-1/5 mx-auto py-2 bg-red text-sm text-white rounded-md hover:bg-light-red"
+            >
+                Load Less
+            </button>
+            )}
+            
             </>))}
 
             </>}
