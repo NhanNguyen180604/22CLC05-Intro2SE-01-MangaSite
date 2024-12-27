@@ -104,7 +104,7 @@ const ProfilePage = () => {
                 <img
                     src={user.avatar.url || 'https://placehold.co/100x100?text=User+Avatar'}
                     alt="Avatar"
-                    className="w-52 h-52 rounded-full overflow-hidden group object-cover mr-12"
+                    className="w-40 h-40 sm:w-52 sm:h-52 rounded-full overflow-hidden group object-cover mr-12"
                 />
                 <div className="text-lg text-white">
                     <div className="text-3xl mb-3 font-bold">{user.name}</div>
@@ -117,16 +117,18 @@ const ProfilePage = () => {
                 <div className="flex justify-center w-full">
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
                         {mangas.map(manga => (
-                                <div key={manga._id}>
-                                <img
-                                    src={manga.cover || 'https://placehold.co/100x100?text=Manga+Cover'}
-                                    alt={manga.name}
-                                    onClick={() => {
-                                        navigate(`/mangas/${manga._id}`);
-                                    }}
-                                    className="h-72 w-48 cursor-pointer"
-                                />
-                                <div className="text-lg font-bold">{manga.name}</div>
+                                <div>
+                                    <div key={manga._id}>
+                                    <img
+                                        src={manga.cover || 'https://placehold.co/100x100?text=Manga+Cover'}
+                                        alt={manga.name}
+                                        onClick={() => {
+                                            navigate(`/mangas/${manga._id}`);
+                                        }}
+                                        className="h-full w-full cursor-pointer"
+                                    />
+                                    <div className="text-lg font-bold">{manga.name}</div>
+                                    </div>
                                 </div>
                         ))}
                     </div>

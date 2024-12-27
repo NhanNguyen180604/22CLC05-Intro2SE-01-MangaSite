@@ -400,9 +400,8 @@ const LibraryPage = () => {
             {displayMode === 'grid'?<div className="flex justify-center w-full"><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
                 {mangas.map(manga => (
                 <div key={manga._id}>
-                    <div className="w-48 h-72">
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
+                        <div className="relative group">                           
+                            <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"></div>
                             <img
                                 src={manga.cover}
                                 alt={manga.name}
@@ -431,17 +430,16 @@ const LibraryPage = () => {
                                     <FaEllipsisV className="hover:text-blue cursor-pointer" onClick={() => setMenuShow(null)} />
                                 </div>)}
                         </div>
-                    </div>
-                </div>))}
+                    </div>))}
             </div></div>
             :
-            <div className="flex flex-col space-y-3">
+            <div className="flex flex-col space-y-12 mb-12">
                 {mangas.map(manga => (
                 <div key={manga._id}>
                     <div className="flex">
-                        <div className="w-48 h-72">
+                        <div className="h-full w-48">
                             <div className="relative group">
-                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 object-cover"></div>
+                                <div className="absolute inset-0 bg-white bg-opacity-30 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"></div>
                                 <img
                                     src={manga.cover}
                                     alt={manga.name}
@@ -491,7 +489,7 @@ const LibraryPage = () => {
             {library.current[readingState].length > itemsToShow[readingState] && (
             <button 
                 onClick={() => handleLoadMore(readingState)}
-                className="block w-1/5 mx-auto py-2 mb-2 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
+                className="block w-1/5 mx-auto py-2 my-2 bg-blue text-sm text-white rounded-md hover:bg-light-blue"
             >
                 Load More
             </button>
@@ -499,7 +497,7 @@ const LibraryPage = () => {
             {perLoad < libraryShow[readingState].length && (
             <button 
                 onClick={() => handleLoadLess(readingState)}
-                className="block w-1/5 mx-auto py-2 bg-red text-sm text-white rounded-md hover:bg-light-red"
+                className="block w-1/5 mx-auto py-2 my-2 bg-red text-sm text-white rounded-md hover:bg-light-red"
             >
                 Load Less
             </button>
