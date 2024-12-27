@@ -7,6 +7,29 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getUserById } from "../service/userService.js";
 
+const useResponsivePerLoad = () => {
+    const [perLoad, setPerLoad] = useState(() => {
+        const width = window.innerWidth;
+        if (width < 768) return 2;
+        if (width < 1024) return 3;
+        return 4;
+    });
+
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            if (width < 768) setPerLoad(2);
+            else if (width < 1024) setPerLoad(3);
+            else setPerLoad(4);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return perLoad;
+};
+
 const ProfilePage = () => {
     const [user, setUser] = useState({});
     const [page, setPage] = useState(1);
@@ -14,13 +37,15 @@ const ProfilePage = () => {
     const {id} = useParams();
     const navigate = useNavigate();
     const [mangas, setMangas] = useState([]);
+    const perLoad = useResponsivePerLoad();
+    const [perPage, setPerPage] = useState(perLoad);
     const [loading, setLoading] = useState(true);
 
-    const fetchData = async (local_page = 1, per_page = 4) => {
+    const fetchData = async (local_page = 1, per_page = 20) => {
         const fetchManga = async () => {
             const mangaResponse = await getMangaByUploader(id, local_page, per_page);
             if (mangaResponse.status === 200) {
-                setMangas([...mangas, ...mangaResponse.mangas.mangas]);
+                setMangas([...mangas, ...mangaResponse.mangas.mangas].slice(0, page*per_page));
                 setTotalPages(mangaResponse.mangas.total_pages);
             }
         }
@@ -32,21 +57,30 @@ const ProfilePage = () => {
         if(userResponse.data.message){
             return navigate('/404');
         }
-        console.log(userResponse)
         setUser(userResponse.data);
     }
     const loadMore = () => {
-        if (page > totalPages)
+        if (page > totalPages) {
             return;
+        }
 
         setPage(prev => prev + 1);
+    };
+    const loadLess = () => {
+        setPage(1);
     };
 
     useEffect(()=> {
         fetchUser();
     }, []);
     useEffect(() => {
-        fetchData(page);
+        setPerPage(perLoad);
+    }, [perLoad]);
+    useEffect(() => {
+        setPage(1);
+    }, [perPage])
+    useEffect(() => {
+        fetchData(page, perPage);
     }, [page]);
 
     return (
@@ -72,24 +106,31 @@ const ProfilePage = () => {
                 </div>
             </div>
             <div className="text-3xl text-white font-bold mt-6 mb-3">Publications</div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {mangas.map(manga => (
-                        <div>
-                        <img
-                            src={manga.cover || 'https://placehold.co/100x100?text=Manga+Cover'}
-                            alt={manga.name}
-                            onClick={() => {
-                                navigate(`/mangas/${manga._id}`);
-                            }}
-                            className="h-72 w-48 cursor-pointer"
-                        />
-                        <div className="text-lg font-bold">{manga.name}</div>
-                        </div>
-                ))}
+            <div className="flex justify-center w-full">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
+                    {mangas.map(manga => (
+                            <div key={manga._id}>
+                            <img
+                                src={manga.cover || 'https://placehold.co/100x100?text=Manga+Cover'}
+                                alt={manga.name}
+                                onClick={() => {
+                                    navigate(`/mangas/${manga._id}`);
+                                }}
+                                className="h-72 w-48 cursor-pointer"
+                            />
+                            <div className="text-lg font-bold">{manga.name}</div>
+                            </div>
+                    ))}
+                </div>
             </div>
             {page < totalPages && (
-                <div className="mx-auto mt-3 w-1/5 rounded-3xl text-xl text-center bg-blue hover:bg-light-blue p-2 cursor-pointer" onClick={loadMore}>
+                <div className="mx-auto mt-3 w-1/5 rounded-3xl text-sm text-center bg-blue hover:bg-light-blue p-2 cursor-pointer" onClick={loadMore}>
                     Load more
+                </div>
+            )}
+            {page > 1 && (
+                <div className="mx-auto mt-3 w-1/5 rounded-3xl text-sm text-center bg-red hover:bg-light-red p-2 cursor-pointer" onClick={loadLess}>
+                    Load less
                 </div>
             )}
             </>}
